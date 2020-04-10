@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="map.xsd">
+	<Region Label="华东区" Abbr="HD" Alies="East China">
+		<Province Label="上海市" Abbr="SH">
+			<City Label="上海" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="江苏省" Abbr="JS">
+			<City Label="南京" PC-Start="0" PC-End="0" />
+			<City Label="苏州" PC-Start="0" PC-End="0" />
+			<City Label="无锡" PC-Start="0" PC-End="0" />
+			<City Label="连云港" PC-Start="0" PC-End="0" />
+			<City Label="常州" PC-Start="0" PC-End="0" />
+			<City Label="盐城" PC-Start="0" PC-End="0" />
+			<City Label="宿迁" PC-Start="0" PC-End="0" />
+			<City Label="南通" PC-Start="0" PC-End="0" />
+			<City Label="徐州" PC-Start="0" PC-End="0" />
+			<City Label="扬州" PC-Start="0" PC-End="0" />
+			<City Label="镇江" PC-Start="0" PC-End="0" />
+			<City Label="泰州" PC-Start="0" PC-End="0" />
+			<City Label="淮安" PC-Start="0" PC-End="0" />
+			<City Label="昆山" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="浙江省">
+			<City Label="杭州" PC-Start="0" PC-End="0" />
+			<City Label="嘉兴" PC-Start="0" PC-End="0" />
+			<City Label="宁波" PC-Start="0" PC-End="0" />
+			<City Label="舟山" PC-Start="0" PC-End="0" />
+			<City Label="湖州" PC-Start="0" PC-End="0" />
+			<City Label="绍兴" PC-Start="0" PC-End="0" />
+			<City Label="衢州" PC-Start="0" PC-End="0" />
+			<City Label="金华" PC-Start="0" PC-End="0" />
+			<City Label="台州" PC-Start="0" PC-End="0" />
+			<City Label="温州" PC-Start="0" PC-End="0" />
+			<City Label="丽水" PC-Start="0" PC-End="0" />
+			<City Label="诸暨" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="安徽省">
+			<City Label="合肥" PC-Start="0" PC-End="0" />
+			<City Label="宿州" PC-Start="0" PC-End="0" />
+			<City Label="阜阳" PC-Start="0" PC-End="0" />
+			<City Label="滁州" PC-Start="0" PC-End="0" />
+			<City Label="马鞍山" PC-Start="0" PC-End="0" />
+			<City Label="芜湖" PC-Start="0" PC-End="0" />
+			<City Label="铜陵" PC-Start="0" PC-End="0" />
+			<City Label="安庆" PC-Start="0" PC-End="0" />
+			<City Label="黄山 " PC-Start="0" PC-End="0" />
+			<City Label="巢湖" PC-Start="0" PC-End="0" />
+			<City Label="宣城" PC-Start="0" PC-End="0" />
+			<City Label="淮北" PC-Start="0" PC-End="0" />
+			<City Label="毫州" PC-Start="0" PC-End="0" />
+			<City Label="池州" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="山东省">
+			<City Label="济南" PC-Start="0" PC-End="0" />
+			<City Label="德州" PC-Start="0" PC-End="0" />
+			<City Label="东营" PC-Start="0" PC-End="0" />
+			<City Label="淄博" PC-Start="0" PC-End="0" />
+			<City Label="潍坊" PC-Start="0" PC-End="0" />
+			<City Label="烟台" PC-Start="0" PC-End="0" />
+			<City Label="威海" PC-Start="0" PC-End="0" />
+			<City Label="青岛" PC-Start="0" PC-End="0" />
+			<City Label="日照" PC-Start="0" PC-End="0" />
+			<City Label="临沂" PC-Start="0" PC-End="0" />
+			<City Label="枣庄" PC-Start="0" PC-End="0" />
+			<City Label="泰安" PC-Start="0" PC-End="0" />
+			<City Label="济宁" PC-Start="0" PC-End="0" />
+			<City Label="莱芜" PC-Start="0" PC-End="0" />
+			<City Label="滨州" PC-Start="0" PC-End="0" />
+			<City Label="荷泽" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="江西省">
+			<City Label="南昌" PC-Start="0" PC-End="0" />
+			<City Label="九江" PC-Start="0" PC-End="0" />
+			<City Label="景德镇" PC-Start="0" PC-End="0" />
+			<City Label="鹰潭" PC-Start="0" PC-End="0" />
+			<City Label="新余" PC-Start="0" PC-End="0" />
+			<City Label="萍乡" PC-Start="0" PC-End="0" />
+			<City Label="漳州" PC-Start="0" PC-End="0" />
+			<City Label="上饶" PC-Start="0" PC-End="0" />
+			<City Label="抚州" PC-Start="0" PC-End="0" />
+			<City Label="宜春" PC-Start="0" PC-End="0" />
+			<City Label="吉安" PC-Start="0" PC-End="0" />
+			<City Label="赣州" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="福建省">
+			<City Label="福州" PC-Start="0" PC-End="0" />
+			<City Label="厦门" PC-Start="0" PC-End="0" />
+			<City Label="樟州" PC-Start="0" PC-End="0" />
+			<City Label="泉州" PC-Start="0" PC-End="0" />
+			<City Label="莆田" PC-Start="0" PC-End="0" />
+			<City Label="三明" PC-Start="0" PC-End="0" />
+			<City Label="南平" PC-Start="0" PC-End="0" />
+			<City Label="龙岩" PC-Start="0" PC-End="0" />
+			<City Label="宁德" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="台湾省">
+			<City Label="高雄" PC-Start="0" PC-End="0" />
+			<City Label="台北" PC-Start="0" PC-End="0" />
+			<City Label="基隆" PC-Start="0" PC-End="0" />
+		</Province>
+	</Region>
+	<Region Label="华南区" Abbr="HN" Alies="Sorth China">
+		<Province Label="广东省">
+			<City Label="深圳" PC-Start="0" PC-End="0" />
+			<City Label="广州" PC-Start="0" PC-End="0" />
+			<City Label="惠州" PC-Start="0" PC-End="0" />
+			<City Label="江门" PC-Start="0" PC-End="0" />
+			<City Label="开平" PC-Start="0" PC-End="0" />
+			<City Label="汕头" PC-Start="0" PC-End="0" />
+			<City Label="顺德" PC-Start="0" PC-End="0" />
+			<City Label="肇庆" PC-Start="0" PC-End="0" />
+			<City Label="中山" PC-Start="0" PC-End="0" />
+			<City Label="珠海" PC-Start="0" PC-End="0" />
+			<City Label="佛山" PC-Start="0" PC-End="0" />
+			<City Label="东莞" PC-Start="0" PC-End="0" />
+			<City Label="韶关" PC-Start="0" PC-End="0" />
+			<City Label="湛江" PC-Start="0" PC-End="0" />
+			<City Label="清远" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="广西自治区">
+			<City Label="南宁" PC-Start="0" PC-End="0" />
+			<City Label="北海" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="云南省">
+			<City Label="昆明" PC-Start="0" PC-End="0"/>
+			<City Label="玉溪" PC-Start="0" PC-End="0"/>
+			<City Label="西双版纳" PC-Start="0" PC-End="0"/>
+			<City Label="大理" PC-Start="0" PC-End="0"/>
+			<City Label="香格里拉" PC-Start="0" PC-End="0"/>
+			<City Label="丽江" PC-Start="0" PC-End="0"/>
+		</Province>
+		<Province Label="海南省">
+			<City Label="海口" PC-Start="0" PC-End="0" />
+			<City Label="三亚" PC-Start="0" PC-End="0" />
+			<City Label="琼海" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="香港特区">
+			<City Label="香港" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="澳门特区">
+			<City Label="澳门" PC-Start="0" PC-End="0" />
+		</Province>
+	</Region>
+	<Region Label="华北区" Abbr="HB" Alies="North China">
+		<Province Label="北京市">
+			<City Label="北京" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="天津市">
+			<City Label="天津" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="辽宁省">
+			<City Label="抚顺" PC-Start="0" PC-End="0" />
+			<City Label="沈阳" PC-Start="0" PC-End="0" />
+			<City Label="鞍山" PC-Start="0" PC-End="0" />
+			<City Label="本溪" PC-Start="0" PC-End="0" />
+			<City Label="大连" PC-Start="0" PC-End="0" />
+			<City Label="锦州" PC-Start="0" PC-End="0" />
+			<City Label="辽阳" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="河北省">
+			<City Label="石家庄" PC-Start="0" PC-End="0" />
+			<City Label="唐山" PC-Start="0" PC-End="0" />
+			<City Label="秦皇岛" PC-Start="0" PC-End="0" />
+			<City Label="邯郸" PC-Start="0" PC-End="0" />
+			<City Label="邢台" PC-Start="0" PC-End="0" />
+			<City Label="张家口" PC-Start="0" PC-End="0" />
+			<City Label="承德" PC-Start="0" PC-End="0" />
+			<City Label="廊坊" PC-Start="0" PC-End="0" />
+			<City Label="沧州" PC-Start="0" PC-End="0" />
+			<City Label="保定" PC-Start="0" PC-End="0" />
+			<City Label="衡水" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="山西省">
+			<City Label="晋城" PC-Start="0" PC-End="0" />
+			<City Label="晋中" PC-Start="0" PC-End="0" />
+			<City Label="太原" PC-Start="0" PC-End="0" />
+			<City Label="临汾" PC-Start="0" PC-End="0" />
+			<City Label="运城" PC-Start="0" PC-End="0" />
+			<City Label="忻州" PC-Start="0" PC-End="0" />
+			<City Label="长治" PC-Start="0" PC-End="0" />
+			<City Label="高平" PC-Start="0" PC-End="0" />
+			<City Label="朔州" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="内蒙古自治区">
+			<City Label="呼和浩特" PC-Start="0" PC-End="0" />
+			<City Label="包头" PC-Start="0" PC-End="0" />
+			<City Label="乌海" PC-Start="0" PC-End="0" />
+			<City Label="赤峰" PC-Start="0" PC-End="0" />
+			<City Label="通辽" PC-Start="0" PC-End="0" />
+			<City Label="鄂尔多斯" PC-Start="0" PC-End="0" />
+			<City Label="呼伦贝尔" PC-Start="0" PC-End="0" />
+			<City Label="锡林郭勒" PC-Start="0" PC-End="0" />
+			<City Label="兴安" PC-Start="0" PC-End="0" />
+			<City Label="巴彦淖尔" PC-Start="0" PC-End="0" />
+			<City Label="乌兰察布" PC-Start="0" PC-End="0" />
+			<City Label="满洲里" PC-Start="0" PC-End="0" />
+			<City Label="二连浩特" PC-Start="0" PC-End="0" />
+			<City Label="阿拉善盟" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="新疆自治区">
+			<City Label="乌鲁木齐" PC-Start="0" PC-End="0" />
+			<City Label="哈密" PC-Start="0" PC-End="0" />
+			<City Label="博州" PC-Start="0" PC-End="0" />
+			<City Label="哈克苏" PC-Start="0" PC-End="0" />
+		</Province>
+	</Region>
+	<Region Label="华中区" Abbr="HZ" Alies="Middle China">
+		<Province Label="重庆市">
+			<City Label="重庆" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="湖南省">
+			<City Label="长沙" PC-Start="0" PC-End="0" />
+			<City Label="株州" PC-Start="0" PC-End="0" />
+			<City Label="湘潭" PC-Start="0" PC-End="0" />
+			<City Label="衡阳" PC-Start="0" PC-End="0" />
+			<City Label="邵阳" PC-Start="0" PC-End="0" />
+			<City Label="岳阳" PC-Start="0" PC-End="0" />
+			<City Label="常德" PC-Start="0" PC-End="0" />
+			<City Label="张家界" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="湖北省">
+			<City Label="黄石" PC-Start="0" PC-End="0" />
+			<City Label="武汉" PC-Start="0" PC-End="0" />
+			<City Label="襄樊" PC-Start="0" PC-End="0" />
+			<City Label="荆州" PC-Start="0" PC-End="0" />
+			<City Label="宜昌" PC-Start="0" PC-End="0" />
+			<City Label="十堰" PC-Start="0" PC-End="0" />
+			<City Label="孝感" PC-Start="0" PC-End="0" />
+			<City Label="鄂州" PC-Start="0" PC-End="0" />
+			<City Label="黄冈" PC-Start="0" PC-End="0" />
+			<City Label="潜江" PC-Start="0" PC-End="0" />
+			<City Label="天门" PC-Start="0" PC-End="0" />
+			<City Label="随州" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="河南省">
+			<City Label="郑州" PC-Start="0" PC-End="0" />
+			<City Label="开封" PC-Start="0" PC-End="0" />
+			<City Label="洛阳" PC-Start="0" PC-End="0" />
+			<City Label="平顶山" PC-Start="0" PC-End="0" />
+			<City Label="安阳" PC-Start="0" PC-End="0" />
+			<City Label="鹤壁" PC-Start="0" PC-End="0" />
+			<City Label="新乡" PC-Start="0" PC-End="0" />
+			<City Label="焦作" PC-Start="0" PC-End="0" />
+			<City Label="濮阳" PC-Start="0" PC-End="0" />
+			<City Label="许昌" PC-Start="0" PC-End="0" />
+			<City Label="漯河" PC-Start="0" PC-End="0" />
+			<City Label="三门峡" PC-Start="0" PC-End="0" />
+			<City Label="南阳" PC-Start="0" PC-End="0" />
+			<City Label="商丘" PC-Start="0" PC-End="0" />
+		</Province>
+		<Province Label="四川省">
+			<City Label="成都" PC-Start="0" PC-End="0" />
+			<City Label="绵阳" PC-Start="0" PC-End="0" />
+			<City Label="广安" PC-Start="0" PC-End="0" />
+		</Province>
+	</Region>
+</xMap>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Kevin MOU (AXESOL) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="xMap">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Region" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Region">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Province" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Label" type="xs:string" use="required"/>
+			<xs:attribute name="Abbr" type="xs:string"/>
+			<xs:attribute name="Alies" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Province">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="City" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Label" type="xs:string" use="required"/>
+			<xs:attribute name="Abbr" type="xs:string"/>
+			<xs:attribute name="Alies" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="City">
+		<xs:complexType>
+			<xs:attribute name="Label" type="xs:string" use="required"/>
+			<xs:attribute name="Abbr" type="xs:string"/>
+			<xs:attribute name="Alies" type="xs:string"/>
+			<xs:attribute name="PC-Start" type="xs:int" use="required"/>
+			<xs:attribute name="PC-End" type="xs:int" use="required"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

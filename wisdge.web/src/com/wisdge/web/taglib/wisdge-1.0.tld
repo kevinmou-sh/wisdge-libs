@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN" "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
+<taglib>
+
+	<tlib-version>1.0.1</tlib-version>
+	<jsp-version>1.2</jsp-version>
+	<short-name>Wisdge Web Template Taglib</short-name>
+
+	<uri>/wisdge</uri>
+
+	<display-name>Wisdge Taglib</display-name>
+	<description>
+		<![CDATA[Wisdge JSP Taglib]]>
+	</description>
+
+	<tag>
+		<name>abbr</name>
+		<tag-class>com.wisdge.web.taglib.AbbrTag</tag-class>
+		<body-content>empty</body-content>
+		<description>
+			<![CDATA[Abbreviate a string as special size]]>
+		</description>
+
+		<attribute>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[The string to use abbreviate]]>
+			</description>
+		</attribute>
+		<attribute>
+			<name>size</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[Set special size, default as 30]]>
+			</description>
+		</attribute>
+		<attribute>
+			<name>htmlencode</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[Transmit string as html encoding]]>
+			</description>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>fnabbr</name>
+		<tag-class>com.wisdge.web.taglib.FilenameAbbrTag</tag-class>
+		<body-content>empty</body-content>
+		<description>
+			<![CDATA[Abbreviate a filename string as special size]]>
+		</description>
+
+		<attribute>
+			<name>filename</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[The filename string to use abbreviate]]>
+			</description>
+		</attribute>
+		<attribute>
+			<name>size</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[Set special size, default as 30]]>
+			</description>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<name>contentType</name>
+		<tag-class>com.wisdge.web.taglib.ContentTypeTag</tag-class>
+		<body-content>empty</body-content>
+		<description>
+			<![CDATA[get file content type]]>
+		</description>
+
+		<attribute>
+			<name>filename</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[Filename]]>
+			</description>
+		</attribute>
+		<attribute>
+			<name>imgShow</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[show image of content type]]>
+			</description>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>html</name>
+		<tag-class>com.wisdge.web.taglib.HtmlEncoderTag</tag-class>
+		<body-content>empty</body-content>
+		<description>
+			<![CDATA[Transmit a string as html encoding]]>
+		</description>
+
+		<attribute>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[The string to use encoding]]>
+			</description>
+		</attribute>
+		<attribute>
+			<name>advance</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[Replace charest(13)]]>
+			</description>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>mutilabbr</name>
+		<tag-class>com.wisdge.web.taglib.MutilAbbrTag</tag-class>
+		<body-content>empty</body-content>
+		<description>
+			<![CDATA[Transmit a string as html encoding]]>
+		</description>
+
+		<attribute>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[The string to use encoding]]>
+			</description>
+		</attribute>
+		<attribute>
+			<name>size</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[Abbr string size, default as 30]]>
+			</description>
+		</attribute>
+		<attribute>
+			<name>rows</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[Abbr mutil rows, default as 1]]>
+			</description>
+		</attribute>
+		<attribute>
+			<name>advance</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>
+				<![CDATA[Replace charest(13)]]>
+			</description>
+		</attribute>
+	</tag>
+
+</taglib>

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<UbbDecoder lastModified="2007-09-11">
+	<regexitems>
+		<item tag="[img]">
+			<regex><![CDATA[\[img\](http|https|ftp):\/\/(.[^\[]*)\[\/img\]]]></regex>
+			<replacement><![CDATA[<a onfocus="this.blur()" href="$1://$2" target="blank"><img src="$1://$2" border="0" title="按此在新窗口浏览图片" onload="javascript:if(this.width>screen.width-300) this.width=screen.width-300"></a>]]></replacement>
+		</item>
+		<item tag="[fieldset=]">
+			<regex><![CDATA[\[fieldset=(.[^\[]*)\]]]></regex>
+			<replacement><![CDATA[<fieldset><legend>$1</legend>]]></replacement>
+		</item>
+		<item tag="[url]">
+			<regex><![CDATA[(\[url\])(.[^\[]*)(\[/url\])]]></regex>
+			<replacement><![CDATA[<a href="$2" target="blank">$2</a>]]></replacement>
+		</item>
+		<item tag="[url=]">
+			<regex><![CDATA[\[url=(.[^\[]*)\]]]></regex>
+			<replacement><![CDATA[<a href="$1" target="blank">]]></replacement>
+		</item>
+		<item tag="[email]">
+			<regex><![CDATA[(\[email\])(.*?)(\[\/email\])]]></regex>
+			<replacement><![CDATA[<a href="mailto:$2" target="blank">$2</a>]]></replacement>
+		</item>
+		<item tag="[email=]">
+			<regex><![CDATA[\[email=(.[^\[]*)\]]]></regex>
+			<replacement><![CDATA[<a href="mailto:$1" target="blank">]]></replacement>
+		</item>
+		<item tag="[QQ]">
+			<regex><![CDATA[\[qq=([1-9]*)\]([1-9]*)\[\/qq\]]]></regex>
+			<replacement><![CDATA[<a href="tencent://message/?uin=$2&Menu=yes" target="blank"><img border="0" src="http://wpa.qq.com/pa?p=1:$2:$1" title="点击这里给我发消息"></a>]]></replacement>
+		</item>
+		<item tag="[color]">
+			<regex><![CDATA[\[color=(.[^\[]*)\]]]></regex>
+			<replacement><![CDATA[<font color="$1">]]></replacement>
+		</item>
+		<item tag="[font]">
+			<regex><![CDATA[\[font=(.[^\[]*)\]]]></regex>
+			<replacement><![CDATA[<font face="$1">]]></replacement>
+		</item>
+		<item tag="[size]">
+			<regex><![CDATA[\[size=([1-7])\]]]></regex>
+			<replacement><![CDATA[<font size="$1">]]></replacement>
+		</item>
+		<item tag="[align]">
+			<regex><![CDATA[\[align=(center|left|right)\]]]></regex>
+			<replacement><![CDATA[<div align="$1">]]></replacement>
+		</item>
+		<item tag="[table]">
+			<regex><![CDATA[\[table=(.[^\[]*)\]]]></regex>
+			<replacement><![CDATA[<table width="$1">]]></replacement>
+		</item>
+		<item tag="[flash]">
+			<regex><![CDATA[(\[flash\])(http://.[^\[]*(.swf))(\[\/flash\])]]></regex>
+			<replacement><![CDATA[
+			<a href="$2" target="blank">
+				<img src="images/swf.gif" border="0" title="点击开新窗口欣赏该flash动画!" height="16" width="16">[全屏欣赏]
+			</a>
+			<br />
+			<center>
+				<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=4,0,2,0" 
+					classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="300" height="200">
+					<param name="movie" value="$2">
+					<param name="quality" value="high">
+					<embed src="$2" quality="high" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?p1_prod_version=shockwaveflash" type="application/x-shockwave-flash" width="300" height="200">$2</embed>
+				</object>
+			</center>
+		]]></replacement>
+		</item>
+		<item tag="[flash=w,h]">
+			<regex><![CDATA[(\[flash=*([0-9]*),*([0-9]*)\])(http://.[^\[]*(.swf))(\[\/flash\])]]></regex>
+			<replacement><![CDATA[
+			<a href="$4" target="blank">
+				<img src="images/swf.gif" border="0" title="点击开新窗口欣赏该flash动画!" height="16" width="16">[全屏欣赏]
+			</a>
+			<br />
+			<center>
+				<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=4,0,2,0" 
+					classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="$2" height="$3">
+					<param name="movie" value="$4">
+					<param name="quality" value="high">
+					<embed src="$4" quality="high" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?p1_prod_version=shockwaveflash" type="application/x-shockwave-flash" width="$2" height="$3">$4</embed>
+				</object>
+			</center>
+		]]></replacement>
+		</item>
+		<item tag="[mwv]">
+			<regex><![CDATA[\[wmv\](.[^\[]*)\[\/wmv]]]></regex>
+			<replacement><![CDATA[
+			<object align="middle" classid="clsid:22d6f312-b0f6-11d0-94ab-0080c74c7e95" class="object" id="mediaplayer" width="300" height="200" >
+				<param name="showstatusbar" value="-1">
+				<param name="filename" value="$1">
+				<embed type="application/x-oleobject" codebase="http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#version=5,1,52,701" flename="mp" src="$1"  width="300" height="100"></embed>
+			</object>
+		]]></replacement>
+		</item>
+		<item tag="[mwv=w,h]">
+			<regex><![CDATA[\[wmv=*([0-9]*),*([0-9]*)\](.[^\[]*)\[\/wmv]]]></regex>
+			<replacement><![CDATA[
+			<object align="middle" classid="clsid:22d6f312-b0f6-11d0-94ab-0080c74c7e95" class="object" id="mediaplayer" width="$1" height="$2" >
+				<param name="showstatusbar" value="-1">
+				<param name="filename" value="$3">
+				<embed type="application/x-oleobject" codebase="http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#version=5,1,52,701" flename="mp" src="$3"  width="$1" height="$2"></embed>
+			</object>
+		]]></replacement>
+		</item>
+		<item tag="[rm]">
+			<regex><![CDATA[\[rm\](.[^\[]*)\[\/rm]]]></regex>
+			<replacement><![CDATA[
+			<object classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa" class="object" id="raocx" width="300" height="200">
+				<param name="src" value="$1">
+				<param name="console" value="clip1">
+				<param name="controls" value="imagewindow">
+				<param name="autostart" value="true">
+			</object>
+			<br />
+			<object classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa" height="32" id="video2" width="300">
+				<param name="src" value="$1">
+				<param name="autostart" value="-1">
+				<param name="controls" value="controlpanel">
+				<param name="console" value="clip1">
+			</object>
+		]]></replacement>
+		</item>
+		<item tag="[rm=w,h]">
+			<regex><![CDATA[\[rm=*([0-9]*),*([0-9]*)\](.[^\[]*)\[\/rm]]]></regex>
+			<replacement><![CDATA[
+			<object classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa" class="object" id="raocx" width="$1" height="$2">
+				<param name="src" value="$3">
+				<param name="console" value="clip1"><param name="controls" value="imagewindow">
+				<param name="autostart" value="true">
+			</object>
+			<br />
+			<object classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa" height="32" id="video2" width="$1">
+				<param name="src" value="$3">
+				<param name="autostart" value="-1">
+				<param name="controls" value="controlpanel">
+				<param name="console" value="clip1">
+			</object>
+		]]></replacement>
+		</item>
+	</regexitems>
+	<replaceitems>
+		<item tag="[fieldset]">
+			<regex><![CDATA[[fieldset]]]></regex>
+			<replacement><![CDATA[<fieldset>]]></replacement>
+		</item>
+		<item tag="[/fieldset]">
+			<regex><![CDATA[[/fieldset]]]></regex>
+			<replacement><![CDATA[</fieldset>]]></replacement>
+		</item>
+		<item tag="[/url]">
+			<regex><![CDATA[[/url]]]></regex>
+			<replacement><![CDATA[</a>]]></replacement>
+		</item>
+		<item tag="[/email]">
+			<regex><![CDATA[[/email]]]></regex>
+			<replacement><![CDATA[</a>]]></replacement>
+		</item>
+		<item tag="[/color]">
+			<regex><![CDATA[[/color]]]></regex>
+			<replacement><![CDATA[</font>]]></replacement>
+		</item>
+		<item tag="[/size]">
+			<regex><![CDATA[[/size]]]></regex>
+			<replacement><![CDATA[</font>]]></replacement>
+		</item>
+		<item tag="[/font]">
+			<regex><![CDATA[[/font]]]></regex>
+			<replacement><![CDATA[</font>]]></replacement>
+		</item>
+		<item tag="[/align]">
+			<regex><![CDATA[[/align]]]></regex>
+			<replacement><![CDATA[</div>]]></replacement>
+		</item>
+		<item tag="[b]">
+			<regex><![CDATA[[b]]]></regex>
+			<replacement><![CDATA[<b>]]></replacement>
+		</item>
+		<item tag="[/b]">
+			<regex><![CDATA[[/b]]]></regex>
+			<replacement><![CDATA[</b>]]></replacement>
+		</item>
+		<item tag="[i]">
+			<regex><![CDATA[[i]]]></regex>
+			<replacement><![CDATA[<i>]]></replacement>
+		</item>
+		<item tag="[/i]">
+			<regex><![CDATA[[/i]]]></regex>
+			<replacement><![CDATA[</i>]]></replacement>
+		</item>
+		<item tag="[u]">
+			<regex><![CDATA[[u]]]></regex>
+			<replacement><![CDATA[<u>]]></replacement>
+		</item>
+		<item tag="[/u]">
+			<regex><![CDATA[[/u]]]></regex>
+			<replacement><![CDATA[</u>]]></replacement>
+		</item>
+		<item tag="[list]">
+			<regex><![CDATA[[list]]]></regex>
+			<replacement><![CDATA[<ul>]]></replacement>
+		</item>
+		<item tag="[list=1]">
+			<regex><![CDATA[[list=1]]]></regex>
+			<replacement><![CDATA[<ol type=1>]]></replacement>
+		</item>
+		<item tag="[list=a]">
+			<regex><![CDATA[[list=a]]]></regex>
+			<replacement><![CDATA[<ol type=a>]]></replacement>
+		</item>
+		<item tag="[list=A]">
+			<regex><![CDATA[[list=A]]]></regex>
+			<replacement><![CDATA[<ol type=A>]]></replacement>
+		</item>
+		<item tag="[*]">
+			<regex><![CDATA[[*]]]></regex>
+			<replacement><![CDATA[<li>]]></replacement>
+		</item>
+		<item tag="[/list]">
+			<regex><![CDATA[[/list]]]></regex>
+			<replacement><![CDATA[</ul></ol>]]></replacement>
+		</item>
+		<item tag="[indent]">
+			<regex><![CDATA[[indent]]]></regex>
+			<replacement><![CDATA[<blockquote>]]></replacement>
+		</item>
+		<item tag="[/indent]">
+			<regex><![CDATA[[/indent]]]></regex>
+			<replacement><![CDATA[</blockquote>]]></replacement>
+		</item>
+		<item tag="[code]">
+			<regex><![CDATA[[code]]]></regex>
+			<replacement><![CDATA[<code>]]></replacement>
+		</item>
+		<item tag="[/code]">
+			<regex><![CDATA[[/code]]]></regex>
+			<replacement><![CDATA[</code>]]></replacement>
+		</item>
+		<item tag="[quote]">
+			<regex><![CDATA[[quote]]]></regex>
+			<replacement><![CDATA[<div style="padding:5px 5px 5px 40px; background:#E2F2FF;border:1px solid #3CAAEC">]]></replacement>
+		</item>
+		<item tag="[/quote]">
+			<regex><![CDATA[[/quote]]]></regex>
+			<replacement><![CDATA[</div>]]></replacement>
+		</item>
+		<item tag="[table]">
+			<regex><![CDATA[[table]]]></regex>
+			<replacement><![CDATA[<table>]]></replacement>
+		</item>
+		<item tag="[tr]">
+			<regex><![CDATA[[tr]]]></regex>
+			<replacement><![CDATA[<tr>]]></replacement>
+		</item>
+		<item tag="[/tr]">
+			<regex><![CDATA[[/tr]]]></regex>
+			<replacement><![CDATA[</tr>]]></replacement>
+		</item>
+		<item tag="[td]">
+			<regex><![CDATA[[td]]]></regex>
+			<replacement><![CDATA[<td>]]></replacement>
+		</item>
+		<item tag="[/td]">
+			<regex><![CDATA[[/td]]]></regex>
+			<replacement><![CDATA[</td>]]></replacement>
+		</item>
+		<item tag="[/table]">
+			<regex><![CDATA[[/table]]]></regex>
+			<replacement><![CDATA[</table>]]></replacement>
+		</item>
+	</replaceitems>
+</UbbDecoder>

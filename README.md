@@ -1,3 +1,0 @@
-# wisdge
-
-Wisdge commons lib

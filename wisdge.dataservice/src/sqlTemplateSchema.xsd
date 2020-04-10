@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.wisdge.com/sqlTemplateSchema" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.wisdge.com/sqlTemplateSchema">
+	<xsd:element name="sqlQuery">
+		<xsd:annotation>
+			<xsd:documentation>SqlQuery Templates</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="workSet" maxOccurs="unbounded" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>SQL WorkSet</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="sql" minOccurs="0" maxOccurs="unbounded">
+								<xsd:complexType mixed="true">
+									<xsd:attribute name="name" type="xsd:string"></xsd:attribute>
+									<xsd:attribute name="type" type="xsd:string"></xsd:attribute>
+									<xsd:attribute name="version" type="xsd:string"></xsd:attribute>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+						<xsd:attribute name="name" type="xsd:string"></xsd:attribute>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="lastModified" type="xsd:dateTime"></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
