@@ -12,6 +12,7 @@
         <module>wisdge.utils</module>
         <module>wisdge.dataservice</module>
         <module>wisdge.web</module>
+        <module>wisdge.ezcell</module>
     </modules>
 
 
