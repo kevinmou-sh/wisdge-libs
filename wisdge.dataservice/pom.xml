@@ -6,11 +6,10 @@
 	<groupId>com.wisdge</groupId>
 	<artifactId>wisdge.dataservice</artifactId>
 	<version>1.4.6</version>
-	<name>com.wisdge.dataservice</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<springframework.version>5.2.4.RELEASE</springframework.version>
+		<springframework.version>5.2.5.RELEASE</springframework.version>
 		<fasterxml.version>2.10.3</fasterxml.version>
 	</properties>
 
