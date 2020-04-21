@@ -10,13 +10,16 @@ import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.KeyUtil;
 
 public class SM2PublicKey extends BCECPublicKey {
-	private static final long serialVersionUID = 1L;
-
-	public static final ASN1ObjectIdentifier ID_SM2_PUBKEY_PARAM = new ASN1ObjectIdentifier("1.2.156.10197.1.301");
+    public static final ASN1ObjectIdentifier ID_SM2_PUBKEY_PARAM = new ASN1ObjectIdentifier("1.2.156.10197.1.301");
 
     private boolean withCompression;
 
-    public SM2PublicKey(String algorithm, BCECPublicKey key) throws NoSuchFieldException, IllegalAccessException {
+    public SM2PublicKey(BCECPublicKey key) {
+        super(key.getAlgorithm(), key);
+        this.withCompression = false;
+    }
+
+    public SM2PublicKey(String algorithm, BCECPublicKey key) {
         super(algorithm, key);
         this.withCompression = false;
     }

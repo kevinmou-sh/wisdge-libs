@@ -52,5 +52,4 @@ public class SM2Cipher {
     public void setCipherText(byte[] cipherText) {
         this.cipherText = cipherText;
     }
-    
 }

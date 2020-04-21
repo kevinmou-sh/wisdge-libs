@@ -1,5 +1,6 @@
 package com.wisdge.utils.security.sm.cert;
 
+import com.wisdge.utils.security.sm.BCECUtil;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
@@ -12,8 +13,6 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-
-import com.wisdge.utils.security.sm.BCECUtil;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -67,8 +66,16 @@ public class SM2X509CertMaker {
             extUtils.createSubjectKeyIdentifier(SubjectPublicKeyInfo.getInstance(subPub.getEncoded())));
         v3CertGen.addExtension(Extension.authorityKeyIdentifier, false,
             extUtils.createAuthorityKeyIdentifier(SubjectPublicKeyInfo.getInstance(issPub.getEncoded())));
-        v3CertGen.addExtension(Extension.basicConstraints, false, new BasicConstraints(isCA));
-        v3CertGen.addExtension(Extension.keyUsage, false, keyUsage);
+
+        // RFC 5280 §4.2.1.9 Basic Contraints:
+        // Conforming CAs MUST include this extension in all CA certificates
+        // that contain public keys used to validate digital signatures on
+        // certificates and MUST mark the extension as critical in such
+        // certificates.
+        v3CertGen.addExtension(Extension.basicConstraints, isCA, new BasicConstraints(isCA));
+
+        // RFC 5280 §4.2.1.3 Key Usage: When present, conforming CAs SHOULD mark this extension as critical.
+        v3CertGen.addExtension(Extension.keyUsage, true, keyUsage);
 
         JcaContentSignerBuilder contentSignerBuilder = makeContentSignerBuilder(issPub);
         X509Certificate cert = new JcaX509CertificateConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME)
