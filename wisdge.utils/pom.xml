@@ -9,7 +9,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<springframework.version>5.2.4.RELEASE</springframework.version>
+		<springframework.version>5.2.5.RELEASE</springframework.version>
 	</properties>
 
 	<dependencies>
@@ -63,7 +63,7 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.60</version>
+			<version>1.64</version>
 		</dependency>
 
 	</dependencies>

@@ -1,5 +1,6 @@
 package com.wisdge.utils.security.sm.cert;
 
+import com.wisdge.utils.security.sm.cert.exception.InvalidX500NameException;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
@@ -14,7 +15,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-import com.wisdge.utils.security.sm.cert.exception.InvalidX500NameException;
 import java.security.PrivateKey;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,8 +28,7 @@ public class CommonUtil {
      * @return
      * @throws InvalidX500NameException
      */
-    @SuppressWarnings("rawtypes")
-	public static X500Name buildX500Name(Map<String, String> names) throws InvalidX500NameException {
+    public static X500Name buildX500Name(Map<String, String> names) throws InvalidX500NameException {
         if (names == null || names.size() == 0) {
             throw new InvalidX500NameException("names can not be empty");
         }

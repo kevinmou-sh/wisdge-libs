@@ -4,6 +4,7 @@ import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
+import org.junit.After;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -18,9 +19,9 @@ public class SM3Util extends GMBaseUtil {
         digest.doFinal(hash, 0);
         return hash;
     }
-    
+
     public static String hash(String src) {
-    	return ByteUtils.toHexString(hash(src.getBytes(StandardCharsets.UTF_8)));
+        return ByteUtils.toHexString(hash(src.getBytes(StandardCharsets.UTF_8)));
     }
 
     public static boolean verify(byte[] srcData, byte[] sm3Hash) {
@@ -31,9 +32,9 @@ public class SM3Util extends GMBaseUtil {
             return false;
         }
     }
-    
+
     public static boolean verify(String srcData, String sm3Hash) {
-    	return verify(srcData.getBytes(StandardCharsets.UTF_8), ByteUtils.fromHexString(sm3Hash));
+        return verify(srcData.getBytes(StandardCharsets.UTF_8), ByteUtils.fromHexString(sm3Hash));
     }
 
     /**
@@ -42,17 +43,17 @@ public class SM3Util extends GMBaseUtil {
      * @param key byte[] 密钥
      * @return
      */
-    public static byte[] hmac(byte[] data, byte[] key) {
+    public static byte[] hmac(byte[] key, byte[] srcData) {
         KeyParameter keyParameter = new KeyParameter(key);
         SM3Digest digest = new SM3Digest();
         HMac mac = new HMac(digest);
         mac.init(keyParameter);
-        mac.update(data, 0, data.length);
+        mac.update(srcData, 0, srcData.length);
         byte[] result = new byte[mac.getMacSize()];
         mac.doFinal(result, 0);
         return result;
     }
-    
+
     /**
      * hmac sm3 encrypt
      * @param message String 加密内容
@@ -60,12 +61,12 @@ public class SM3Util extends GMBaseUtil {
      * @return
      */
     public static String hmac(String message, String key) {
-    	return ByteUtils.toHexString(hmac(message.getBytes(StandardCharsets.UTF_8), key.getBytes(StandardCharsets.UTF_8)));
+        return ByteUtils.toHexString(hmac(message.getBytes(StandardCharsets.UTF_8), key.getBytes(StandardCharsets.UTF_8)));
     }
-    
+
     @Test
     public void testHashAndVerify() {
-	   	String message = "simida😈中国";
+        String message = "simida😈中国";
         try {
             String hash = SM3Util.hash(message);
             System.out.println("SM3: " + hash);
@@ -75,15 +76,15 @@ public class SM3Util extends GMBaseUtil {
         }
     }
 
+    @After
     public void testHmacSM3() {
-	   	String message = "simida😈中国";
-	   	String key = "letmein0308";
-       try {
+        String message = "simida😈中国";
+        String key = "letmein0308";
+        try {
             String hmac = SM3Util.hmac(message, key);
             System.out.println("SM3-hmac:" + hmac);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }
