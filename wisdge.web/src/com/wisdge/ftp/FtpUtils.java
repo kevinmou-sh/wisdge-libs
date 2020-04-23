@@ -1,11 +1,6 @@
 package com.wisdge.ftp;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.Socket;
@@ -159,6 +154,21 @@ public class FtpUtils {
 	}
 
 	/**
+	 * Retrieve input stream from FTP/FTPS server
+	 * @param ftpClient
+	 * @param remote
+	 * @return
+	 * @throws IOException
+	 * @throws FTPException
+	 */
+	public static InputStream retrieveStream(FTPClient ftpClient, String remote) throws IOException {
+		String encodeRemote = new String(remote.getBytes(StandardCharsets.UTF_8), SERVER_CHARSET);
+		ftpClient.setBufferSize(1024);
+		ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+		return ftpClient.retrieveFileStream(encodeRemote);
+	}
+
+	/**
 	 * Retrieve file from SFTP server
 	 * @param sftp
 	 * @param remote
@@ -174,6 +184,18 @@ public class FtpUtils {
 		} finally {
 			IOUtils.closeQuietly(baos);
 		}
+	}
+
+	/**
+	 * Retrieve input stream from SFTP server
+	 * @param sftp
+	 * @param remote
+	 * @return
+	 * @throws SftpException
+	 * @throws IOException
+	 */
+	public static InputStream retrieveStream(ChannelSftp sftp, String remote) throws SftpException, IOException {
+		return sftp.get(remote);
 	}
 
 	public static void storeFile(FTPConfig config, String remote, byte[] data) throws SftpException, JSchException, SocketException, IOException, FTPException {
