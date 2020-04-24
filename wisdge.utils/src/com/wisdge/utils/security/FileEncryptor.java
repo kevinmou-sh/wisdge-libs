@@ -80,7 +80,6 @@ public class FileEncryptor {
 		byte[] buffer = new byte[1024];
 		int r;
 		while ((r = bais.read(buffer)) >= 0) {
-			System.out.println();
 			cos.write(buffer, 0, r);
 		}
 		cos.close();
@@ -88,6 +87,13 @@ public class FileEncryptor {
 		byte[] data = baos.toByteArray();
 		baos.close();
 		return data;
+	}
+
+	public CipherOutputStream getCipherOutputStream(OutputStream os) throws Exception {
+		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		cipher.init(Cipher.DECRYPT_MODE, this.key);
+		CipherOutputStream cos = new CipherOutputStream(os, cipher);
+		return cos;
 	}
 
 	/**
