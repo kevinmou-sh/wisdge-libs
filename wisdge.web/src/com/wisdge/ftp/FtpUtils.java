@@ -198,7 +198,7 @@ public class FtpUtils {
 		return sftp.get(remote);
 	}
 
-	public static void storeFile(FTPConfig config, String remote, byte[] data) throws SftpException, JSchException, SocketException, IOException, FTPException {
+	public static void storeFile(FTPConfig config, String remote, byte[] data) throws SftpException, JSchException, IOException, FTPException {
 		if (config.isSsh()) {
 			ChannelSftp sftp = getChannel(config);
 			try {
@@ -216,6 +216,24 @@ public class FtpUtils {
 		}
 	}
 
+	public static void storeStream(FTPConfig config, String remote, InputStream inputStream) throws SftpException, JSchException, IOException, FTPException {
+		if (config.isSsh()) {
+			ChannelSftp sftp = getChannel(config);
+			try {
+				storeStream(sftp, remote, inputStream);
+			} finally {
+				closeChannel(sftp);
+			}
+		} else {
+			FTPClient ftpClient = getClient(config);
+			try {
+				storeStream(ftpClient, remote, inputStream);
+			} finally {
+				ftpClient.disconnect();
+			}
+		}
+	}
+
 	/**
 	 * Store file into FTP/FTPS server
 	 * @param ftpClient
@@ -225,6 +243,11 @@ public class FtpUtils {
 	 * @throws FTPException
 	 */
 	public static void storeFile(FTPClient ftpClient, String remote, byte[] data) throws IOException, FTPException {
+		ByteArrayInputStream bais = new ByteArrayInputStream(data);
+		storeStream(ftpClient, remote, bais);
+	}
+
+	public static void storeStream(FTPClient ftpClient, String remote, InputStream inputStream) throws IOException, FTPException {
 		String encodeRemote = new String(remote.getBytes(StandardCharsets.UTF_8), SERVER_CHARSET);
 		String path = FilenameUtils.getPath(encodeRemote);
 		String saveName = FilenameUtils.getName(encodeRemote);
@@ -237,13 +260,10 @@ public class FtpUtils {
 
 		ftpClient.setBufferSize(1024);
 		ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-		ByteArrayInputStream bais = new ByteArrayInputStream(data);
-		try {
-			if (! ftpClient.storeFile(saveName, bais)) {
+		try (InputStream source = inputStream) {
+			if (! ftpClient.storeFile(saveName, source)) {
 				throw new FTPException("Store file faild: " + remote);
 			}
-		} finally {
-			IOUtils.closeQuietly(bais);
 		}
 	}
 
@@ -255,18 +275,20 @@ public class FtpUtils {
 	 * @throws SftpException
 	 * @throws UnsupportedEncodingException
 	 */
-	public static void storeFile(ChannelSftp sftp, String remote, byte[] data) throws SftpException, UnsupportedEncodingException {
+	public static void storeFile(ChannelSftp sftp, String remote, byte[] data) throws SftpException, IOException {
+		ByteArrayInputStream bais = new ByteArrayInputStream(data);
+		storeStream(sftp, remote, bais);
+	}
+
+	public static void storeStream(ChannelSftp sftp, String remote, InputStream inputStream) throws SftpException, IOException {
 		String path = FilenameUtils.getPath(remote);
 		sftp.cd("/");
 		if (! StringUtils.isEmpty(path)) {
 			cwd(sftp, path);
 		}
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(data);
-		try {
-			sftp.put(bais, remote, ChannelSftp.OVERWRITE);
-		} finally {
-			IOUtils.closeQuietly(bais);
+		try (InputStream source = inputStream) {
+			sftp.put(source, remote, ChannelSftp.OVERWRITE);
 		}
 	}
 
