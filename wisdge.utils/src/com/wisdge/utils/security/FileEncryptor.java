@@ -122,6 +122,13 @@ public class FileEncryptor {
 		out.close();
 	}
 
+	public CipherInputStream getCipherInputStream(InputStream is) throws Exception {
+		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		cipher.init(Cipher.ENCRYPT_MODE, this.key);
+		CipherInputStream cis = new CipherInputStream(is, cipher);
+		return cis;
+	}
+
 	/**
 	 * 文件采用DES算法解密文件
 	 * 
