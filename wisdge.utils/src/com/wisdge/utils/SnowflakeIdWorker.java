@@ -145,7 +145,7 @@ public class SnowflakeIdWorker {
         return System.currentTimeMillis();
     }
 
-    public long getWorkId(long snowflakeId) {
+    public long getWorkerId(long snowflakeId) {
         return snowflakeId >> workerIdShift & ~(-1L << workerIdBits);
     }
 
@@ -163,7 +163,7 @@ public class SnowflakeIdWorker {
             System.out.println(id);
         }
 
-        System.out.println(idWorker.getWorkId(47832648100114445L));
+        System.out.println(idWorker.getWorkerId(47832648100114445L));
         System.out.println(idWorker.getDatacenterId(47832648100114446L));
     }
 }
