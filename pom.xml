@@ -8,6 +8,11 @@
     <artifactId>wisdge.lib</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
     <modules>
         <module>wisdge.utils</module>
         <module>wisdge.dataservice</module>

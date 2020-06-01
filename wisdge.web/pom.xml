@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.wisdge</groupId>
 	<artifactId>wisdge.web</artifactId>
-	<version>1.7.3.1</version>
+	<version>1.8</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<springframework.version>5.2.5.RELEASE</springframework.version>
+		<springframework.version>5.2.6.RELEASE</springframework.version>
 	</properties>
 	
 	<dependencies>
@@ -52,12 +52,12 @@
 		<dependency>
 			<groupId>com.wisdge</groupId>
 			<artifactId>wisdge.utils</artifactId>
-			<version>1.6.3.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.wisdge</groupId>
 			<artifactId>wisdge.dataservice</artifactId>
-			<version>1.4.6</version>
+			<version>1.8</version>
 		</dependency>
 	</dependencies>
 
