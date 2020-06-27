@@ -1,10 +1,8 @@
 package com.wisdge.dataservice.sql;
 
-import java.util.List;
-
 public class SqlTemplate {
     private String sql;
-    private List<WhereExpress> expresses;
+    private String process;
 
     public String getSql() {
         return sql;
@@ -14,33 +12,16 @@ public class SqlTemplate {
         this.sql = sql;
     }
 
-    public List<WhereExpress> getExpresses() {
-        return expresses;
+    public String getProcess() {
+        return process;
     }
 
-    public void setExpresses(List<WhereExpress> expresses) {
-        this.expresses = expresses;
-    }
-}
-
-
-class WhereExpress {
-    private String expression;
-    private String fragment;
-
-    public String getExpression() {
-        return expression;
+    public void setProcess(String process) {
+        this.process = process;
     }
 
-    public void setExpression(String expression) {
-        this.expression = expression;
-    }
-
-    public String getFragment() {
-        return fragment;
-    }
-
-    public void setFragment(String fragment) {
-        this.fragment = fragment;
+    public SqlTemplate(String sql, String process) {
+        this.sql = sql;
+        this.process = process;
     }
 }

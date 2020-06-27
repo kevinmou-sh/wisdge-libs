@@ -18,17 +18,8 @@ import java.util.Map;
 
 public class SqlTemplateManager {
 	private static final Logger logger = LoggerFactory.getLogger(SqlTemplateManager.class);
-	private String dbType;
 	private List<String> sqls;
-	private Map<String, String> sqlTemplates = new HashMap<>();
-
-	public String getDbType() {
-		return dbType;
-	}
-
-	public void setDbType(String dbType) {
-		this.dbType = dbType;
-	}
+	private Map<String, SqlTemplate> sqlTemplates = new HashMap<>();
 
 	public List<String> getSqls() {
 		return sqls;
@@ -43,8 +34,7 @@ public class SqlTemplateManager {
 			sqls = new ArrayList<>();
 
 		for(String sqlFile:sqls) {
-			System.out.println(this.getClass().getResource(""));
-			try (InputStream is = this.getClass().getResourceAsStream(sqlFile)) {
+			try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(sqlFile)) {
 				Document document = DomUtils.parser(is);
 				List<Node> nodes = document.selectNodes("//workset");
 				for(Node node:nodes) {
@@ -57,31 +47,40 @@ public class SqlTemplateManager {
 						String dbType = element.attributeValue("db");
 						if (! StringUtils.isEmpty(dbType))
 							sqlKey += "." + dbType.toUpperCase();
-						sqlTemplates.put(sqlKey, element.getTextTrim());
+
+						sqlTemplates.put(sqlKey, new SqlTemplate(element.getTextTrim(), element.attributeValue("process")));
 					}
 				}
 			} catch (Exception e) {
 				logger.error("Load sql templates {} failed", sqlFile, e);
 			}
 		}
+		logger.debug(sqlTemplates.toString());
 	}
 
-	public String getTemplate(String sqlKey) throws SqlTemplateNullPointerException {
+
+	public SqlTemplate getTemplate(String sqlKey) throws SqlTemplateNullPointerException {
+		return getTemplate(sqlKey, "MYSQL");
+	}
+
+	public SqlTemplate getTemplate(String sqlKey, String dbType) throws SqlTemplateNullPointerException {
 		if (StringUtils.isEmpty(sqlKey))
 			throw new SqlTemplateNullPointerException(sqlKey);
 
-		if (! StringUtils.isEmpty(dbType)) {
+		if (!StringUtils.isEmpty(dbType)) {
 			String fullKey = sqlKey + "." + dbType.toUpperCase();
-			String sql = sqlTemplates.get(fullKey);
+			SqlTemplate sql = sqlTemplates.get(fullKey);
 			if (sql != null)
 				return sql;
 		}
 
-		if (! sqlTemplates.containsKey(sqlKey))
+		if (!sqlTemplates.containsKey(sqlKey))
 			throw new SqlTemplateNullPointerException(sqlKey);
 
-		String sql = sqlTemplates.get(sqlKey);
+		return sqlTemplates.get(sqlKey);
+	}
 
+	public static String replaceVariables(String sql, String dbType) {
 		if (dbType.equalsIgnoreCase("MYSQL")) {
 			return sql.replace("{C_GUID}", "UUID()")
 					.replace("{C_NOW}", "NOW()");
@@ -93,14 +92,5 @@ public class SqlTemplateManager {
 					.replace("'{C_NOW}'", "SYSDATE");
 		}
 		return sql;
-	}
-
-	@Test
-	public void test() {
-		SqlTemplateManager sqlTemplateManager = new SqlTemplateManager();
-		List xmls = new ArrayList();
-		xmls.add("test.xml");
-		sqlTemplateManager.setSqls(xmls);
-		sqlTemplateManager.initialize();
 	}
 }

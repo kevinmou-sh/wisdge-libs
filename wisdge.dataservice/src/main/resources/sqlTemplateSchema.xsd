@@ -17,6 +17,7 @@
 									<xsd:attribute name="name" type="xsd:string"></xsd:attribute>
 									<xsd:attribute name="db" type="xsd:string"></xsd:attribute>
 									<xsd:attribute name="version" type="xsd:string"></xsd:attribute>
+									<xsd:attribute name="process" type="xsd:string"></xsd:attribute>
 								</xsd:complexType>
 							</xsd:element>
 						</xsd:sequence>

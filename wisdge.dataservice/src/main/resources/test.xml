@@ -6,17 +6,12 @@
 		]]>
 	</sql>
 	 -->
-	<sql name="user.get">
+	<sql name="user.get" process="freemarker">
 		<![CDATA[
 SELECT * FROM T_USER WHERE USERNAME = ?
+WHERE 1=1
+	<#if status != null>AND STATUS = ${status}</#if>
+	<#if filter != null>AND FULLNAME LINK ${filter}</#if>
 		]]>
-		<where>
-			<if test="status != null">
-				STATUS = ${status}
-			</if>
-			<if test="filter != null">
-				AND FULLNAME LINK ${filter}
-			</if>
-		</where>
 	</sql>
 </workset>
