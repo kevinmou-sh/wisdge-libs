@@ -6,8 +6,8 @@
 
     <groupId>com.wisdge</groupId>
     <artifactId>wisdge.lib</artifactId>
-    <packaging>pom</packaging>
     <version>1.0.0</version>
+    <packaging>pom</packaging>
 
     <properties>
         <java.version>1.8</java.version>
@@ -18,6 +18,7 @@
         <module>wisdge.dataservice</module>
         <module>wisdge.web</module>
         <module>wisdge.ezcell</module>
+        <module>wisdge.common</module>
     </modules>
 
 </project>
