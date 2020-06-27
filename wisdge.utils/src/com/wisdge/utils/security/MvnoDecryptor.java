@@ -17,9 +17,7 @@ public class MvnoDecryptor {
         this.key = key;
     }
 
-    protected static String decrypt(String message, String key)
-            throws Exception {
-
+    protected static String decrypt(String message, String key) throws Exception {
         byte[] bytesrc = convertHexString(message);
         Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
         DESKeySpec desKeySpec = new DESKeySpec(key.getBytes("UTF-8"));
@@ -31,8 +29,7 @@ public class MvnoDecryptor {
         return new String(retByte);
     }
 
-    protected static byte[] encrypt(String message, String key)
-            throws Exception {
+    protected static byte[] encrypt(String message, String key) throws Exception {
         Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
         DESKeySpec desKeySpec = new DESKeySpec(key.getBytes("UTF-8"));
 

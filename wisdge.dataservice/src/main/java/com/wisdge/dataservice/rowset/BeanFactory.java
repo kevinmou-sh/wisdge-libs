@@ -1,4 +1,4 @@
-package com.wisdge.dataservice;
+package com.wisdge.dataservice.rowset;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -9,9 +9,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.wisdge.dataservice.rowset.ResultRowSet;
-import com.wisdge.dataservice.rowset.ResultSingleRow;
 
 /**
  * Auto ware POJO bean from ResultRowSet or ResultSignleRow

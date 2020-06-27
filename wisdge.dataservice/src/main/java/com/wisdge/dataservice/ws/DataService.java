@@ -15,9 +15,10 @@ import com.wisdge.dataservice.rowset.ResultSingleRow;
  * @see ResultSingleRow
  */
 @WebService
-public interface DataService2 {
+public interface DataService {
 	public static short SQLSERVER = 0;
 	public static short ORACLE = 1;
+	public static short MYSQL = 2;
 
 	/**
 	 * 查询记录到一个MAP集合中

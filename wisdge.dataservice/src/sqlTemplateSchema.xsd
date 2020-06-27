@@ -15,7 +15,7 @@
 							<xsd:element name="sql" minOccurs="0" maxOccurs="unbounded">
 								<xsd:complexType mixed="true">
 									<xsd:attribute name="name" type="xsd:string"></xsd:attribute>
-									<xsd:attribute name="type" type="xsd:string"></xsd:attribute>
+									<xsd:attribute name="db" type="xsd:string"></xsd:attribute>
 									<xsd:attribute name="version" type="xsd:string"></xsd:attribute>
 								</xsd:complexType>
 							</xsd:element>

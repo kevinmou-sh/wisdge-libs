@@ -100,7 +100,7 @@ public class JdbcFactory {
 		return jdbcEntries.containsKey(name);
 	}
 	
-	public void destory() {
+	public void destroy() {
 		Iterator<String> iter = jdbcEntries.keySet().iterator();
 		while(iter.hasNext()) {
 			String key = iter.next();

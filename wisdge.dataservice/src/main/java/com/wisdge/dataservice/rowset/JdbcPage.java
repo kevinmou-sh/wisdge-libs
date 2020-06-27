@@ -1,4 +1,4 @@
-package com.wisdge.dataservice;
+package com.wisdge.dataservice.rowset;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

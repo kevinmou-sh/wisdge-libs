@@ -1,4 +1,4 @@
-package com.wisdge.dataservice;
+package com.wisdge.dataservice.sql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
