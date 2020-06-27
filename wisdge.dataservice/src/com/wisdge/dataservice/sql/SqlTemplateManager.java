@@ -96,6 +96,10 @@ public class SqlTemplateManager {
 
 	@Test
 	public void test() {
-		
+		SqlTemplateManager sqlTemplateManager = new SqlTemplateManager();
+		List xmls = new ArrayList();
+		xmls.add("test.xml");
+		sqlTemplateManager.setSqls(xmls);
+		sqlTemplateManager.initialize();
 	}
 }

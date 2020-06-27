@@ -23,9 +23,6 @@ public class SqlFactory {
 
     public <T> T queryForObject(String sqlKey, Map<String, Object> whereExpress, Class<T> requiredType, Object...args) throws DataAccessException {
         String sql = sqlTemplateManager.getTemplate(sqlKey);
-        if (whereExpress != null) {
-            sql
-        }
         long start = new Date().getTime();
         logger.debug("[{}][SQL] {}", start, sql);
         T result = jdbcTemplate.queryForObject(sql, requiredType, args);
