@@ -25,13 +25,9 @@ import java.util.*;
 
 public class SqlFactory {
     private static Logger logger = LoggerFactory.getLogger(SqlFactory.class);
-    @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
     private PlatformTransactionManager transactionManager;
-    @Autowired
     private SqlTemplateManager sqlTemplateManager;
-    @Autowired
     private String dbType;
 
     public JdbcTemplate getJdbcTemplate() {
