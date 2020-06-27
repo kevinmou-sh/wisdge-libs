@@ -43,7 +43,8 @@ public class SqlTemplateManager {
 			sqls = new ArrayList<>();
 
 		for(String sqlFile:sqls) {
-			try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(sqlFile)) {
+			System.out.println(this.getClass().getResource(""));
+			try (InputStream is = this.getClass().getResourceAsStream(sqlFile)) {
 				Document document = DomUtils.parser(is);
 				List<Node> nodes = document.selectNodes("//workset");
 				for(Node node:nodes) {
