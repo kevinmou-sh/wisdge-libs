@@ -39,7 +39,6 @@ public class SqlTemplateManager {
 				List<Node> nodes = document.selectNodes("//workset");
 				for(Node node:nodes) {
 					String workset = ((Element) node).attributeValue("name");
-					logger.debug("Collection sql templates: {}", workset);
 					List<Node> sqls = node.selectNodes("sql");
 					for(Node sqlNode : sqls) {
 						Element element = (Element) sqlNode;
@@ -51,7 +50,7 @@ public class SqlTemplateManager {
 						sqlTemplates.put(sqlKey, new SqlTemplate(element.getTextTrim(), element.attributeValue("process")));
 					}
 				}
-				logger.debug("load sql templates {}, {} records", sqlFile, sqlTemplates.size());
+				logger.debug("Load sql templates {}, {} records", sqlFile, sqlTemplates.size());
 			} catch (Exception e) {
 				logger.error("Load sql templates {} failed", sqlFile, e);
 			}
