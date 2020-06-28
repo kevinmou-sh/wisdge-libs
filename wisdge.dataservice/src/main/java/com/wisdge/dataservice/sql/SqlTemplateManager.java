@@ -51,11 +51,11 @@ public class SqlTemplateManager {
 						sqlTemplates.put(sqlKey, new SqlTemplate(element.getTextTrim(), element.attributeValue("process")));
 					}
 				}
+				logger.debug("load sql templates {}, {} records", sqlFile, sqlTemplates.size());
 			} catch (Exception e) {
 				logger.error("Load sql templates {} failed", sqlFile, e);
 			}
 		}
-		logger.debug(sqlTemplates.toString());
 	}
 
 
