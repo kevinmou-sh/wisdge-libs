@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import com.wisdge.utils.StringUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -19,9 +21,8 @@ import org.w3c.dom.NodeList;
  * @version 1.2
  */
 public class FileExt {
-	private static Log log = LogFactory.getLog(FileExt.class);
+	private static Logger logger = LoggerFactory.getLogger(FileExt.class);
 	private static java.util.Vector<Map<String, String>> extVT = null;
-	private static boolean debug = true;
 
 	private static synchronized void initialize() {
 		buildConfig("FileExtType.xml");
@@ -32,10 +33,7 @@ public class FileExt {
 			return;
 		}
 
-		if (debug) {
-			log.info("Initialize file ext types XML.");
-		}
-		extVT = new java.util.Vector<Map<String, String>>();
+		extVT = new java.util.Vector<>();
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = dbf.newDocumentBuilder();
@@ -49,16 +47,11 @@ public class FileExt {
 				Map<String, String> suffix = new HashMap<String, String>();
 				suffix.put("ext", ((Element) nl.item(i)).getAttribute("ext"));
 				suffix.put("image", ((Element) nl.item(i)).getAttribute("image"));
-				suffix.put("contenttype", ((Element) nl.item(i)).getAttribute("contenttype"));
-				if (debug) {
-					System.out.println("ext=" + suffix.get("ext") + ", image=" + suffix.get("image") + ", contentType=" + suffix.get("contenttype"));
-				}
+				suffix.put("contentType", ((Element) nl.item(i)).getAttribute("contentType"));
 				extVT.add(suffix);
 			}
 		} catch (Exception e) {
-			if (debug) {
-				e.printStackTrace();
-			}
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -80,7 +73,7 @@ public class FileExt {
 		for (int i = 0; i < extVT.size(); i++) {
 			Map<String, String> suffix = extVT.get(i);
 			if (suffix.get("ext").equals(ext)) {
-				return suffix.get("contenttype");
+				return suffix.get("contentType");
 			}
 		}
 		return null;
@@ -112,7 +105,7 @@ public class FileExt {
 	 * @return String对象，LOGO图片文件名
 	 */
 	public static String getImgByExt(String ext) {
-		if (ext == null) {
+		if (StringUtils.isEmpty(ext)) {
 			return "shb.gif";
 		}
 

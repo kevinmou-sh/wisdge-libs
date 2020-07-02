@@ -98,7 +98,7 @@ public class VerifyFactory {
 		return timer.isAlive(code, sponsor, cancel);
 	}
 	
-	public void destory() {
+	public void destroy() {
 		timer.cancel();
 	}
 	

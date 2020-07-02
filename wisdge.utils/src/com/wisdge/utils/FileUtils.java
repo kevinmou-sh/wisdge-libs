@@ -11,6 +11,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import info.monitorenter.cpdetector.io.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -57,4 +59,24 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		}
 		throw new FileNotFoundException();
 	}
+
+
+	public static Charset detect(File file) throws IOException {
+		CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
+		detector.add(new ParsingDetector(false));
+		detector.add(JChardetFacade.getInstance());
+		detector.add(ASCIIDetector.getInstance());
+		detector.add(UnicodeDetector.getInstance());
+		return detector.detectCodepage(file.toURI().toURL());
+	}
+
+	public static Charset detect(InputStream inputStream, int length) throws IOException {
+		CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
+		detector.add(new ParsingDetector(false));
+		detector.add(JChardetFacade.getInstance());
+		detector.add(ASCIIDetector.getInstance());
+		detector.add(UnicodeDetector.getInstance());
+		return detector.detectCodepage(inputStream, length);
+	}
+
 }
