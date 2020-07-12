@@ -99,7 +99,7 @@ public class AliOSSStorage implements IFileStorageClient {
 			logger.debug("\t创建时间：{}", info.getBucket().getCreationDate());
 			logger.debug("\t用户标志：{}", info.getBucket().getOwner());
 		} catch (Exception e) {
-			logger.info("保险经纪不兼容getBucketInfo这个方法，他们的云服务器是阿里云的阉割版");
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 

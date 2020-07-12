@@ -52,6 +52,7 @@ public class QREncoder {
 		hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
 		// 指定编码格式
 		hints.put(EncodeHintType.CHARACTER_SET, charsetName);
+		hints.put(EncodeHintType.MARGIN, 0);
 
 		try {
 			BitMatrix bitMatrix = new QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, width, height, hints);
@@ -272,5 +273,4 @@ public class QREncoder {
 		else
 			return qrcodeImage;
 	}
-
 }
