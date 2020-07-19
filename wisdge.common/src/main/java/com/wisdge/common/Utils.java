@@ -30,7 +30,7 @@ public class Utils {
 		if (locale == null)
 			locale = Locale.getDefault();
 		
-		ResourceBundle bundle = ResourceBundle.getBundle("resources/" + baseName, locale);
+		ResourceBundle bundle = ResourceBundle.getBundle("i18n/" + baseName, locale);
 		if (bundle.containsKey(key)) {
 			String resource = bundle.getString(key);
 			if (objects != null && objects.length > 0)

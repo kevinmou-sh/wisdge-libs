@@ -26,7 +26,7 @@ public abstract class EventManager implements Runnable {
 			mainThread = new Thread(this);
 			mainThread.start();
 		} catch (Exception e) {
-			logger.error(e, e);
+			logger.error(e.getMessage(), e);
 		}
 
 	}
@@ -69,7 +69,7 @@ public abstract class EventManager implements Runnable {
 	 *            EventListener对象
 	 */
 	public void addEventListener(EventListener listener) {
-		logger.debug("Add new event listener: " + listener.getName());
+		logger.info("Add new event listener: " + listener.getName());
 		listeners.add(listener);
 	}
 

@@ -84,20 +84,19 @@ public class AliOSSStorage implements IFileStorageClient {
 	}
 
 	public void init() {
-		logger.debug("Aliyun OSS service initializing remoteRoot： {}", remoteRoot);
+		logger.info("Aliyun OSS Service initializing remoteRoot： {}", remoteRoot);
 		ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 		if (ossClient.doesBucketExist(bucketName)) {
-			logger.debug("已创建Bucket：{}", bucketName);
+			logger.info("已创建Bucket：{}", bucketName);
 		} else {
-			logger.debug("Bucket不存在，创建Bucket：{}", bucketName);
+			logger.info("Bucket不存在，创建Bucket：{}", bucketName);
 			ossClient.createBucket(bucketName);
 		}
 		try {
 			BucketInfo info = ossClient.getBucketInfo(bucketName);
-			logger.debug("Bucket {} {}", bucketName, "的信息如下：");
-			logger.debug("\t数据中心：{}", info.getBucket().getLocation());
-			logger.debug("\t创建时间：{}", info.getBucket().getCreationDate());
-			logger.debug("\t用户标志：{}", info.getBucket().getOwner());
+			logger.info("\t数据中心：{}", info.getBucket().getLocation());
+			logger.info("\t创建时间：{}", info.getBucket().getCreationDate());
+			logger.info("\t用户标志：{}", info.getBucket().getOwner());
 		} catch (Exception e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}

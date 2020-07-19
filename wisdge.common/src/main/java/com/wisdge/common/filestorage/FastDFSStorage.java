@@ -272,7 +272,7 @@ public class FastDFSStorage implements IFileStorageClient {
         		filepath = filepath.substring(1);
             return storageClient1.downloadFile1(filepath);
         } catch (Exception e) {
-        	logger.error("download_file1 faild", e);
+        	logger.error("download_file1 failed", e);
             //如果出现了IO异常应该销毁此连接
         	connectionPool.drop(storageClient1);
             throw e;
@@ -293,7 +293,7 @@ public class FastDFSStorage implements IFileStorageClient {
 			metadata.setContentLength(data.length);
 			executor.execute(new ByteArrayInputStream(data), metadata);
 		} catch (Exception e) {
-			logger.error("download_file1 faild", e);
+			logger.error("download_file1 failed", e);
 			//如果出现了IO异常应该销毁此连接
 			connectionPool.drop(storageClient1);
 			throw e;
@@ -308,7 +308,7 @@ public class FastDFSStorage implements IFileStorageClient {
         storageClient1 = connectionPool.checkout(10);
         try {
             if (storageClient1.deleteFile1(filepath) < 1)
-            	throw new FileException("File delete faild");
+            	throw new FileException("File delete failed");
         } catch (Exception e) {
             //如果出现了IO异常应该销毁此连接
         	connectionPool.drop(storageClient1);

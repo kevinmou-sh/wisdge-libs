@@ -97,7 +97,7 @@ public class HttpStorage implements IFileStorageClient {
 		if (result.getCode() > 0) {
 			return result.getValue().toString();
 		} else {
-			throw new FileException("File upload faild");
+			throw new FileException("File upload failed");
 		}
 	}
 
@@ -117,7 +117,7 @@ public class HttpStorage implements IFileStorageClient {
 			if (result.getCode() > 0) {
 				return result.getValue().toString();
 			} else {
-				throw new FileException("File upload faild");
+				throw new FileException("File upload failed");
 			}
 		}
 	}
@@ -147,7 +147,7 @@ public class HttpStorage implements IFileStorageClient {
 		params.put(inputField, filepath);
 		Result result = JSonUtils.read(xhrService.post(deleteUrl, params), Result.class);
 		if (result.getCode() <= 0) {
-			throw new FileException("File delete faild");
+			throw new FileException("File delete failed");
 		}
 	}
 

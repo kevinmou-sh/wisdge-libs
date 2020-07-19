@@ -29,16 +29,16 @@ public class LocalStorage implements IFileStorageClient {
 		FileUtils.forceMkdir(new File(path));
 		File file = new File(filepath);
 		if (!file.exists() && !file.createNewFile()) {
-			throw new FileException("Cann't create target file");
+			throw new FileException("Can not create target file");
 		}
 		if (! file.setWritable(true, false)) {
-			throw new FileException("Cann't set file writable");
+			throw new FileException("Can not set file writable");
 		}
 		if (file.canWrite()) {
 			FileUtils.writeByteArrayToFile(file, data);
 			return "";
 		} else {
-			throw new FileException("Cann't set file writable");
+			throw new FileException("Can not set file writable");
 		}
 	}
 
@@ -51,16 +51,16 @@ public class LocalStorage implements IFileStorageClient {
 		FileUtils.forceMkdir(new File(path));
 		File file = new File(filepath);
 		if (!file.exists() && !file.createNewFile()) {
-			throw new FileException("Cann't create target file");
+			throw new FileException("Can not create target file");
 		}
 		if (! file.setWritable(true, false)) {
-			throw new FileException("Cann't set file writable");
+			throw new FileException("Can not set file writable");
 		}
 		if (file.canWrite()) {
 			FileUtils.copyInputStreamToFile(inputStream, file);
 			return "";
 		} else {
-			throw new FileException("Cann't set file writable");
+			throw new FileException("Can not set file writable");
 		}
 	}
 
