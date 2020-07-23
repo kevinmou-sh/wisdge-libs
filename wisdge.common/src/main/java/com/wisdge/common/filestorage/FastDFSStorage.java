@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -213,10 +212,9 @@ public class FastDFSStorage implements IFileStorageClient {
 	    metaList[0] = new NameValuePair("fileName", filename);
 	    metaList[1] = new NameValuePair("fileLength", String.valueOf(data.length));
 	    metaList[2] = new NameValuePair("fileExt", fileext);
-	    metaList[3] = new NameValuePair("fileAuthor", "elite.ngs");
+	    metaList[3] = new NameValuePair("fileAuthor", "wisdge");
 	    
-        StorageClient1 storageClient1 = null;
-        storageClient1 = connectionPool.checkout(10);
+        StorageClient1 storageClient1 = connectionPool.checkout(10);
         try {
             return storageClient1.uploadFile1(data, fileext, metaList);
         } catch (Exception e) {
@@ -239,18 +237,15 @@ public class FastDFSStorage implements IFileStorageClient {
 		metaList[2] = new NameValuePair("fileExt", fileext);
 		metaList[3] = new NameValuePair("fileAuthor", "elite.ngs");
 
-		StorageClient1 storageClient1 = null;
-		storageClient1 = connectionPool.checkout(10);
+		StorageClient1 storageClient1 = connectionPool.checkout(10);
 		try {
 			return storageClient1.uploadFile1(null, size, os -> {
 				byte[] bs = new byte[1024];
 				int i;
-				try (InputStream source = inputStream;
-					 OutputStream target = os){
+				try (InputStream source = inputStream){
 					while ((i = source.read(bs)) != -1) {
-						target.write(bs, 0, i);
+						os.write(bs, 0, i);
 					}
-					target.flush();
 				}
 				return 0;
 			}, fileext, metaList);

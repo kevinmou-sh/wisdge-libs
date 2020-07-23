@@ -84,21 +84,22 @@ public class AliOSSStorage implements IFileStorageClient {
 	}
 
 	public void init() {
-		logger.info("Aliyun OSS Service initializing remoteRoot： {}", remoteRoot);
+		logger.debug("Aliyun OSS service initializing remoteRoot： {}", remoteRoot);
 		ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 		if (ossClient.doesBucketExist(bucketName)) {
-			logger.info("已创建Bucket：{}", bucketName);
+			logger.debug("已创建Bucket：{}", bucketName);
 		} else {
-			logger.info("Bucket不存在，创建Bucket：{}", bucketName);
+			logger.debug("Bucket不存在，创建Bucket：{}", bucketName);
 			ossClient.createBucket(bucketName);
 		}
 		try {
 			BucketInfo info = ossClient.getBucketInfo(bucketName);
-			logger.info("\t数据中心：{}", info.getBucket().getLocation());
-			logger.info("\t创建时间：{}", info.getBucket().getCreationDate());
-			logger.info("\t用户标志：{}", info.getBucket().getOwner());
+			logger.debug("Bucket {} {}", bucketName, "的信息如下：");
+			logger.debug("\t数据中心：{}", info.getBucket().getLocation());
+			logger.debug("\t创建时间：{}", info.getBucket().getCreationDate());
+			logger.debug("\t用户标志：{}", info.getBucket().getOwner());
 		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage(), e);
+			logger.info("保险经纪不兼容getBucketInfo这个方法，他们的云服务器是阿里云的阉割版");
 		}
 	}
 
@@ -132,9 +133,9 @@ public class AliOSSStorage implements IFileStorageClient {
 	public byte[] retrieve(String filepath) throws Exception {
 		if (filepath.startsWith("/"))
 			filepath = filepath.substring(1);
-		OSSObject ossObject = ossClient.getObject(bucketName, filepath);
-		try (InputStream is = ossObject.getObjectContent()) {
-			return toByteArray(is);
+		try (OSSObject ossObject = ossClient.getObject(bucketName, filepath)) {
+			// 这里ossObject.getObjectContent()的输入流，在OSSObject的close就会关闭了，不需要再次关闭
+			return toByteArray(ossObject.getObjectContent());
 		}
 	}
 
@@ -142,18 +143,18 @@ public class AliOSSStorage implements IFileStorageClient {
 	public void retrieveStream(String filepath, IFileExecutor executor) throws Exception {
 		if (filepath.startsWith("/"))
 			filepath = filepath.substring(1);
-		OSSObject ossObject = ossClient.getObject(bucketName, filepath);
 		FileMetadata metadata = new FileMetadata();
-		ObjectMetadata objectMetadata = ossObject.getObjectMetadata();
-		metadata.setContentLength(objectMetadata.getContentLength());
-		metadata.setLastModified(objectMetadata.getLastModified().getTime());
 		if (this.isDownloadFromURL()) {
 			URL url = ossClient.generatePresignedUrl(bucketName, filepath, getExpiredDate());
 			metadata.setDownloadURL(url.toString());
 			executor.execute(null, metadata);
 		} else {
-			try (InputStream is = ossObject.getObjectContent()) {
-				executor.execute(is, metadata);
+			try (OSSObject ossObject = ossClient.getObject(bucketName, filepath)) {
+				ObjectMetadata objectMetadata = ossObject.getObjectMetadata();
+				metadata.setContentLength(objectMetadata.getContentLength());
+				metadata.setLastModified(objectMetadata.getLastModified().getTime());
+				// 这里ossObject.getObjectContent()的输入流，在OSSObject的close就会关闭了，不需要再次关闭
+				executor.execute(ossObject.getObjectContent(), metadata);
 			}
 		}
 	}
