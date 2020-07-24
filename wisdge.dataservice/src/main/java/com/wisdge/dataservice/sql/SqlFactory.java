@@ -9,7 +9,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -194,14 +193,42 @@ public class SqlFactory {
             return list;
         });
     }
-    public Map<String, Object> queryForPage(String sqlKey, int maxRowSize, int page, Object...args) throws DataAccessException, ProcessSqlContextException {
+    public Pagination queryForPage(String sqlKey, int maxRowSize, int page, Object...args) throws DataAccessException, ProcessSqlContextException {
         return queryForPage(sqlKey, null, maxRowSize, page, args);
     }
 
-    public Map<String, Object> queryForPage(String sqlKey, Map<String, Object> processContext, int maxRowSize, int page, Object...args) throws DataAccessException, ProcessSqlContextException {
-        long start = new Date().getTime();
+    public Pagination queryForPage(String sqlKey, Map<String, Object> processContext, int maxRowSize, int page, Object...args) throws DataAccessException, ProcessSqlContextException {
+        final long start = new Date().getTime();
         String sql = processSqlContext(sqlKey, processContext);
         logger.debug("[{}][SQL] {}", start, sql);
+
+        String countSql = "SELECT COUNT(*) FROM (" + sql + ")";
+        int totalCount = queryForObject(countSql, Integer.class, args);
+        // 需要分页信息
+        int pageIndex = Math.max(page, 0);
+        int pageSize = Math.min(maxRowSize, 500);
+        // 构建分页内容
+        int pageCount = 0;
+        if (totalCount > 0) {
+            if (totalCount % pageSize == 0)
+                pageCount = totalCount / pageSize;
+            else
+                pageCount = (totalCount / pageSize) + 1;
+        }
+        if (pageCount == 0)
+            pageIndex = 0;
+        else {
+            // 当前页编码，从0开始，如果传的值为Integer.MAX_VALUE为最后一页。 如果当前页超过总页数，也表示最后一页。
+            if (pageIndex == Integer.MAX_VALUE || pageIndex >= pageCount) {
+                pageIndex = pageCount - 1;
+            }
+        }
+        final Pagination pagination = new Pagination();
+        pagination.setPageSize(pageSize);
+        pagination.setPageCount(pageCount);
+        pagination.setPageIndex(pageIndex);
+        pagination.setTotalCount(totalCount);
+
         return jdbcTemplate.query(sql, args, rs -> {
             Map<String, Object> result = new HashMap<>();
             // 获取当前记录集的字段数据
@@ -210,55 +237,21 @@ public class SqlFactory {
             for (int column = 1; column <= rsmd.getColumnCount(); column++) {
                 columns.add(rsmd.getColumnLabel(column).toUpperCase());
             }
-            result.put("columns", columns);
+            pagination.setColumns(columns);
 
-            // 需要分页信息
-            int pageIndex = Math.max(page, 0);
-            int pageSize = Math.min(maxRowSize, 500);
-            // 获得记录总数
-            rs.last();
-            int totalCount = rs.getRow();
-            // 构建分页内容
-            int pageCount = 0;
-            if (totalCount > 0) {
-                if (totalCount % pageSize == 0)
-                    pageCount = totalCount / pageSize;
-                else
-                    pageCount = (totalCount / pageSize) + 1;
-            }
-            if (pageCount == 0)
-                pageIndex = 0;
-            else {
-                // 当前页编码，从0开始，如果传的值为Integer.MAX_VALUE为最后一页。 如果当前页超过总页数，也表示最后一页。
-                if (pageIndex == Integer.MAX_VALUE || pageIndex >= pageCount) {
-                    pageIndex = pageCount - 1;
-                }
-            }
-            result.put("pageSize", pageSize);
-            result.put("pageCount", pageCount);
-            result.put("pageIndex", pageIndex);
-            result.put("totalCount", totalCount);
             // 获取当前记录集的字段数据
             List<Map<String, Object>> list = new ArrayList<>();
-            if (totalCount > pageIndex * pageSize) {
-                rs.absolute(pageIndex * pageSize + 1);
-                int rowNum = 0;
-                do {
-                    if (rowNum >= pageSize)
-                        break;
-
-                    Map<String, Object> row = new HashMap<>();
-                    for(String column : columns) {
-                        row.put(column, rs.getObject(column));
-                    }
-                    list.add(row);
-                    rowNum++;
-                } while (rs.next());
+            while(rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                for(String column : columns) {
+                    row.put(column, rs.getObject(column));
+                }
+                list.add(row);
             }
             logger.debug("[ROWS] " + list.size());
-            result.put("fields", list);
+            pagination.setFields(list);
             logger.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
-            return result;
+            return pagination;
         });
     }
 
