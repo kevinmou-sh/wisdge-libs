@@ -202,7 +202,7 @@ public class SqlFactory {
         String sql = processSqlContext(sqlKey, processContext);
         logger.debug("[{}][SQL] {}", start, sql);
 
-        String countSql = "SELECT COUNT(*) FROM (" + sql + ")";
+        String countSql = "SELECT COUNT(*) FROM (" + sql + ") PAGER_COUNT_ALIAS";
         int totalCount = jdbcTemplate.queryForObject(countSql, Integer.class, args);
         // 需要分页信息
         int pageIndex = Math.max(page, 0);
