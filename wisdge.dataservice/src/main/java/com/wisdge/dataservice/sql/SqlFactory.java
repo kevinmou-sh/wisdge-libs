@@ -203,7 +203,7 @@ public class SqlFactory {
         logger.debug("[{}][SQL] {}", start, sql);
 
         String countSql = "SELECT COUNT(*) FROM (" + sql + ")";
-        int totalCount = queryForObject(countSql, Integer.class, args);
+        int totalCount = jdbcTemplate.queryForObject(countSql, Integer.class, args);
         // 需要分页信息
         int pageIndex = Math.max(page, 0);
         int pageSize = Math.min(maxRowSize, 500);
@@ -229,7 +229,8 @@ public class SqlFactory {
         pagination.setPageIndex(pageIndex);
         pagination.setTotalCount(totalCount);
 
-        return jdbcTemplate.query(sql, args, rs -> {
+        String realSql = sql + " limit "+ pagination.getPageSize() + " offset " + (pagination.getPageSize() * pagination.getPageIndex());
+        return jdbcTemplate.query(realSql, args, rs -> {
             Map<String, Object> result = new HashMap<>();
             // 获取当前记录集的字段数据
             List<String> columns = new ArrayList<>();
