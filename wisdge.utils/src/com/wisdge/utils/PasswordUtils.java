@@ -1,9 +1,22 @@
 package com.wisdge.utils;
 
-public class PasswordUtils {
+import org.junit.Test;
 
-	private PasswordUtils() {
-		throw new IllegalStateException("PasswordUtils class");
+public class PasswordUtils {
+	public static int RULE_NONE = 0;
+	public static int RULE_ALLCASE = 1 << 0;
+	public static int RULE_DIGIT = 1 << 1;
+	public static int RULE_SPECIAL = 1 << 2;
+	public static int RULE_CONTINUOUS = 1 << 3;
+
+	public static int ERROR_LESS = -1;
+	public static int ERROR_SENSITIVE = -2;
+	public static int ERROR_DIGIT_MISSING = -3;
+	public static int ERROR_SPECIAL_MISSING = -4;
+	public static int ERROR_CONTINUOUS_NATURE = -5;
+	public static int ERROR_CONTINUOUS_KEYBOARD = -6;
+
+	public PasswordUtils () {
 	}
 
 	/**
@@ -38,9 +51,9 @@ public class PasswordUtils {
 				break;
 		}
 		if (count > 2 || reverseCount > 2)
-			throw new PasswordInvalidException(-5, "正序或反序连续4位及以上");
+			throw new PasswordInvalidException(ERROR_CONTINUOUS_NATURE, "正序或反序连续4位及以上");
 		if (includeFlow && flowCount > 2)
-			throw new PasswordInvalidException(-6, "键盘连续相邻的字母4位及以上");
+			throw new PasswordInvalidException(ERROR_CONTINUOUS_KEYBOARD, "键盘连续相邻的字母4位及以上");
 
 		return true;
 	}
@@ -91,7 +104,12 @@ public class PasswordUtils {
 	 * - 密码必须同时包含字母和数字<br/>
 	 * - 密码长度8-20位<br/>
 	 * - 密码中不能存在连续4个及以上的数字或字母（如：1234、7654、abcd、defgh等）<br/>
-	 * 
+	 * 		-1: 不符合长度
+	 * 		-2: 缺少大小写字母
+	 * 		-3: 缺少数字
+	 * 		-4: 缺少特殊字符
+	 * 		-5: 正序或反序连续4位及以上
+	 * 		-6: 键盘连续相邻的字母4位及以上
 	 * @param password 密码
 	 * @param min      最短长度
 	 * @param level    密码安全等级
@@ -99,40 +117,75 @@ public class PasswordUtils {
 	 */
 	public static boolean isAvailable(String password, int min, int level) throws PasswordInvalidException {
 		if (password.length() < min)
-			throw new PasswordInvalidException(-1, "不符合长度：" + min);
+			throw new PasswordInvalidException(ERROR_LESS, "不符合长度：" + min);
 		if (level < 1)
 			return true;
 
 		// level > 0
 		if (!password.matches(".*?[a-z]+.*?") || !password.matches(".*?[A-Z]+.*?")) {
-			throw new PasswordInvalidException(-2, "缺少大小写字母");
+			throw new PasswordInvalidException(ERROR_SENSITIVE, "缺少大小写字母");
 		}
 		if (level > 1 && !password.matches(".*?[\\d]+.*?")) {
-			throw new PasswordInvalidException(-3, "缺少数字");
+			throw new PasswordInvalidException(ERROR_DIGIT_MISSING, "缺少数字");
 		}
 		if (level > 2 && !password.matches(".*?[^a-zA-Z\\d]+.*?")) {
-			throw new PasswordInvalidException(-4, "缺少特殊字符");
+			throw new PasswordInvalidException(ERROR_SPECIAL_MISSING, "缺少特殊字符");
 		}
 		if (level > 3)
 			return isContinuous(password, true);
 
 		return true;
 	}
-	
-	public static void main(String[] args) {
-		try {
-			System.out.println(PasswordUtils.isAvailable("Letmein_0308", 8, 4));
-		} catch (PasswordInvalidException e) {
-			int errorCode = e.getCode();
-			System.err.println(errorCode);
-			/*
-			 * -1: 不符合长度
-			 * -2: 缺少大小写字母
-			 * -3: 缺少数字
-			 * -4: 缺少特殊字符
-			 * -5: 正序或反序连续4位及以上
-			 * -6: 键盘连续相邻的字母4位及以上
-			 */
+
+	/**
+	 * - 字母区分大小写，可输入符号<br/>
+	 * - 密码必须同时包含字母和数字<br/>
+	 * - 密码长度8-20位<br/>
+	 * - 密码中不能存在连续4个及以上的数字或字母（如：1234、7654、abcd、defgh等）<br/>
+	 *
+	 * @param password String 密码
+	 * @param min	int 最短长度
+	 * @param role	int 密码安全规则
+	 * @return boolean true为正确，false为错误
+	 **/
+	public static boolean match(String password, int min, int role) throws PasswordInvalidException {
+		if (password.length() < min)
+			throw new PasswordInvalidException(ERROR_LESS, "不符合长度：" + min);
+
+		if (role == PasswordUtils.RULE_NONE)
+			return true;
+
+		if ((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE) {
+			if (!password.matches(".*?[a-z]+.*?") || !password.matches(".*?[A-Z]+.*?"))
+				throw new PasswordInvalidException(ERROR_SENSITIVE, "缺少大小写字母");
 		}
+		if ((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT) {
+			if (!password.matches(".*?[\\d]+.*?"))
+				throw new PasswordInvalidException(ERROR_DIGIT_MISSING, "缺少数字");
+		}
+		if ((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL) {
+			if (!password.matches(".*?[^a-zA-Z\\d]+.*?"))
+				throw new PasswordInvalidException(ERROR_SPECIAL_MISSING, "缺少特殊字符");
+		}
+		if ((role & PasswordUtils.RULE_CONTINUOUS) == PasswordUtils.RULE_CONTINUOUS) {
+			return isContinuous(password, true);
+		}
+		return true;
+	}
+
+	@Test
+	public void test() throws PasswordInvalidException {
+		int role = PasswordUtils.RULE_ALLCASE | PasswordUtils.RULE_DIGIT | PasswordUtils.RULE_SPECIAL | PasswordUtils.RULE_CONTINUOUS;
+		System.out.println(role);
+		System.out.println(PasswordUtils.RULE_ALLCASE);
+		System.out.println(PasswordUtils.RULE_DIGIT);
+		System.out.println(PasswordUtils.RULE_SPECIAL);
+		System.out.println(PasswordUtils.RULE_CONTINUOUS);
+		System.out.println((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE);
+		System.out.println((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT);
+		System.out.println((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL);
+		System.out.println((role & PasswordUtils.RULE_CONTINUOUS) == PasswordUtils.RULE_CONTINUOUS);
+
+		System.out.println(PasswordUtils.match("letmein_0308", 8, role));
 	}
 }
