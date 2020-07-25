@@ -2,6 +2,11 @@ package com.wisdge.utils;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 public class PasswordUtils {
 	public static int RULE_NONE = 0;
 	public static int RULE_ALLCASE = 1 << 0;
@@ -173,6 +178,73 @@ public class PasswordUtils {
 		return true;
 	}
 
+	public static final char[] allowedSpecialCharactors = {
+			'`', '~', '@', '#', '$', '%', '^', '&',
+			'*', '(', ')', '-', '_', '=', '+', '[',
+			'{', '}', ']', '\\', '|', ';', ':', '"',
+			'\'', ',', '<', '.', '>', '/', '?'};//密码能包含的特殊字符
+	private static final int letterRange = 26;
+	private static final int numberRange = 10;
+	private static final int spCharactorRange = allowedSpecialCharactors.length;
+	private static final Random random = new Random();
+
+	public static String random() {
+		return random(8);
+	}
+	public static String random(int length) {
+		if (length < 8)
+			length = 0;
+
+		char[] password = new char[length];
+		List<Integer> pwCharsIndex = new ArrayList();
+		for (int i = 0; i < password.length; i++) {
+			pwCharsIndex.add(i);
+		}
+		List<CharactorType> takeTypes = new ArrayList(Arrays.asList(CharactorType.values()));
+		List<CharactorType> fixedTypes = Arrays.asList(CharactorType.values());
+		int typeCount = 0;
+		while (pwCharsIndex.size() > 0) {
+			int pwIndex = pwCharsIndex.remove(random.nextInt(pwCharsIndex.size()));//随机填充一位密码
+			Character c;
+			if (typeCount < CharactorType.values().length) {
+				//生成不同种类字符
+				c = generateCharacter(takeTypes.remove(random.nextInt(takeTypes.size())));
+				typeCount ++;
+			} else {//随机生成所有种类密码
+				c = generateCharacter(fixedTypes.get(random.nextInt(fixedTypes.size())));
+			}
+			password[pwIndex] = c.charValue();
+		}
+		return String.valueOf(password);
+	}
+
+	private static Character generateCharacter(CharactorType type) {
+		Character c = null;
+		int rand;
+		switch (type) {
+			case LOWERCASE://随机小写字母
+				rand = random.nextInt(letterRange);
+				rand += 97;
+				c = new Character((char) rand);
+				break;
+			case UPPERCASE://随机大写字母
+				rand = random.nextInt(letterRange);
+				rand += 65;
+				c = new Character((char) rand);
+				break;
+			case NUMBER://随机数字
+				rand = random.nextInt(numberRange);
+				rand += 48;
+				c = new Character((char) rand);
+				break;
+			case SPECIAL_CHARACTOR://随机特殊字符
+				rand = random.nextInt(spCharactorRange);
+				c = new Character(allowedSpecialCharactors[rand]);
+				break;
+		}
+		return c;
+	}
+
 	@Test
 	public void test() throws PasswordInvalidException {
 		int role = PasswordUtils.RULE_ALLCASE | PasswordUtils.RULE_DIGIT | PasswordUtils.RULE_SPECIAL | PasswordUtils.RULE_CONTINUOUS;
@@ -186,6 +258,14 @@ public class PasswordUtils {
 		System.out.println((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL);
 		System.out.println((role & PasswordUtils.RULE_CONTINUOUS) == PasswordUtils.RULE_CONTINUOUS);
 
-		System.out.println(PasswordUtils.match("letmein_0308", 8, role));
+		System.out.println(PasswordUtils.match("Letmein_0308", 8, role));
+		System.out.println(PasswordUtils.random());
 	}
+}
+
+enum CharactorType {
+	LOWERCASE,
+	UPPERCASE,
+	NUMBER,
+	SPECIAL_CHARACTOR
 }
