@@ -266,7 +266,7 @@ public class XHRPoolService {
 
 			thread = new IdleConnectionMonitorThread(connManager);
 			thread.start();
-
+			logger.info("Initialize XhrPoolService succeeded");
 		} catch (Exception e) {
 			logger.error("获取httpClient(https)对象池异常:" + e.getMessage(), e);
 		}
@@ -371,6 +371,7 @@ public class XHRPoolService {
 		// 设置httpClient失效
 		httpClient = null;
 		connManager = null;
+		logger.info("XhrPoolService destroyed");
 	}
 
 	/**
