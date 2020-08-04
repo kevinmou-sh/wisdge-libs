@@ -5,10 +5,10 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Test;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -22,8 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.ResultSetMetaData;
 import java.util.*;
 
+@Slf4j
 public class SqlFactory {
-    private static Logger logger = LoggerFactory.getLogger(SqlFactory.class);
     private JdbcTemplate jdbcTemplate;
     private PlatformTransactionManager transactionManager;
     private SqlTemplateManager sqlTemplateManager;
@@ -59,6 +59,10 @@ public class SqlFactory {
 
     public void setDbType(String dbType) {
         this.dbType = dbType;
+    }
+
+    public SqlFactory() {
+
     }
 
     private String mergeWithFreemarker(String sql, Map<String, Object> parameters) throws ProcessSqlContextException {
@@ -130,16 +134,16 @@ public class SqlFactory {
     public <T> T queryForObject(String sqlKey, Map<String, Object> processContext, Class<T> requiredType, Object...args) throws DataAccessException, ProcessSqlContextException, IllegalAccessException, InstantiationException {
         long start = new Date().getTime();
         String sql = processSqlContext(sqlKey, processContext);
-        logger.debug("[{}][SQL] {}", start, sql);
+        log.debug("[{}][SQL] {}", start, sql);
 
-        if (requiredType.isAssignableFrom(IRowMapper.class)) {
+        if (IRowMapper.class.isAssignableFrom(requiredType)) {
             T result = requiredType.newInstance();
             Map<String, Object> map = jdbcTemplate.queryForMap(sql, args);
             ((IRowMapper) result).rowMap(map);
             return (T) result;
         } else {
             T result = jdbcTemplate.queryForObject(sql, requiredType, args);
-            logger.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
             return result;
         }
     }
@@ -151,18 +155,18 @@ public class SqlFactory {
     public Map<String, Object> queryForMap(String sqlKey, Map<String, Object> processContext, Object...args) throws DataAccessException, ProcessSqlContextException {
         long start = new Date().getTime();
         String sql = processSqlContext(sqlKey, processContext);
-        logger.debug("[{}][SQL] {}", start, sql);
+        log.debug("[{}][SQL] {}", start, sql);
         try {
             Map<String, Object> result = jdbcTemplate.queryForMap(sql, args);
-            logger.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
             return result;
         } catch(Exception e) {
             if (e instanceof EmptyResultDataAccessException) {
                 EmptyResultDataAccessException erdae = (EmptyResultDataAccessException) e;
-                logger.debug("None record has been found");
+                log.debug("None record has been found");
             } else if (e instanceof IncorrectResultSizeDataAccessException) {
                 IncorrectResultSizeDataAccessException e2 = (IncorrectResultSizeDataAccessException) e;
-                logger.debug("Expect {} record, but actual size is {}", e2.getExpectedSize(), e2.getActualSize());
+                log.debug("Expect {} record, but actual size is {}", e2.getExpectedSize(), e2.getActualSize());
             }
             throw e;
         }
@@ -175,7 +179,7 @@ public class SqlFactory {
     public List<Map<String, Object>> queryForList(String sqlKey, Map<String, Object> processContext, int maxRowSize, Object...args) throws DataAccessException, ProcessSqlContextException {
         long start = new Date().getTime();
         String sql = processSqlContext(sqlKey, processContext);
-        logger.debug("[{}][SQL] {}", start, sql);
+        log.debug("[{}][SQL] {}", start, sql);
         return jdbcTemplate.query(sql, args, rs -> {
             // 获取当前记录集的字段数据
             List<String> columns = new ArrayList<>();
@@ -196,8 +200,8 @@ public class SqlFactory {
                 if (max > 0 && num > max)
                     break;
             }
-            logger.debug("[ROWS] " + list.size());
-            logger.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            log.debug("[ROWS] " + list.size());
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
             return list;
         });
     }
@@ -208,7 +212,7 @@ public class SqlFactory {
     public Pagination queryForPage(String sqlKey, Map<String, Object> processContext, int maxRowSize, int page, Object...args) throws DataAccessException, ProcessSqlContextException {
         final long start = new Date().getTime();
         String sql = processSqlContext(sqlKey, processContext);
-        logger.debug("[{}][SQL] {}", start, sql);
+        log.debug("[{}][SQL] {}", start, sql);
 
         String countSql = "SELECT COUNT(*) FROM (" + sql + ") PAGER_COUNT_ALIAS";
         int totalCount = jdbcTemplate.queryForObject(countSql, Integer.class, args);
@@ -257,9 +261,9 @@ public class SqlFactory {
                 }
                 list.add(row);
             }
-            logger.debug("[ROWS] " + list.size());
+            log.debug("[ROWS] " + list.size());
             pagination.setFields(list);
-            logger.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
             return pagination;
         });
     }
@@ -271,9 +275,9 @@ public class SqlFactory {
     public int execute(String sqlKey, Map<String, Object> processContext, Object...args) throws DataAccessException, ProcessSqlContextException {
         long start = new Date().getTime();
         String sql = processSqlContext(sqlKey, processContext);
-        logger.debug("[{}][SQL] {}", start, sql);
+        log.debug("[{}][SQL] {}", start, sql);
         int result = jdbcTemplate.update(sql, args);
-        logger.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+        log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
         return result;
     }
 
@@ -289,4 +293,8 @@ public class SqlFactory {
         batch.add(processSqlContext(sqlKey, processContext), args);
     }
 
+    @Test
+    public void test() {
+        log.info("isAssignableFrom: {}", IRowMapper.class.isAssignableFrom(RowMapperAdapter.class));
+    }
 }

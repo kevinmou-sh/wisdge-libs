@@ -3,7 +3,7 @@ package com.wisdge.dataservice.sql;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class RowMapperAdapter implements IRowMapper {
+public abstract class RowMapperAdapter implements IRowMapper {
 
     @Override
     public void rowMap(Map<String, Object> map) throws IllegalAccessException {
