@@ -14,6 +14,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.CollectionUtils;
+
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
@@ -295,6 +300,16 @@ public class SqlFactory {
 
     @Test
     public void test() {
-        log.info("isAssignableFrom: {}", IRowMapper.class.isAssignableFrom(RowMapperAdapter.class));
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(SqlFactory.class);
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            List<PropertyDescriptor> descriptors = CollectionUtils.arrayToList(propertyDescriptors);
+            log.info("PropertyDescriptors {}", descriptors.size());
+            for(PropertyDescriptor property : descriptors) {
+                log.info(property.getName());
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }
