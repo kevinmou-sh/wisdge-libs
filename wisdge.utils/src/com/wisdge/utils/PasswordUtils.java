@@ -203,7 +203,7 @@ public class PasswordUtils {
 
 		if (excludes != null) {
 			for(String exclude: excludes) {
-				if (password.contains(exclude))
+				if (password.indexOf(exclude) != -1)
 					return ERROR_WORD_SENSITIVE;
 			}
 		}
@@ -289,11 +289,13 @@ public class PasswordUtils {
 		System.out.println("ContinuousNature: " + ((role & PasswordUtils.RULE_CONTINUOUS_NATURE) == PasswordUtils.RULE_CONTINUOUS_NATURE));
 		System.out.println("ContinuousKeyboard: " + ((role & PasswordUtils.RULE_CONTINUOUS_KEYBOARD) == PasswordUtils.RULE_CONTINUOUS_KEYBOARD));
 
+		List<String> excludes = new ArrayList<>();
+		excludes.add("mein");
 		int code = PasswordUtils.match("Letmein_0308", 8, PasswordUtils.RULE_ALLCASE |
 				PasswordUtils.RULE_DIGIT |
 				PasswordUtils.RULE_SPECIAL |
 				PasswordUtils.RULE_CONTINUOUS_NATURE |
-				PasswordUtils.RULE_CONTINUOUS_KEYBOARD);
+				PasswordUtils.RULE_CONTINUOUS_KEYBOARD, excludes);
 		System.out.println(code);
 
 	}
