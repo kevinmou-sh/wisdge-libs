@@ -8,33 +8,34 @@ import java.util.List;
 import java.util.Random;
 
 public class PasswordUtils {
-	public static int RULE_NONE = 0;
-	public static int RULE_ALLCASE = 1 << 0;
-	public static int RULE_DIGIT = 1 << 1;
-	public static int RULE_SPECIAL = 1 << 2;
-	public static int RULE_CONTINUOUS = 1 << 3;
+	public static int RULE_NONE = 0;					// 无规则
+	public static int RULE_ALLCASE = 1 << 0;			// 必须包含大小写字符
+	public static int RULE_DIGIT = 1 << 1;				// 必须包含数字
+	public static int RULE_SPECIAL = 1 << 2;			// 必须包含特殊字符
+	public static int RULE_CONTINUOUS_NATURE = 1 << 3;	// 必须少于3个以上连续相邻字符
+	public static int RULE_CONTINUOUS_KEYBOARD = 1 << 4;// 必须少于3个以上连续键盘相邻字符
 
-	public static int ERROR_LESS = -1;
-	public static int ERROR_SENSITIVE = -2;
-	public static int ERROR_DIGIT_MISSING = -3;
-	public static int ERROR_SPECIAL_MISSING = -4;
-	public static int ERROR_CONTINUOUS_NATURE = -5;
-	public static int ERROR_CONTINUOUS_KEYBOARD = -6;
+	public static int ERROR_LESS = -1; // 长度不符合要求
+	public static int ERROR_CASE_SENSITIVE = -2;	// 缺少大小写字母
+	public static int ERROR_DIGIT_MISSING = -3;	// 缺少数字
+	public static int ERROR_SPECIAL_MISSING = -4;	// 缺少特殊字符
+	public static int ERROR_CONTINUOUS_NATURE = -5;	// 连续相邻3个以上字符
+	public static int ERROR_CONTINUOUS_KEYBOARD = -6;	// 连续相邻3个以上键盘字符
+	public static int ERROR_WORD_SENSITIVE = -7;	// 出现关键敏感词
 
 	public PasswordUtils () {
 	}
 
 	/**
-	 * 密码是否是正序或反序连续4位及以上
+	 * 密码是否是正序或反序连续4位及以上相邻字符
 	 * 
-	 * @param pwd
-	 * @return true为正确，false为错误。
+	 * @param password String
+	 * @return boolean
 	 */
-	public static boolean isContinuous(String pwd, boolean includeFlow) throws PasswordInvalidException {
+	private static boolean isContinuousNature(String password) throws PasswordInvalidException {
 		int count = 0; // 正序次数
-		int flowCount = 0; // 键盘顺序
 		int reverseCount = 0; // 反序次数
-		String[] strArr = pwd.split("");
+		String[] strArr = password.split("");
 		for (int i = 0; i < strArr.length - 1; i++) {
 			// 从1开始是因为划分数组时，第一个为空
 			if (isPositiveContinuous(strArr[i], strArr[i + 1])) {
@@ -42,24 +43,35 @@ public class PasswordUtils {
 			} else {
 				count = 0;
 			}
-			if (isPositiveFlowkey(strArr[i].charAt(0), strArr[i + 1].charAt(0))) {
-				flowCount++;
-			} else {
-				flowCount = 0;
-			}
 			if (isReverseContinuous(strArr[i], strArr[i + 1])) {
 				reverseCount++;
 			} else {
 				reverseCount = 0;
 			}
-			if (count > 2 || reverseCount > 2 || (includeFlow && flowCount > 2))
-				break;
+			if (count > 2 || reverseCount > 2)
+				return false;
 		}
-		if (count > 2 || reverseCount > 2)
-			throw new PasswordInvalidException(ERROR_CONTINUOUS_NATURE, "正序或反序连续4位及以上");
-		if (includeFlow && flowCount > 2)
-			throw new PasswordInvalidException(ERROR_CONTINUOUS_KEYBOARD, "键盘连续相邻的字母4位及以上");
+		return true;
+	}
 
+	/**
+	 * 密码是否是正序或反序连续4位及以上相邻字符
+	 *
+	 * @param password String
+	 * @return boolean
+	 */
+	private static boolean isContinuousKeyboard(String password) throws PasswordInvalidException {
+		int flowCount = 0; // 键盘顺序
+		String[] strArr = password.split("");
+		for (int i = 0; i < strArr.length - 1; i++) {
+			if (isPositiveFlowkey(strArr[i].charAt(0), strArr[i + 1].charAt(0))) {
+				flowCount ++;
+			} else {
+				flowCount = 0;
+			}
+			if (flowCount > 2)
+				return false;
+		}
 		return true;
 	}
 
@@ -70,15 +82,14 @@ public class PasswordUtils {
 	 * @param str2
 	 * @return
 	 */
-	public static boolean isPositiveContinuous(String str1, String str2) {
+	private static boolean isPositiveContinuous(String str1, String str2) {
 		if (str2.hashCode() - str1.hashCode() == 1)
 			return true;
 		return false;
 	}
 
-	static String[] lines = new String[] { "qwertyuiop[]\\", "QWERTYUIOP{}|", "asdfghjkl;'", "ASDFGHJKL:\"", "zxcvbnm,./", "ZXCVBNM<>?" };
-
-	public static boolean isPositiveFlowkey(char c1, char c2) {
+	private static String[] lines = new String[] { "qwertyuiop[]\\", "QWERTYUIOP{}|", "asdfghjkl;'", "ASDFGHJKL:\"", "zxcvbnm,./", "ZXCVBNM<>?" };
+	private static boolean isPositiveFlowkey(char c1, char c2) {
 		for (String line : lines) {
 			int i = line.indexOf(c1);
 			if (i != -1) {
@@ -97,7 +108,7 @@ public class PasswordUtils {
 	 * @param str2
 	 * @return
 	 */
-	public static boolean isReverseContinuous(String str1, String str2) {
+	private static boolean isReverseContinuous(String str1, String str2) {
 		if (str2.hashCode() - str1.hashCode() == -1)
 			return true;
 		else
@@ -128,7 +139,7 @@ public class PasswordUtils {
 
 		// level > 0
 		if (!password.matches(".*?[a-z]+.*?") || !password.matches(".*?[A-Z]+.*?")) {
-			throw new PasswordInvalidException(ERROR_SENSITIVE, "缺少大小写字母");
+			throw new PasswordInvalidException(ERROR_CASE_SENSITIVE, "缺少大小写字母");
 		}
 		if (level > 1 && !password.matches(".*?[\\d]+.*?")) {
 			throw new PasswordInvalidException(ERROR_DIGIT_MISSING, "缺少数字");
@@ -136,46 +147,68 @@ public class PasswordUtils {
 		if (level > 2 && !password.matches(".*?[^a-zA-Z\\d]+.*?")) {
 			throw new PasswordInvalidException(ERROR_SPECIAL_MISSING, "缺少特殊字符");
 		}
-		if (level > 3)
-			return isContinuous(password, true);
-
+		if (level > 3) {
+			if (! isContinuousNature(password))
+				throw new PasswordInvalidException(ERROR_CONTINUOUS_NATURE, "相邻字符超过3个");
+			else if (! isContinuousKeyboard(password))
+				throw new PasswordInvalidException(ERROR_CONTINUOUS_KEYBOARD, "相邻键盘字符超过3个");
+		}
 		return true;
 	}
 
 	/**
-	 * - 字母区分大小写，可输入符号<br/>
-	 * - 密码必须同时包含字母和数字<br/>
-	 * - 密码长度8-20位<br/>
-	 * - 密码中不能存在连续4个及以上的数字或字母（如：1234、7654、abcd、defgh等）<br/>
-	 *
 	 * @param password String 密码
 	 * @param min	int 最短长度
 	 * @param role	int 密码安全规则
-	 * @return boolean true为正确，false为错误
+	 * @return int 返回1为验证通过，否则为不通过
 	 **/
-	public static boolean match(String password, int min, int role) throws PasswordInvalidException {
+	public static int match(String password, int min, int role) throws PasswordInvalidException {
+		return match(password, min, role, null);
+	}
+
+	/**
+	 * @param password String 密码
+	 * @param min	int 最短长度
+	 * @param role	int 密码安全规则
+	 * @param excludes List 需要过滤的敏感词
+	 * @return int 返回1为验证通过，否则为不通过
+	 **/
+	public static int match(String password, int min, int role, List<String> excludes) throws PasswordInvalidException {
 		if (password.length() < min)
-			throw new PasswordInvalidException(ERROR_LESS, "不符合长度：" + min);
+			return ERROR_LESS;
 
 		if (role == PasswordUtils.RULE_NONE)
-			return true;
+			return 1;
 
 		if ((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE) {
 			if (!password.matches(".*?[a-z]+.*?") || !password.matches(".*?[A-Z]+.*?"))
-				throw new PasswordInvalidException(ERROR_SENSITIVE, "缺少大小写字母");
+				return ERROR_CASE_SENSITIVE;
 		}
 		if ((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT) {
 			if (!password.matches(".*?[\\d]+.*?"))
-				throw new PasswordInvalidException(ERROR_DIGIT_MISSING, "缺少数字");
+				return ERROR_DIGIT_MISSING;
 		}
 		if ((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL) {
 			if (!password.matches(".*?[^a-zA-Z\\d]+.*?"))
-				throw new PasswordInvalidException(ERROR_SPECIAL_MISSING, "缺少特殊字符");
+				return ERROR_SPECIAL_MISSING;
 		}
-		if ((role & PasswordUtils.RULE_CONTINUOUS) == PasswordUtils.RULE_CONTINUOUS) {
-			return isContinuous(password, true);
+		if ((role & PasswordUtils.RULE_CONTINUOUS_NATURE) == PasswordUtils.RULE_CONTINUOUS_NATURE) {
+			if (! isContinuousNature(password))
+				return ERROR_CONTINUOUS_NATURE;
 		}
-		return true;
+		if ((role & PasswordUtils.RULE_CONTINUOUS_KEYBOARD) == PasswordUtils.RULE_CONTINUOUS_KEYBOARD) {
+			if (! isContinuousKeyboard(password))
+				return ERROR_CONTINUOUS_KEYBOARD;
+		}
+
+		if (excludes != null) {
+			for(String exclude: excludes) {
+				if (password.contains(exclude))
+					return ERROR_WORD_SENSITIVE;
+			}
+		}
+
+		return 1;
 	}
 
 	public static final char[] allowedSpecialCharactors = {
@@ -247,19 +280,22 @@ public class PasswordUtils {
 
 	@Test
 	public void test() throws PasswordInvalidException {
-		int role = PasswordUtils.RULE_ALLCASE | PasswordUtils.RULE_DIGIT | PasswordUtils.RULE_SPECIAL | PasswordUtils.RULE_CONTINUOUS;
-		System.out.println(role);
-		System.out.println(PasswordUtils.RULE_ALLCASE);
-		System.out.println(PasswordUtils.RULE_DIGIT);
-		System.out.println(PasswordUtils.RULE_SPECIAL);
-		System.out.println(PasswordUtils.RULE_CONTINUOUS);
-		System.out.println((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE);
-		System.out.println((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT);
-		System.out.println((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL);
-		System.out.println((role & PasswordUtils.RULE_CONTINUOUS) == PasswordUtils.RULE_CONTINUOUS);
+		int role = PasswordUtils.RULE_ALLCASE | PasswordUtils.RULE_DIGIT |
+				PasswordUtils.RULE_SPECIAL | PasswordUtils.RULE_CONTINUOUS_NATURE | PasswordUtils.RULE_CONTINUOUS_KEYBOARD;
+		// System.out.println(role);
+		System.out.println("AllCase: " + ((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE));
+		System.out.println("Digit: " + ((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT));
+		System.out.println("Special: " + ((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL));
+		System.out.println("ContinuousNature: " + ((role & PasswordUtils.RULE_CONTINUOUS_NATURE) == PasswordUtils.RULE_CONTINUOUS_NATURE));
+		System.out.println("ContinuousKeyboard: " + ((role & PasswordUtils.RULE_CONTINUOUS_KEYBOARD) == PasswordUtils.RULE_CONTINUOUS_KEYBOARD));
 
-		System.out.println(PasswordUtils.match("Letmein_0308", 8, role));
-		System.out.println(PasswordUtils.random());
+		int code = PasswordUtils.match("Letmein_0308", 8, PasswordUtils.RULE_ALLCASE |
+				PasswordUtils.RULE_DIGIT |
+				PasswordUtils.RULE_SPECIAL |
+				PasswordUtils.RULE_CONTINUOUS_NATURE |
+				PasswordUtils.RULE_CONTINUOUS_KEYBOARD);
+		System.out.println(code);
+
 	}
 }
 

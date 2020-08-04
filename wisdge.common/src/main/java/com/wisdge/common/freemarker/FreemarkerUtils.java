@@ -5,21 +5,27 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import java.io.File;
 import java.util.Map;
 
 public class FreemarkerUtils {
-    public static String freemarkerByTemplate(String templateFilename, Map params) throws Exception {
+    public static String processByTemplate(String templateFilename, Map params) throws Exception {
         // 创建配置类
         Configuration configuration = new Configuration(Configuration.getVersion());
         // 设置字符集
         configuration.setDefaultEncoding("UTF-8");
+
+        // 设置模板路径 toURI()防止路径出现空格
+        String classpath = FreemarkerUtils.class.getResource("/").toURI().getPath();
+        configuration.setDirectoryForTemplateLoading(new File(classpath+"/templates/"));
+
         // 加载模板
         Template template = configuration.getTemplate(templateFilename);
         // 静态化
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, params);
     }
 
-    public static String freemarkerByString(String content, Map params) throws Exception {
+    public static String processByString(String content, Map params) throws Exception {
         // 创建配置类
         Configuration configuration = new Configuration(Configuration.getVersion());
         // 设置字符集

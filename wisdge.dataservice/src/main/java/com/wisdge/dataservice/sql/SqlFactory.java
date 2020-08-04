@@ -123,17 +123,25 @@ public class SqlFactory {
             return sql;
     }
 
-    public <T> T queryForObject(String sqlKey, Class<T> requiredType, Object...args) throws DataAccessException, ProcessSqlContextException {
+    public <T> T queryForObject(String sqlKey, Class<T> requiredType, Object...args) throws DataAccessException, ProcessSqlContextException, IllegalAccessException, InstantiationException {
         return queryForObject(sqlKey, null, requiredType, args);
     }
 
-    public <T> T queryForObject(String sqlKey, Map<String, Object> processContext, Class<T> requiredType, Object...args) throws DataAccessException, ProcessSqlContextException {
+    public <T> T queryForObject(String sqlKey, Map<String, Object> processContext, Class<T> requiredType, Object...args) throws DataAccessException, ProcessSqlContextException, IllegalAccessException, InstantiationException {
         long start = new Date().getTime();
         String sql = processSqlContext(sqlKey, processContext);
         logger.debug("[{}][SQL] {}", start, sql);
-        T result = jdbcTemplate.queryForObject(sql, requiredType, args);
-        logger.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
-        return result;
+
+        if (requiredType.isAssignableFrom(IRowMapper.class)) {
+            T result = requiredType.newInstance();
+            Map<String, Object> map = jdbcTemplate.queryForMap(sql, args);
+            ((IRowMapper) result).rowMap(map);
+            return (T) result;
+        } else {
+            T result = jdbcTemplate.queryForObject(sql, requiredType, args);
+            logger.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            return result;
+        }
     }
 
     public Map<String, Object> queryForMap(String sqlKey, Object...args) throws DataAccessException, ProcessSqlContextException {
