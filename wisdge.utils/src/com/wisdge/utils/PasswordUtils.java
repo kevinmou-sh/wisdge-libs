@@ -1,12 +1,13 @@
 package com.wisdge.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+@Slf4j
 public class PasswordUtils {
 	public static int RULE_NONE = 0;					// 无规则
 	public static int RULE_ALLCASE = 1 << 0;			// 必须包含大小写字符
@@ -15,13 +16,15 @@ public class PasswordUtils {
 	public static int RULE_CONTINUOUS_NATURE = 1 << 3;	// 必须少于3个以上连续相邻字符
 	public static int RULE_CONTINUOUS_KEYBOARD = 1 << 4;// 必须少于3个以上连续键盘相邻字符
 
-	public static int ERROR_LESS = -1; // 长度不符合要求
-	public static int ERROR_CASE_SENSITIVE = -2;	// 缺少大小写字母
-	public static int ERROR_DIGIT_MISSING = -3;	// 缺少数字
-	public static int ERROR_SPECIAL_MISSING = -4;	// 缺少特殊字符
-	public static int ERROR_CONTINUOUS_NATURE = -5;	// 连续相邻3个以上字符
-	public static int ERROR_CONTINUOUS_KEYBOARD = -6;	// 连续相邻3个以上键盘字符
-	public static int ERROR_WORD_SENSITIVE = -7;	// 出现关键敏感词
+	public static int ERROR_EMPTY = 0;	// 密码为空
+	public static int ERROR_LESS = -1; // 小于最小长度要求
+	public static int ERROR_OVERFLOW = -2; // 大于最大长度要求
+	public static int ERROR_CASE_SENSITIVE = -3;	// 缺少大小写字母
+	public static int ERROR_DIGIT_MISSING = -4;	// 缺少数字
+	public static int ERROR_SPECIAL_MISSING = -5;	// 缺少特殊字符
+	public static int ERROR_CONTINUOUS_NATURE = -6;	// 连续相邻3个以上字符
+	public static int ERROR_CONTINUOUS_KEYBOARD = -7;	// 连续相邻3个以上键盘字符
+	public static int ERROR_WORD_SENSITIVE = -8;	// 出现关键敏感词
 
 	public PasswordUtils () {
 	}
@@ -158,24 +161,30 @@ public class PasswordUtils {
 
 	/**
 	 * @param password String 密码
-	 * @param min	int 最短长度
+	 * @param min	int 最小长度
+	 * @param max	int 最大长度
 	 * @param role	int 密码安全规则
 	 * @return int 返回1为验证通过，否则为不通过
 	 **/
-	public static int match(String password, int min, int role) throws PasswordInvalidException {
-		return match(password, min, role, null);
+	public static int match(String password, int min, int max, int role) throws PasswordInvalidException {
+		return match(password, min, max, role, null);
 	}
 
 	/**
 	 * @param password String 密码
-	 * @param min	int 最短长度
+	 * @param min	int 最小长度
+	 * @param max	int 最大长度
 	 * @param role	int 密码安全规则
 	 * @param excludes List 需要过滤的敏感词
 	 * @return int 返回1为验证通过，否则为不通过
 	 **/
-	public static int match(String password, int min, int role, List<String> excludes) throws PasswordInvalidException {
+	public static int match(String password, int min, int max, int role, List<String> excludes) throws PasswordInvalidException {
+		if (StringUtils.isEmpty(password))
+			return ERROR_EMPTY;
 		if (password.length() < min)
 			return ERROR_LESS;
+		if (password.length() > max)
+			return ERROR_OVERFLOW;
 
 		if (role == PasswordUtils.RULE_NONE)
 			return 1;
@@ -203,6 +212,7 @@ public class PasswordUtils {
 
 		if (excludes != null) {
 			for(String exclude: excludes) {
+				//log.info("{} vs {}", password, exclude);
 				if (password.indexOf(exclude) != -1)
 					return ERROR_WORD_SENSITIVE;
 			}
@@ -291,7 +301,7 @@ public class PasswordUtils {
 
 		List<String> excludes = new ArrayList<>();
 		excludes.add("mein");
-		int code = PasswordUtils.match("Letmein_0308", 8, PasswordUtils.RULE_ALLCASE |
+		int code = PasswordUtils.match("Letmein_0308", 8, 20, PasswordUtils.RULE_ALLCASE |
 				PasswordUtils.RULE_DIGIT |
 				PasswordUtils.RULE_SPECIAL |
 				PasswordUtils.RULE_CONTINUOUS_NATURE |
