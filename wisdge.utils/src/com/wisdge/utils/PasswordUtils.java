@@ -337,7 +337,7 @@ public class PasswordUtils {
 			String[] roles = roleString.split("|");
 			List<Integer> roleCodes = new ArrayList();
 			for (String role: roles) {
-				switch (role.toLowerCase()) {
+				switch (role.trim().toLowerCase()) {
 					case "a":
 						roleCodes.add(PasswordUtils.RULE_CHAR);
 						break;
