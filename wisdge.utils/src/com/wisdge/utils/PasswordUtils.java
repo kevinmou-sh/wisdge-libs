@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class PasswordUtils {
@@ -27,6 +28,8 @@ public class PasswordUtils {
 	public static int ERROR_CONTINUOUS_KEYBOARD = -7;	// 连续相邻3个以上键盘字符
 	public static int ERROR_WORD_SENSITIVE = -8;	// 出现关键敏感词
 	public static int ERROR_CHAR = -9;	// 缺少字母
+
+	public static int SUCCESS = 1;
 
 	public PasswordUtils () {
 	}
@@ -166,10 +169,34 @@ public class PasswordUtils {
 	 * @param min	int 最小长度
 	 * @param max	int 最大长度
 	 * @param role	int 密码安全规则
-	 * @return int 返回1为验证通过，否则为不通过
+	 * @return PasswordMatchResult 返回code>0为验证通过，否则为不通过
 	 **/
-	public static int match(String password, int min, int max, int role) throws PasswordInvalidException {
+	public static PasswordMatchResult match(String password, int min, int max, int role) throws PasswordInvalidException {
 		return match(password, min, max, role, null);
+	}
+	/**
+	 * @param password String 密码
+	 * @param min	int 最小长度
+	 * @param max	int 最大长度
+	 * @param role	int 密码安全规则
+	 * @param excludes List 需要过滤的敏感词
+	 * @return PasswordMatchResult 返回code>0为验证通过，否则为不通过
+	 **/
+	public static PasswordMatchResult match(String password, int min, int max, int role, List<String> excludes) throws PasswordInvalidException {
+		return match(password, min, max, role, excludes, null);
+	}
+
+	/**
+	 * @param password String 密码
+	 * @param min	int 最小长度
+	 * @param max	int 最大长度
+	 * @param roleString	String 密码安全规则代码
+	 * @param excludes List 需要过滤的敏感词
+	 * @param regexes List 额外的正则表达式
+	 * @return PasswordMatchResult 返回code>0为验证通过，否则为不通过
+	 **/
+	public static PasswordMatchResult match(String password, int min, int max, String roleString, List<String> excludes, List<PasswordRegex> regexes) throws PasswordInvalidException {
+		return match(password, min, max, getRoles(roleString), excludes, regexes);
 	}
 
 	/**
@@ -178,53 +205,62 @@ public class PasswordUtils {
 	 * @param max	int 最大长度
 	 * @param role	int 密码安全规则
 	 * @param excludes List 需要过滤的敏感词
-	 * @return int 返回1为验证通过，否则为不通过
+	 * @param regexes List 额外的正则表达式
+	 * @return PasswordMatchResult 返回code>0为验证通过，否则为不通过
 	 **/
-	public static int match(String password, int min, int max, int role, List<String> excludes) throws PasswordInvalidException {
+	public static PasswordMatchResult match(String password, int min, int max, int role, List<String> excludes, List<PasswordRegex> regexes) throws PasswordInvalidException {
 		if (StringUtils.isEmpty(password))
-			return ERROR_EMPTY;
+			return new PasswordMatchResult(ERROR_EMPTY, "密码为空");
 		if (password.length() < min)
-			return ERROR_LESS;
+			return new PasswordMatchResult(ERROR_LESS, "小于最小长度要求");
 		if (password.length() > max)
-			return ERROR_OVERFLOW;
+			return new PasswordMatchResult(ERROR_OVERFLOW, "大于最大长度要求");
 
-		if (role == PasswordUtils.RULE_NONE)
-			return 1;
-
-		if ((role & PasswordUtils.RULE_CHAR) == PasswordUtils.RULE_CHAR) {
-			if (! password.matches(".*?[a-zA-Z]+.*?"))
-				return ERROR_CHAR;
-		}
-		if ((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE) {
-			if (! password.matches(".*?[a-z]+.*?") || ! password.matches(".*?[A-Z]+.*?"))
-				return ERROR_CASE_SENSITIVE;
-		}
-		if ((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT) {
-			if (! password.matches(".*?[\\d]+.*?"))
-				return ERROR_DIGIT_MISSING;
-		}
-		if ((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL) {
-			if (! password.matches(".*?[^a-zA-Z\\d]+.*?"))
-				return ERROR_SPECIAL_MISSING;
-		}
-		if ((role & PasswordUtils.RULE_CONTINUOUS_NATURE) == PasswordUtils.RULE_CONTINUOUS_NATURE) {
-			if (! isContinuousNature(password))
-				return ERROR_CONTINUOUS_NATURE;
-		}
-		if ((role & PasswordUtils.RULE_CONTINUOUS_KEYBOARD) == PasswordUtils.RULE_CONTINUOUS_KEYBOARD) {
-			if (! isContinuousKeyboard(password))
-				return ERROR_CONTINUOUS_KEYBOARD;
+		if (role != PasswordUtils.RULE_NONE) {
+			if ((role & PasswordUtils.RULE_CHAR) == PasswordUtils.RULE_CHAR) {
+				if (!password.matches(".*?[a-zA-Z]+.*?"))
+					return new PasswordMatchResult(ERROR_CHAR, "");
+			}
+			if ((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE) {
+				if (!password.matches(".*?[a-z]+.*?") || !password.matches(".*?[A-Z]+.*?"))
+					return new PasswordMatchResult(ERROR_CASE_SENSITIVE, "缺少大小写字母");
+			}
+			if ((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT) {
+				if (!password.matches(".*?[\\d]+.*?"))
+					return new PasswordMatchResult(ERROR_DIGIT_MISSING, "缺少数字");
+			}
+			if ((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL) {
+				if (!password.matches(".*?[^a-zA-Z\\d]+.*?"))
+					return new PasswordMatchResult(ERROR_SPECIAL_MISSING, "缺少特殊字符");
+			}
+			if ((role & PasswordUtils.RULE_CONTINUOUS_NATURE) == PasswordUtils.RULE_CONTINUOUS_NATURE) {
+				if (!isContinuousNature(password))
+					return new PasswordMatchResult(ERROR_CONTINUOUS_NATURE, "出现连续相邻3个以上字符");
+			}
+			if ((role & PasswordUtils.RULE_CONTINUOUS_KEYBOARD) == PasswordUtils.RULE_CONTINUOUS_KEYBOARD) {
+				if (!isContinuousKeyboard(password))
+					return new PasswordMatchResult(ERROR_CONTINUOUS_KEYBOARD, "出现连续相邻3个以上键盘字符");
+			}
 		}
 
 		if (excludes != null) {
 			for(String exclude: excludes) {
 				//log.info("{} vs {}", password, exclude);
 				if (password.indexOf(exclude) != -1)
-					return ERROR_WORD_SENSITIVE;
+					return new PasswordMatchResult(ERROR_WORD_SENSITIVE, "禁止使用敏感词 " + exclude);
 			}
 		}
 
-		return 1;
+		if (regexes != null) {
+			for(PasswordRegex extraRegex: regexes) {
+				Pattern pattern = Pattern.compile(extraRegex.getRegex());
+				if ( (extraRegex.isPositive() && ! pattern.matches(extraRegex.getRegex(), password))
+					|| (! extraRegex.isPositive() && pattern.matches(extraRegex.getRegex(), password)))
+					return new PasswordMatchResult(extraRegex.getCode(), extraRegex.getMessage());
+			}
+		}
+
+		return new PasswordMatchResult(SUCCESS, "");
 	}
 
 	public static final char[] allowedSpecialCharactors = {
@@ -294,16 +330,56 @@ public class PasswordUtils {
 		return c;
 	}
 
+	private static int getRoles(String roleString) {
+		if (StringUtils.isEmpty(roleString)) {
+			return PasswordUtils.RULE_NONE;
+		} else {
+			String[] roles = roleString.split("|");
+			List<Integer> roleCodes = new ArrayList();
+			for (String role: roles) {
+				switch (role.toLowerCase()) {
+					case "a":
+						roleCodes.add(PasswordUtils.RULE_CHAR);
+						break;
+					case "b":
+						roleCodes.add(PasswordUtils.RULE_ALLCASE);
+						break;
+					case "c":
+						roleCodes.add(PasswordUtils.RULE_DIGIT);
+						break;
+					case "d":
+						roleCodes.add(PasswordUtils.RULE_SPECIAL);
+						break;
+					case "e":
+						roleCodes.add(PasswordUtils.RULE_CONTINUOUS_NATURE);
+						break;
+					case "f":
+						roleCodes.add(PasswordUtils.RULE_CONTINUOUS_KEYBOARD);
+						break;
+				}
+			}
+			if (roleCodes.size() == 0) {
+				return PasswordUtils.RULE_NONE;
+			} else {
+				int result = roleCodes.get(0).intValue();
+				for(int i=1; i<roleCodes.size(); i++) {
+					result = result | roleCodes.get(i).intValue();
+				}
+				return result;
+			}
+		}
+	}
+
 	@Test
 	public void test() throws PasswordInvalidException {
 		List<String> excludes = new ArrayList<>();
 		excludes.add("kevin");
-		int code = PasswordUtils.match("l03080308!~", 8, 20, PasswordUtils.RULE_ALLCASE |
+		PasswordMatchResult result = PasswordUtils.match("l03080308!~", 8, 20, PasswordUtils.RULE_ALLCASE |
 				PasswordUtils.RULE_DIGIT |
 				PasswordUtils.RULE_SPECIAL |
 				PasswordUtils.RULE_CONTINUOUS_NATURE |
 				PasswordUtils.RULE_CONTINUOUS_KEYBOARD, excludes);
-		System.out.println(code);
+		System.out.println(result);
 
 	}
 }
