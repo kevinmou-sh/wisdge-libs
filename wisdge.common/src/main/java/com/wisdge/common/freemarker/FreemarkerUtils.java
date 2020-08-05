@@ -11,7 +11,7 @@ import java.util.Map;
 public class FreemarkerUtils {
     public static String processByTemplate(String templateFilename, Map params) throws Exception {
         // 创建配置类
-        Configuration configuration = new Configuration(Configuration.getVersion());
+        Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
         // 设置字符集
         configuration.setDefaultEncoding("UTF-8");
 
@@ -27,7 +27,7 @@ public class FreemarkerUtils {
 
     public static String processByString(String content, Map params) throws Exception {
         // 创建配置类
-        Configuration configuration = new Configuration(Configuration.getVersion());
+        Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
         // 设置字符集
         configuration.setDefaultEncoding("UTF-8");
         // 模板加载器
