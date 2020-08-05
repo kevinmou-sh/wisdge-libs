@@ -10,11 +10,12 @@ import java.util.Random;
 @Slf4j
 public class PasswordUtils {
 	public static int RULE_NONE = 0;					// 无规则
-	public static int RULE_ALLCASE = 1 << 0;			// 必须包含大小写字符
-	public static int RULE_DIGIT = 1 << 1;				// 必须包含数字
-	public static int RULE_SPECIAL = 1 << 2;			// 必须包含特殊字符
-	public static int RULE_CONTINUOUS_NATURE = 1 << 3;	// 必须少于3个以上连续相邻字符
-	public static int RULE_CONTINUOUS_KEYBOARD = 1 << 4;// 必须少于3个以上连续键盘相邻字符
+	public static int RULE_CHAR = 1 << 0;				// 必须包含英语字母
+	public static int RULE_ALLCASE = 1 << 1;			// 必须包含大小写字符
+	public static int RULE_DIGIT = 1 << 2;				// 必须包含数字
+	public static int RULE_SPECIAL = 1 << 3;			// 必须包含特殊字符
+	public static int RULE_CONTINUOUS_NATURE = 1 << 4;	// 必须少于3个以上连续相邻字符
+	public static int RULE_CONTINUOUS_KEYBOARD = 1 << 5;// 必须少于3个以上连续键盘相邻字符
 
 	public static int ERROR_EMPTY = 0;	// 密码为空
 	public static int ERROR_LESS = -1; // 小于最小长度要求
@@ -25,6 +26,7 @@ public class PasswordUtils {
 	public static int ERROR_CONTINUOUS_NATURE = -6;	// 连续相邻3个以上字符
 	public static int ERROR_CONTINUOUS_KEYBOARD = -7;	// 连续相邻3个以上键盘字符
 	public static int ERROR_WORD_SENSITIVE = -8;	// 出现关键敏感词
+	public static int ERROR_CHAR = -9;	// 缺少字母
 
 	public PasswordUtils () {
 	}
@@ -189,16 +191,20 @@ public class PasswordUtils {
 		if (role == PasswordUtils.RULE_NONE)
 			return 1;
 
+		if ((role & PasswordUtils.RULE_CHAR) == PasswordUtils.RULE_CHAR) {
+			if (! password.matches(".*?[a-zA-Z]+.*?"))
+				return ERROR_CHAR;
+		}
 		if ((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE) {
-			if (!password.matches(".*?[a-z]+.*?") || !password.matches(".*?[A-Z]+.*?"))
+			if (! password.matches(".*?[a-z]+.*?") || ! password.matches(".*?[A-Z]+.*?"))
 				return ERROR_CASE_SENSITIVE;
 		}
 		if ((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT) {
-			if (!password.matches(".*?[\\d]+.*?"))
+			if (! password.matches(".*?[\\d]+.*?"))
 				return ERROR_DIGIT_MISSING;
 		}
 		if ((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL) {
-			if (!password.matches(".*?[^a-zA-Z\\d]+.*?"))
+			if (! password.matches(".*?[^a-zA-Z\\d]+.*?"))
 				return ERROR_SPECIAL_MISSING;
 		}
 		if ((role & PasswordUtils.RULE_CONTINUOUS_NATURE) == PasswordUtils.RULE_CONTINUOUS_NATURE) {
@@ -290,18 +296,9 @@ public class PasswordUtils {
 
 	@Test
 	public void test() throws PasswordInvalidException {
-		int role = PasswordUtils.RULE_ALLCASE | PasswordUtils.RULE_DIGIT |
-				PasswordUtils.RULE_SPECIAL | PasswordUtils.RULE_CONTINUOUS_NATURE | PasswordUtils.RULE_CONTINUOUS_KEYBOARD;
-		// System.out.println(role);
-		System.out.println("AllCase: " + ((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE));
-		System.out.println("Digit: " + ((role & PasswordUtils.RULE_DIGIT) == PasswordUtils.RULE_DIGIT));
-		System.out.println("Special: " + ((role & PasswordUtils.RULE_SPECIAL) == PasswordUtils.RULE_SPECIAL));
-		System.out.println("ContinuousNature: " + ((role & PasswordUtils.RULE_CONTINUOUS_NATURE) == PasswordUtils.RULE_CONTINUOUS_NATURE));
-		System.out.println("ContinuousKeyboard: " + ((role & PasswordUtils.RULE_CONTINUOUS_KEYBOARD) == PasswordUtils.RULE_CONTINUOUS_KEYBOARD));
-
 		List<String> excludes = new ArrayList<>();
-		excludes.add("mein");
-		int code = PasswordUtils.match("Letmein_0308", 8, 20, PasswordUtils.RULE_ALLCASE |
+		excludes.add("kevin");
+		int code = PasswordUtils.match("l03080308!~", 8, 20, PasswordUtils.RULE_ALLCASE |
 				PasswordUtils.RULE_DIGIT |
 				PasswordUtils.RULE_SPECIAL |
 				PasswordUtils.RULE_CONTINUOUS_NATURE |
