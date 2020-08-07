@@ -46,10 +46,16 @@ public class SnowflakeIdWorker {
     private final long sequenceMask = -1L ^ (-1L << sequenceBits);
 
     /** 工作机器ID(0~31) */
-    private long workerId=0L;
+    private long workerId;
 
     /** 数据中心ID(0~31) */
-    private long datacenterId=0L;
+    private long datacenterId;
+
+    /** 备用的数据中心ID(0~31)，当时钟回拨时，为了不抛异常，启用备用ID */
+    private long standbyDatacenterId;
+
+    /**是否时钟回拨*/
+    private boolean isTimestampBack = false;
 
     /** 毫秒内序列(0~4095) */
     private long sequence = 0L;
@@ -58,31 +64,42 @@ public class SnowflakeIdWorker {
     private long lastTimestamp = -1L;
 
     //==============================Constructors=====================================
+    public SnowflakeIdWorker() {
+        this(0L, 0L);
+    }
     /**
      * 构造函数
-     * @param workerId integer 工作ID (0~31)
-     * @param datacenterId integer 数据中心ID (0~31)
+     * @param workerId 工作ID (0~31)
+     * @param datacenterId 数据中心ID (0~31)
      */
     public SnowflakeIdWorker(long workerId, long datacenterId) {
-        this(workerId, datacenterId, 0L);
+        this(workerId, datacenterId, datacenterId + 16);
     }
 
     /**
      * 构造函数
-     * @param workerId integer 工作ID (0~31)
-     * @param datacenterId integer 数据中心ID (0~31)
-     * @param sequence integer 毫秒内序列(0~4095)
+     * @param workerId 工作ID (0~31)
+     * @param datacenterId 数据中心ID (0~31)
      */
-    public SnowflakeIdWorker(long workerId, long datacenterId, long sequence) {
+    public SnowflakeIdWorker(long workerId, long datacenterId, long standbyDatacenterId) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
-        if (datacenterId > maxDatacenterId || datacenterId < 0) {
-            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
+        if (datacenterId >= maxDatacenterId/2 || datacenterId < 0) {
+            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId/2));
+        }
+        if (standbyDatacenterId > maxDatacenterId) {
+            throw new IllegalArgumentException(String.format("standby datacenter Id can't be greater than %d, which is %d", maxDatacenterId, standbyDatacenterId));
+        }
+        if (standbyDatacenterId < maxDatacenterId/2) {
+            throw new IllegalArgumentException(String.format("standby datacenter Id can't be less than %d, which is %d", maxDatacenterId/2, standbyDatacenterId));
+        }
+        if(datacenterId == standbyDatacenterId) {
+            throw new IllegalArgumentException("datacenter Id can't equal to standby datacenter Id.");
         }
         this.workerId = workerId;
         this.datacenterId = datacenterId;
-        this.sequence = sequence;
+        this.standbyDatacenterId = standbyDatacenterId;
     }
 
     // ==============================Methods==========================================
@@ -93,31 +110,36 @@ public class SnowflakeIdWorker {
     public synchronized long nextId() {
         long timestamp = timeGen();
 
-        // 如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
+        //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过，这时启用备用的datacenterId
         if (timestamp < lastTimestamp) {
-            throw new RuntimeException(String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
+            isTimestampBack = true;
+        } else {
+            isTimestampBack = false;
         }
 
-        // 如果是同一时间生成的，则进行毫秒内序列
+        //如果是同一时间生成的，则进行毫秒内序列
         if (lastTimestamp == timestamp) {
             sequence = (sequence + 1) & sequenceMask;
-            // 毫秒内序列溢出
+            //毫秒内序列溢出
             if (sequence == 0) {
-                // 阻塞到下一个毫秒,获得新的时间戳
+                //阻塞到下一个毫秒,获得新的时间戳
                 timestamp = tilNextMillis(lastTimestamp);
             }
         }
-        // 时间戳改变，毫秒内序列重置
+        //时间戳改变，毫秒内序列重置
         else {
             sequence = 0L;
         }
 
-        // 上次生成ID的时间截
+        //上次生成ID的时间截
         lastTimestamp = timestamp;
 
-        // 移位并通过或运算拼到一起组成64位的ID
+        //要使用的datacenterId
+        long datacenterIdToUse = isTimestampBack ? standbyDatacenterId : datacenterId;
+
+        //移位并通过或运算拼到一起组成64位的ID
         return ((timestamp - twepoch) << timestampLeftShift) //
-                | (datacenterId << datacenterIdShift) //
+                | (datacenterIdToUse << datacenterIdShift) //
                 | (workerId << workerIdShift) //
                 | sequence;
     }
@@ -143,25 +165,11 @@ public class SnowflakeIdWorker {
         return System.currentTimeMillis();
     }
 
-    public long getWorkerId(long snowflakeId) {
-        return snowflakeId >> workerIdShift & ~(-1L << workerIdBits);
-    }
-
-    public long getDatacenterId(long snowflakeId) {
-        return snowflakeId >> datacenterIdShift & ~(-1L << datacenterIdBits);
-    }
-
-    //==============================Test=============================================
-    /** 测试 */
     public static void main(String[] args) {
-        SnowflakeIdWorker idWorker = new SnowflakeIdWorker(7, 22);
+        SnowflakeIdWorker idWorker = new SnowflakeIdWorker(0, 1);
         for (int i = 0; i < 1000; i++) {
             long id = idWorker.nextId();
-            System.out.println(Long.toBinaryString(id));
             System.out.println(id);
         }
-
-        System.out.println(idWorker.getWorkerId(47832648100114445L));
-        System.out.println(idWorker.getDatacenterId(47832648100114446L));
     }
 }
