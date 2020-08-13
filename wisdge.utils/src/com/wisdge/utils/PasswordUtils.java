@@ -219,7 +219,7 @@ public class PasswordUtils {
 		if (role != PasswordUtils.RULE_NONE) {
 			if ((role & PasswordUtils.RULE_CHAR) == PasswordUtils.RULE_CHAR) {
 				if (!password.matches(".*?[a-zA-Z]+.*?"))
-					return new PasswordMatchResult(ERROR_CHAR, "");
+					return new PasswordMatchResult(ERROR_CHAR, "缺少字母");
 			}
 			if ((role & PasswordUtils.RULE_ALLCASE) == PasswordUtils.RULE_ALLCASE) {
 				if (!password.matches(".*?[a-z]+.*?") || !password.matches(".*?[A-Z]+.*?"))
