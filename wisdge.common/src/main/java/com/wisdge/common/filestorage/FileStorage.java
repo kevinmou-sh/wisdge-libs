@@ -95,8 +95,8 @@ public class FileStorage {
      * @return
      * 	Result对象
      */
-    public Result save(String uploadPath, String original, String filename, InputStream inputStream, long size) {
-        return save(FIELD_DEFAULT, uploadPath, original, filename, inputStream, size);
+    public Result saveStream(String uploadPath, String original, String filename, InputStream inputStream, long size) {
+        return saveStream(FIELD_DEFAULT, uploadPath, original, filename, inputStream, size);
     }
 
     /**
@@ -116,7 +116,7 @@ public class FileStorage {
      * @return
      * 	Result对象
      */
-    public Result save(String fsKey, String uploadPath, String original, String filename, InputStream inputStream, long size) {
+    public Result saveStream(String fsKey, String uploadPath, String original, String filename, InputStream inputStream, long size) {
         if (StringUtils.isEmpty(fsKey))
             fsKey = FIELD_DEFAULT;
 
@@ -145,7 +145,7 @@ public class FileStorage {
         }
     }
 
-    public void retrive(String fsKey, String filepath, IFileExecutor executor) throws Exception {
+    public void retrieveStream(String fsKey, String filepath, IFileExecutor executor) throws Exception {
         if (StringUtils.isEmpty(fsKey))
             fsKey = FIELD_DEFAULT;
 
