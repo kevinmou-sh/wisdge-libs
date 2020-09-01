@@ -106,6 +106,9 @@ public class FileStorage {
      * 	Result对象
      */
     public Result save(String fsKey, String uploadPath, String original, String filename, InputStream inputStream, long size) {
+        if (StringUtils.isEmpty(fsKey))
+            fsKey = "default";
+
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
             return new Result(Result.ERROR, MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
@@ -120,8 +123,10 @@ public class FileStorage {
         String finalRemote = concat(remoteRoot, requestRemote);
 
         try {
-            log.info("Save file to {}: {}", fileStorageClient.getClass().getSimpleName(), finalRemote);
+            log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
             String newPath = fileStorageClient.saveStream(finalRemote, inputStream, size);
+            if (! fsKey.equals("default"))
+                newPath = fsKey + "@" + newPath;
             return new Result(Result.SUCCESS, original, newPath);
         } catch(Exception e) {
             log.error(e.getMessage(), e);
