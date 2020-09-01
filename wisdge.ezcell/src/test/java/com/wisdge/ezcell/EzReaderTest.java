@@ -14,7 +14,7 @@ public class EzReaderTest {
 	 */
 	@org.junit.Test
 	public void saxReadListObjectsV2007() throws Exception {
-		InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/QQ/jw.xls"));
+		InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/Documents/temp/2.xlsx"));
 //        InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/Documents/2007.xlsx"));
 		EzPreview preview = EzCellFactory.getPreview(inputStream, 0);
 		System.out.println("Total rows: " + preview.getTotalRows());

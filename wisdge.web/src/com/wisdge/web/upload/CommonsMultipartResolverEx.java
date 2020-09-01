@@ -8,6 +8,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 public class CommonsMultipartResolverEx extends CommonsMultipartResolver {
@@ -64,6 +65,29 @@ public class CommonsMultipartResolverEx extends CommonsMultipartResolver {
 	public MultipartHttpServletRequest resolveMultipart(HttpServletRequest request) throws MultipartException {
 		this.request = request;// 获取到request
 		return super.resolveMultipart(request);
+	}
+
+	/**
+	 * 正常情况下直接转换MultipartHttpServletRequest
+	 * 在JBoss下，需要手动再次resolve一下
+	 * @param request
+	 * @return
+	 */
+	public static MultipartHttpServletRequest getMultipartHttpServletRequest(HttpServletRequest request) {
+		try {
+			// 如果配置过了multipartResolver，就不需要手动调用resolveMultipart
+			MultipartHttpServletRequest mr = (MultipartHttpServletRequest) request;
+			return mr;
+		} catch (Exception e) {
+			/**
+			 * what if we use JBoss web container, it will throw NullPointerException
+			 * MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+			 * MultipartHttpServletRequest mr = resolver.resolveMultipart(request);
+			 */
+			MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+			MultipartHttpServletRequest mr = resolver.resolveMultipart(request);
+			return mr;
+		}
 	}
 
 }
