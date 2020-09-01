@@ -9,7 +9,7 @@ import java.io.InputStream;
 @Slf4j
 public class FileStorage {
 
-    @Autowired
+    @Autowired(required = false)
     private IFileStorageClient fileStorageClient;
 
     /**
@@ -61,7 +61,6 @@ public class FileStorage {
                 .replace("-", "_");
     }
 
-
     /**
      * 保存文件到文件服务
      * @param uploadPath
@@ -78,6 +77,9 @@ public class FileStorage {
      * 	Result对象
      */
     public Result saveStream(String uploadPath, String original, String filename, InputStream inputStream, long size) {
+        if (fileStorageClient == null)
+            return new Result(Result.ERROR, "文件服务未配置");
+
         // Replace specially char at filename and uploadPath
         filename = filterFilename(filename);
         uploadPath = filterFilepath(uploadPath);
@@ -93,7 +95,7 @@ public class FileStorage {
             return new Result(Result.SUCCESS, original, newPath);
         } catch(Exception e) {
             log.error(e.getMessage(), e);
-            return new Result(Result.ERROR);
+            return new Result(Result.ERROR, e.getMessage());
         }
     }
 
