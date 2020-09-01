@@ -4,17 +4,20 @@ import com.wisdge.dataservice.Result;
 import com.wisdge.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.Map;
 
 @Slf4j
 public class FileStorage {
-    private IFileStorageClient fileStorageClient;
+    private final String FILESTORAGE_NOT_EXIST = "文件服务{0}未配置";
+    private Map<String, IFileStorageClient> fileStorages;
 
-    public IFileStorageClient getFileStorageClient() {
-        return fileStorageClient;
+    public Map<String, IFileStorageClient> getFileStorages() {
+        return fileStorages;
     }
 
-    public void setFileStorageClient(IFileStorageClient fileStorageClient) {
-        this.fileStorageClient = fileStorageClient;
+    public void setFileStorages(Map<String, IFileStorageClient> fileStorages) {
+        this.fileStorages = fileStorages;
     }
 
     /**
@@ -81,9 +84,31 @@ public class FileStorage {
      * @return
      * 	Result对象
      */
-    public Result saveStream(String uploadPath, String original, String filename, InputStream inputStream, long size) {
+    public Result save(String uploadPath, String original, String filename, InputStream inputStream, long size) {
+        return save("default", uploadPath, original, filename, inputStream, size);
+    }
+
+    /**
+     * 保存文件到文件服务
+     * @param fsKey
+     *  String 文件服务的Key
+     * @param uploadPath
+     * 	String 文件上传的路径
+     * @param original
+     * 	String 文件原始名
+     * @param filename
+     * 	String 文件保存名
+     * @param inputStream
+     * 	InputStream 文件流
+     * @param size
+     * 	long 文件大小
+     * @return
+     * 	Result对象
+     */
+    public Result save(String fsKey, String uploadPath, String original, String filename, InputStream inputStream, long size) {
+        IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
-            return new Result(Result.ERROR, "文件服务未配置");
+            return new Result(Result.ERROR, MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
 
         // Replace specially char at filename and uploadPath
         filename = filterFilename(filename);
@@ -102,6 +127,20 @@ public class FileStorage {
             log.error(e.getMessage(), e);
             return new Result(Result.ERROR, e.getMessage());
         }
+    }
+
+    public void retrive(String fsKey, String filepath, IFileExecutor executor) throws Exception {
+        IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
+        if (fileStorageClient == null)
+            throw new NullPointerException(MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
+
+        // Replace specially char at filename and uploadPath
+        filepath = filterFilepath(filepath);
+        // Get final remote file path
+        String remoteRoot = getRemoteRoot(fileStorageClient.getRemoteRoot());
+        String finalRemote = concat(remoteRoot, filepath);
+        log.info("Retrieve file from {}: {}", fileStorageClient.getClass().getSimpleName(), finalRemote);
+        fileStorageClient.retrieveStream(finalRemote, executor);
     }
 
     public String concat(String...path) {
@@ -148,4 +187,6 @@ public class FileStorage {
         }
         return remoteRoot;
     }
+
+
 }
