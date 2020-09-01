@@ -3,14 +3,19 @@ package com.wisdge.common.filestorage;
 import com.wisdge.dataservice.Result;
 import com.wisdge.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.io.InputStream;
 
 @Slf4j
 public class FileStorage {
-
-    @Autowired(required = false)
     private IFileStorageClient fileStorageClient;
+
+    public IFileStorageClient getFileStorageClient() {
+        return fileStorageClient;
+    }
+
+    public void setFileStorageClient(IFileStorageClient fileStorageClient) {
+        this.fileStorageClient = fileStorageClient;
+    }
 
     /**
      * 对文件名过滤特殊字符
