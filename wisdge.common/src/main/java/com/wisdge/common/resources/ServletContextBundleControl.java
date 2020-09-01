@@ -54,7 +54,5 @@ public class ServletContextBundleControl extends ResourceBundle.Control {
 	public long getTimeToLive(String baseName, Locale locale) {
 		return TTL_DONT_CACHE;
 	}
-	
-	
 
 }
