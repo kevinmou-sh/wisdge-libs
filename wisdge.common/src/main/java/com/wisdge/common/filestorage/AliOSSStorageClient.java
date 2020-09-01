@@ -15,8 +15,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 
-public class AliOSSStorage implements IFileStorageClient {
-	private static final Logger logger = LoggerFactory.getLogger(AliOSSStorage.class);
+public class AliOSSStorageClient implements IFileStorageClient {
+	private static final Logger logger = LoggerFactory.getLogger(AliOSSStorageClient.class);
 	private String bucketName;
 	private String accessKeyId;
 	private String accessKeySecret;
@@ -83,6 +83,7 @@ public class AliOSSStorage implements IFileStorageClient {
 		this.endpoint = endpoint;
 	}
 
+	@Override
 	public void init() {
 		logger.debug("Aliyun OSS service initializing remoteRoot： {}", remoteRoot);
 		ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
@@ -103,6 +104,7 @@ public class AliOSSStorage implements IFileStorageClient {
 		}
 	}
 
+	@Override
 	public void destroy() {
 		ossClient.shutdown();
 	}

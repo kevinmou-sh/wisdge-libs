@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpStorage implements IFileStorageClient {
+public class HttpStorageClient implements IFileStorageClient {
 	@Autowired
 	private XHRPoolService xhrService;
 	
@@ -71,6 +71,11 @@ public class HttpStorage implements IFileStorageClient {
 
 	public void setPathField(String pathField) {
 		this.pathField = pathField;
+	}
+
+	@Override
+	public void init() {
+
 	}
 
 	@Override
@@ -149,6 +154,11 @@ public class HttpStorage implements IFileStorageClient {
 		if (result.getCode() <= 0) {
 			throw new FileException("File delete failed");
 		}
+	}
+
+	@Override
+	public void destroy() {
+
 	}
 
 }

@@ -3,10 +3,16 @@ package com.wisdge.common.filestorage;
 import java.io.InputStream;
 
 public interface IFileStorageClient {
+
+	/**
+	 * 初始化服务
+	 */
+	void init();
+
 	/**
 	 * @return String 文件服务的根路径
 	 */
-	public String getRemoteRoot();
+	String getRemoteRoot();
 	
 	/**
 	 * 保存文件
@@ -49,4 +55,9 @@ public interface IFileStorageClient {
 	 * @throws Exception
 	 */
 	void delete(String filepath) throws Exception;
+
+	/**
+	 * 销毁服务
+	 */
+	void destroy();
 }

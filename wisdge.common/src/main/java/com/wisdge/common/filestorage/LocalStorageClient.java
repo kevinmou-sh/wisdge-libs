@@ -8,8 +8,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-public class LocalStorage implements IFileStorageClient {
+public class LocalStorageClient implements IFileStorageClient {
 	private String remoteRoot;
+
+	@Override
+	public void init() {
+
+	}
 
 	@Override
 	public String getRemoteRoot() {
@@ -89,6 +94,11 @@ public class LocalStorage implements IFileStorageClient {
 		String encoding = System.getProperty("file.encoding");
 		filepath = encodingFilename(filepath, encoding);
 		FileUtils.deleteQuietly(new File(filepath));
+	}
+
+	@Override
+	public void destroy() {
+
 	}
 
 	private String encodingFilename(String filename, String encoding) throws UnsupportedEncodingException {

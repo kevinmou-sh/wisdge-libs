@@ -8,13 +8,17 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 
-public class FtpStorage extends FTPConfig implements IFileStorageClient {
+public class FtpStorageClient extends FTPConfig implements IFileStorageClient {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.getLogger(FtpStorage.class);
+	private static final Logger logger = LoggerFactory.getLogger(FtpStorageClient.class);
 	private String remoteRoot;
+
+	@Override
+	public void init() {
+
+	}
 
 	@Override
 	public String getRemoteRoot() {
@@ -77,6 +81,11 @@ public class FtpStorage extends FTPConfig implements IFileStorageClient {
 	@Override
 	public void delete(String filepath) throws Exception {
 		FtpUtils.deleteFile(this, filepath); 
+	}
+
+	@Override
+	public void destroy() {
+
 	}
 
 }

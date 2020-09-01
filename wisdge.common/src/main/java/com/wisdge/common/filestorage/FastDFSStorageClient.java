@@ -14,8 +14,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class FastDFSStorage implements IFileStorageClient {
-	private static final Logger logger = LoggerFactory.getLogger(FastDFSStorage.class);
+public class FastDFSStorageClient implements IFileStorageClient {
+	private static final Logger logger = LoggerFactory.getLogger(FastDFSStorageClient.class);
 	private int connectTimeout = 2000;
 	private int networkTimeout = 3000;
 	private String charset = "UTF-8";
@@ -199,6 +199,7 @@ public class FastDFSStorage implements IFileStorageClient {
 	    }
 	}
 
+	@Override
 	public void init() {
 		connectionPool = new ConnectionPool();
 	}
@@ -311,6 +312,11 @@ public class FastDFSStorage implements IFileStorageClient {
         } finally {
         	connectionPool.checkin(storageClient1);
         }
+	}
+
+	@Override
+	public void destroy() {
+
 	}
 
 }
