@@ -57,6 +57,12 @@ public interface IFileStorageClient {
 	void delete(String filepath) throws Exception;
 
 	/**
+	 * 判断该服务是否需要安全控制
+	 * @return boolean
+	 */
+	boolean isSecurity();
+
+	/**
 	 * 销毁服务
 	 */
 	void destroy();

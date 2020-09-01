@@ -4,16 +4,25 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpATTRS;
 import com.wisdge.ftp.FTPConfig;
 import com.wisdge.ftp.FtpUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 
+@Slf4j
 public class FtpStorageClient extends FTPConfig implements IFileStorageClient {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.getLogger(FtpStorageClient.class);
 	private String remoteRoot;
+	private boolean security;
+
+	@Override
+	public boolean isSecurity() {
+		return security;
+	}
+
+	public void setSecurity(boolean security) {
+		this.security = security;
+	}
 
 	@Override
 	public void init() {
@@ -56,7 +65,7 @@ public class FtpStorageClient extends FTPConfig implements IFileStorageClient {
 				if (attrs != null) {
 					metadata.setContentLength(attrs.getSize());
 				} else {
-					logger.debug("lstat file {} failed, cannot get file size", filepath);
+					log.debug("lstat file {} failed, cannot get file size", filepath);
 				}
 				executor.execute(is, metadata);
 			} finally {
@@ -69,7 +78,7 @@ public class FtpStorageClient extends FTPConfig implements IFileStorageClient {
 				if (file != null) {
 					metadata.setContentLength(file.getSize());
 				} else {
-					logger.debug("List file {} failed, cannot get file size", filepath);
+					log.debug("List file {} failed, cannot get file size", filepath);
 				}
 				executor.execute(is, metadata);
 			} finally {

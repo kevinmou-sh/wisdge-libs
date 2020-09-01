@@ -1,15 +1,26 @@
 package com.wisdge.common.filestorage;
 
 import com.wisdge.utils.FileUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+@Slf4j
 public class LocalStorageClient implements IFileStorageClient {
 	private String remoteRoot;
+	private boolean security;
+
+	@Override
+	public boolean isSecurity() {
+		return security;
+	}
+
+	public void setSecurity(boolean security) {
+		this.security = security;
+	}
 
 	@Override
 	public void init() {

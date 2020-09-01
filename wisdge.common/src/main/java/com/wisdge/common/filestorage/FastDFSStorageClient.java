@@ -1,5 +1,6 @@
 package com.wisdge.common.filestorage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
@@ -14,8 +15,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class FastDFSStorageClient implements IFileStorageClient {
-	private static final Logger logger = LoggerFactory.getLogger(FastDFSStorageClient.class);
 	private int connectTimeout = 2000;
 	private int networkTimeout = 3000;
 	private String charset = "UTF-8";
@@ -25,6 +26,7 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	private String httpTrackerServers;
 	private ConnectionPool connectionPool;
 	private int poolSize = 5;
+	private boolean security;
 
 	public int getConnectTimeout() {
 		return connectTimeout;
@@ -86,7 +88,16 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	public String getRemoteRoot() {
 		return "";
 	}
-	
+
+	@Override
+	public boolean isSecurity() {
+		return security;
+	}
+
+	public void setSecurity(boolean security) {
+		this.security = security;
+	}
+
 	class ConnectionPool {
 	    //被使用的连接
 	    private ConcurrentHashMap<StorageClient1,Object> busyConnectionPool = null;
@@ -113,16 +124,16 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	            for(int i=0; i<poolSize; i++){
 	                storageClient1 = new StorageClient1(trackerServer, storageServer);
 	                idleConnectionPool.add(storageClient1);
-	                logger.debug("FastDFS Connections: connection +1");
+	                log.debug("FastDFS Connections: connection +1");
 	            }
 	        } catch (Exception e) {
-	        	logger.error(e.getMessage(), e);
+	        	log.error(e.getMessage(), e);
 	        } finally {
 	            if(trackerServer != null){
 	                try {
 	                    trackerServer.close();
 	                } catch (IOException e) {
-	                	logger.error(e.getMessage(), e);
+	                	log.error(e.getMessage(), e);
 	                }
 	            }
 	        }
@@ -162,7 +173,7 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	            }
 	        } catch (InterruptedException e) {
 	            storageClient1 = null;
-	            logger.error(e.getMessage(), e);
+	            log.error(e.getMessage(), e);
 	        }
 	        return storageClient1;
 	    }
@@ -183,15 +194,15 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	                trackerServer = trackerClient.getConnection();
 	                StorageClient1 newStorageClient1 = new StorageClient1(trackerServer,null);
 	                idleConnectionPool.add(newStorageClient1);
-	                logger.debug("FastDFS Connections: connection +1");
+	                log.debug("FastDFS Connections: connection +1");
 	            } catch (Exception e) {
-	                logger.error(e.getMessage(), e);
+	                log.error(e.getMessage(), e);
 	            } finally {
 	                if(trackerServer != null){
 	                    try {
 	                        trackerServer.close();
 	                    } catch (IOException e) {
-	                        logger.error(e.getMessage(), e);
+	                        log.error(e.getMessage(), e);
 	                    }
 	                }
 	            }
@@ -268,7 +279,7 @@ public class FastDFSStorageClient implements IFileStorageClient {
         		filepath = filepath.substring(1);
             return storageClient1.downloadFile1(filepath);
         } catch (Exception e) {
-        	logger.error("download_file1 failed", e);
+        	log.error("download_file1 failed", e);
             //如果出现了IO异常应该销毁此连接
         	connectionPool.drop(storageClient1);
             throw e;
@@ -289,7 +300,7 @@ public class FastDFSStorageClient implements IFileStorageClient {
 			metadata.setContentLength(data.length);
 			executor.execute(new ByteArrayInputStream(data), metadata);
 		} catch (Exception e) {
-			logger.error("download_file1 failed", e);
+			log.error("download_file1 failed", e);
 			//如果出现了IO异常应该销毁此连接
 			connectionPool.drop(storageClient1);
 			throw e;

@@ -5,6 +5,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.BucketInfo;
 import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.ObjectMetadata;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +16,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 
+@Slf4j
 public class AliOSSStorageClient implements IFileStorageClient {
-	private static final Logger logger = LoggerFactory.getLogger(AliOSSStorageClient.class);
 	private String bucketName;
 	private String accessKeyId;
 	private String accessKeySecret;
@@ -25,6 +26,7 @@ public class AliOSSStorageClient implements IFileStorageClient {
 	private String remoteRoot;
 	private boolean downloadFromURL;// 是否通过oss的url直接下载
 	private long expiredMins; // oss的url多少分钟后过期
+	private boolean security;
 
 	public boolean isDownloadFromURL() {
 		return downloadFromURL;
@@ -84,23 +86,32 @@ public class AliOSSStorageClient implements IFileStorageClient {
 	}
 
 	@Override
+	public boolean isSecurity() {
+		return security;
+	}
+
+	public void setSecurity(boolean security) {
+		this.security = security;
+	}
+
+	@Override
 	public void init() {
-		logger.debug("Aliyun OSS service initializing remoteRoot： {}", remoteRoot);
+		log.debug("Aliyun OSS service initializing remoteRoot： {}", remoteRoot);
 		ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 		if (ossClient.doesBucketExist(bucketName)) {
-			logger.debug("已创建Bucket：{}", bucketName);
+			log.debug("已创建Bucket：{}", bucketName);
 		} else {
-			logger.debug("Bucket不存在，创建Bucket：{}", bucketName);
+			log.debug("Bucket不存在，创建Bucket：{}", bucketName);
 			ossClient.createBucket(bucketName);
 		}
 		try {
 			BucketInfo info = ossClient.getBucketInfo(bucketName);
-			logger.debug("Bucket {} {}", bucketName, "的信息如下：");
-			logger.debug("\t数据中心：{}", info.getBucket().getLocation());
-			logger.debug("\t创建时间：{}", info.getBucket().getCreationDate());
-			logger.debug("\t用户标志：{}", info.getBucket().getOwner());
+			log.debug("Bucket {} {}", bucketName, "的信息如下：");
+			log.debug("\t数据中心：{}", info.getBucket().getLocation());
+			log.debug("\t创建时间：{}", info.getBucket().getCreationDate());
+			log.debug("\t用户标志：{}", info.getBucket().getOwner());
 		} catch (Exception e) {
-			logger.info("保险经纪不兼容getBucketInfo这个方法，他们的云服务器是阿里云的阉割版");
+			log.info("保险经纪不兼容getBucketInfo这个方法，他们的云服务器是阿里云的阉割版");
 		}
 	}
 

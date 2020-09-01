@@ -10,6 +10,7 @@ import java.util.Map;
 @Slf4j
 public class FileStorage {
     private final String FILESTORAGE_NOT_EXIST = "文件服务{0}未配置";
+    private final String FIELD_DEFAULT = "default";
     private Map<String, IFileStorageClient> fileStorages;
 
     public Map<String, IFileStorageClient> getFileStorages() {
@@ -69,6 +70,16 @@ public class FileStorage {
                 .replace("-", "_");
     }
 
+    public boolean isSecurity(String fsKey) {
+        if (StringUtils.isEmpty(fsKey))
+            fsKey = FIELD_DEFAULT;
+
+        IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
+        if (fileStorageClient != null)
+            return fileStorageClient.isSecurity();
+        return false;
+    }
+
     /**
      * 保存文件到文件服务
      * @param uploadPath
@@ -85,7 +96,7 @@ public class FileStorage {
      * 	Result对象
      */
     public Result save(String uploadPath, String original, String filename, InputStream inputStream, long size) {
-        return save("default", uploadPath, original, filename, inputStream, size);
+        return save(FIELD_DEFAULT, uploadPath, original, filename, inputStream, size);
     }
 
     /**
@@ -107,7 +118,7 @@ public class FileStorage {
      */
     public Result save(String fsKey, String uploadPath, String original, String filename, InputStream inputStream, long size) {
         if (StringUtils.isEmpty(fsKey))
-            fsKey = "default";
+            fsKey = FIELD_DEFAULT;
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
@@ -125,7 +136,7 @@ public class FileStorage {
         try {
             log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
             String newPath = fileStorageClient.saveStream(finalRemote, inputStream, size);
-            if (! fsKey.equals("default"))
+            if (! fsKey.equals(FIELD_DEFAULT))
                 newPath = fsKey + "@" + newPath;
             return new Result(Result.SUCCESS, original, newPath);
         } catch(Exception e) {
@@ -135,6 +146,9 @@ public class FileStorage {
     }
 
     public void retrive(String fsKey, String filepath, IFileExecutor executor) throws Exception {
+        if (StringUtils.isEmpty(fsKey))
+            fsKey = FIELD_DEFAULT;
+
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
             throw new NullPointerException(MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
@@ -144,7 +158,7 @@ public class FileStorage {
         // Get final remote file path
         String remoteRoot = getRemoteRoot(fileStorageClient.getRemoteRoot());
         String finalRemote = concat(remoteRoot, filepath);
-        log.info("Retrieve file from {}: {}", fileStorageClient.getClass().getSimpleName(), finalRemote);
+        log.info("[{}] Retrieve file from {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
         fileStorageClient.retrieveStream(finalRemote, executor);
     }
 

@@ -3,6 +3,7 @@ package com.wisdge.common.filestorage;
 import com.wisdge.dataservice.Result;
 import com.wisdge.dataservice.utils.JSonUtils;
 import com.wisdge.dataservice.xhr.XHRPoolService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class HttpStorageClient implements IFileStorageClient {
 	@Autowired
 	private XHRPoolService xhrService;
@@ -24,6 +26,7 @@ public class HttpStorageClient implements IFileStorageClient {
 	private String deleteUrl;
 	private String inputField = "file";
 	private String pathField = "path";
+	private boolean security;
 
 	public XHRPoolService getXhrService() {
 		return xhrService;
@@ -71,6 +74,15 @@ public class HttpStorageClient implements IFileStorageClient {
 
 	public void setPathField(String pathField) {
 		this.pathField = pathField;
+	}
+
+	@Override
+	public boolean isSecurity() {
+		return security;
+	}
+
+	public void setSecurity(boolean security) {
+		this.security = security;
 	}
 
 	@Override
