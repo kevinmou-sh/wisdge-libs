@@ -3,6 +3,8 @@ package com.wisdge.common.filestorage;
 import com.wisdge.dataservice.Result;
 import com.wisdge.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Map;
@@ -132,16 +134,17 @@ public class FileStorage {
         String requestRemote = concat(uploadPath, filename);
         String remoteRoot = getRemoteRoot(fileStorageClient.getRemoteRoot());
         String finalRemote = concat(remoteRoot, requestRemote);
+        requestRemote = fsKey.equals(FIELD_DEFAULT) ? requestRemote : (fsKey + "@" + requestRemote);
 
         try {
             log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
             String newPath = fileStorageClient.saveStream(finalRemote, inputStream, size);
-            if (! fsKey.equals(FIELD_DEFAULT))
-                newPath = fsKey + "@" + newPath;
-            return new Result(Result.SUCCESS, original, newPath);
+            if (StringUtils.isNotEmpty(newPath))
+                requestRemote = fsKey.equals(FIELD_DEFAULT) ? newPath : (fsKey + "@" + newPath);
+            return new Result(Result.SUCCESS, original, requestRemote);
         } catch(Exception e) {
             log.error(e.getMessage(), e);
-            return new Result(Result.ERROR, e.getMessage());
+            return new Result(Result.ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -160,6 +163,73 @@ public class FileStorage {
         String finalRemote = concat(remoteRoot, filepath);
         log.info("[{}] Retrieve file from {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
         fileStorageClient.retrieveStream(finalRemote, executor);
+    }
+
+    /**
+     * 保存文件到文件服务
+     * @param fsKey
+     * 	String 文件服务的key
+     * @param uploadPath
+     * 	String 文件上传的路径
+     * @param original
+     * 	String 文件原始名
+     * @param filename
+     * 	String 文件保存名
+     * @param data
+     * 	byte[] 文件内容
+     * @return
+     * 	Result对象
+     */
+    public Result saveFile(String fsKey, String uploadPath, String original, String filename, byte[] data) {
+        if (StringUtils.isEmpty(fsKey))
+            fsKey = FIELD_DEFAULT;
+
+        IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
+        if (fileStorageClient == null)
+            throw new NullPointerException(MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
+
+        // Replace specially char at filename and uploadPath
+        filename = filterFilename(filename);
+        uploadPath = filterFilepath(uploadPath);
+        // Get final remote file path
+        String requestRemote = concat(uploadPath, filename);
+        String remoteRoot = getRemoteRoot(fileStorageClient.getRemoteRoot());
+        String finalRemote = concat(remoteRoot, requestRemote);
+        requestRemote = fsKey.equals(FIELD_DEFAULT) ? requestRemote : (fsKey + "@" + requestRemote);
+
+        try {
+            log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
+            String newPath = fileStorageClient.save(finalRemote, data);
+            if (! StringUtils.isEmpty(newPath)) {
+                requestRemote = fsKey.equals(FIELD_DEFAULT) ? newPath : (fsKey + "@" + newPath);
+            }
+            return new Result(Result.SUCCESS, original, requestRemote);
+        } catch(Exception e) {
+            log.error(e.getMessage(), e);
+            return new Result(Result.ERROR, e.getLocalizedMessage());
+        }
+    }
+
+    public byte[] retrieveFile(String fsKey, String filepath) throws Exception {
+        if (StringUtils.isEmpty(fsKey))
+            fsKey = FIELD_DEFAULT;
+
+        IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
+        if (fileStorageClient == null)
+            throw new NullPointerException(MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
+
+        // Replace specially char at filename and uploadPath
+        filepath = filterFilepath(filepath);
+        // Get final remote file path
+        String remoteRoot = getRemoteRoot(fileStorageClient.getRemoteRoot());
+        String finalRemote = concat(remoteRoot, filepath);
+        log.info("[{}] Retrieve file from {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
+        byte[] data = fileStorageClient.retrieve(finalRemote);
+
+        if (data == null || data.length == 0) {
+            throw new FileNotFoundException(finalRemote);
+        }
+        return data;
     }
 
     public String concat(String...path) {
