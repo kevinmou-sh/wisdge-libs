@@ -6,7 +6,6 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.junit.After;
 import org.junit.Test;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -39,11 +38,11 @@ public class SM3Util extends GMBaseUtil {
 
     /**
      * hmac sm3 encrypt
-     * @param data byte[] 加密内容
+     * @param srcData byte[] 加密内容
      * @param key byte[] 密钥
      * @return
      */
-    public static byte[] hmac(byte[] key, byte[] srcData) {
+    public static byte[] hmac(byte[] srcData, byte[] key) {
         KeyParameter keyParameter = new KeyParameter(key);
         SM3Digest digest = new SM3Digest();
         HMac mac = new HMac(digest);

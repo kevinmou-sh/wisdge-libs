@@ -107,7 +107,7 @@
 		<dependency>
 			<groupId>com.wisdge</groupId>
 			<artifactId>wisdge.utils</artifactId>
-			<version>1.8</version>
+			<version>1.8.1</version>
 		</dependency>
 	</dependencies>
 
