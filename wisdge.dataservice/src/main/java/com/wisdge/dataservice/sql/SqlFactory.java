@@ -169,7 +169,7 @@ public class SqlFactory {
             if (processContext.containsKey(key))
                 placeholders.add(processContext.get(key));
             else
-                throw new SqlTemplateNullPointerException(key + " has not injected");
+                throw new ProcessSqlContextException(key + " has not injected");
         }
         sql = sql.replaceAll("@(\\w+)", "?");
 
@@ -223,7 +223,7 @@ public class SqlFactory {
             if (processContext.containsKey(key))
                 placeholders.add(processContext.get(key));
             else
-                throw new SqlTemplateNullPointerException(key + " has not injected");
+                throw new ProcessSqlContextException(key + " has not injected");
         }
         sql = sql.replaceAll("@(\\w+)", "?");
 
@@ -290,7 +290,7 @@ public class SqlFactory {
             if (processContext.containsKey(key))
                 placeholders.add(processContext.get(key));
             else
-                throw new SqlTemplateNullPointerException(key + " has not injected");
+                throw new ProcessSqlContextException(key + " has not injected");
         }
         sql = sql.replaceAll("@(\\w+)", "?");
 
@@ -396,7 +396,7 @@ public class SqlFactory {
             if (processContext.containsKey(key))
                 placeholders.add(processContext.get(key));
             else
-                throw new SqlTemplateNullPointerException(key + " has not injected");
+                throw new ProcessSqlContextException(key + " has not injected");
         }
         sql = sql.replaceAll("@(\\w+)", "?");
 
@@ -470,7 +470,7 @@ public class SqlFactory {
             if (processContext.containsKey(key))
                 placeholders.add(processContext.get(key));
             else
-                throw new SqlTemplateNullPointerException(key + " has not injected");
+                throw new ProcessSqlContextException(key + " has not injected");
         }
         sql = sql.replaceAll("@(\\w+)", "?");
         int result = jdbcTemplate.update(sql, placeholders.toArray());
@@ -509,7 +509,7 @@ public class SqlFactory {
             if (processContext.containsKey(key))
                 placeholders.add(processContext.get(key));
             else
-                throw new SqlTemplateNullPointerException(key + " has not injected");
+                throw new ProcessSqlContextException(key + " has not injected");
         }
         sql = sql.replaceAll("@(\\w+)", "?");
 
