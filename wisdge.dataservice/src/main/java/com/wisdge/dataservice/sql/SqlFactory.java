@@ -156,6 +156,36 @@ public class SqlFactory {
         }
     }
 
+    public <T> T queryForObject(String sqlKey, Map<String, Object> processContext, Class<T> requiredType) throws DataAccessException, ProcessSqlContextException, IllegalAccessException, InstantiationException {
+        long start = new Date().getTime();
+        String sql = processSqlContext(sqlKey, processContext);
+        log.debug("[{}][SQL] {}", start, sql);
+
+        List<Object> placeholders = new ArrayList<>();
+        Pattern pattern = Pattern.compile("@(\\w+)");
+        Matcher matcher = pattern.matcher(sql);
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (processContext.containsKey(key))
+                placeholders.add(processContext.get(key));
+            else
+                throw new SqlTemplateNullPointerException(key + " has not injected");
+        }
+        sql = sql.replaceAll("@(\\w+)", "?");
+
+        if (IRowMapper.class.isAssignableFrom(requiredType)) {
+            T result = requiredType.newInstance();
+            Map<String, Object> map = jdbcTemplate.queryForMap(sql, placeholders.toArray());
+            ((IRowMapper) result).rowMap(map);
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            return (T) result;
+        } else {
+            T result = jdbcTemplate.queryForObject(sql, requiredType, placeholders.toArray());
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            return result;
+        }
+    }
+
     public Map<String, Object> queryForMap(String sqlKey, Object...args) throws DataAccessException, ProcessSqlContextException {
         return queryForMap(sqlKey, null, args);
     }
@@ -166,6 +196,39 @@ public class SqlFactory {
         log.debug("[{}][SQL] {}", start, sql);
         try {
             Map<String, Object> result = jdbcTemplate.queryForMap(sql, args);
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            return result;
+        } catch(Exception e) {
+            if (e instanceof EmptyResultDataAccessException) {
+                EmptyResultDataAccessException erdae = (EmptyResultDataAccessException) e;
+                log.debug("None record has been found");
+            } else if (e instanceof IncorrectResultSizeDataAccessException) {
+                IncorrectResultSizeDataAccessException e2 = (IncorrectResultSizeDataAccessException) e;
+                log.debug("Expect {} record, but actual size is {}", e2.getExpectedSize(), e2.getActualSize());
+            }
+            throw e;
+        }
+    }
+
+    public Map<String, Object> queryForMap(String sqlKey, Map<String, Object> processContext) throws DataAccessException, ProcessSqlContextException {
+        long start = new Date().getTime();
+        String sql = processSqlContext(sqlKey, processContext);
+        log.debug("[{}][SQL] {}", start, sql);
+
+        List<Object> placeholders = new ArrayList<>();
+        Pattern pattern = Pattern.compile("@(\\w+)");
+        Matcher matcher = pattern.matcher(sql);
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (processContext.containsKey(key))
+                placeholders.add(processContext.get(key));
+            else
+                throw new SqlTemplateNullPointerException(key + " has not injected");
+        }
+        sql = sql.replaceAll("@(\\w+)", "?");
+
+        try {
+            Map<String, Object> result = jdbcTemplate.queryForMap(sql, placeholders.toArray());
             log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
             return result;
         } catch(Exception e) {
@@ -213,6 +276,50 @@ public class SqlFactory {
             return list;
         });
     }
+
+    public List<Map<String, Object>> queryForList(String sqlKey, Map<String, Object> processContext, int maxRowSize) throws DataAccessException, ProcessSqlContextException {
+        long start = new Date().getTime();
+        String sql = processSqlContext(sqlKey, processContext);
+        log.debug("[{}][SQL] {}", start, sql);
+
+        List<Object> placeholders = new ArrayList<>();
+        Pattern pattern = Pattern.compile("@(\\w+)");
+        Matcher matcher = pattern.matcher(sql);
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (processContext.containsKey(key))
+                placeholders.add(processContext.get(key));
+            else
+                throw new SqlTemplateNullPointerException(key + " has not injected");
+        }
+        sql = sql.replaceAll("@(\\w+)", "?");
+
+        return jdbcTemplate.query(sql, placeholders.toArray(), rs -> {
+            // 获取当前记录集的字段数据
+            List<String> columns = new ArrayList<>();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            for (int column = 1; column <= rsmd.getColumnCount(); column++) {
+                columns.add(rsmd.getColumnLabel(column).toUpperCase());
+            }
+            List<Map<String, Object>> list = new ArrayList<>();
+            int num = 1;
+            int max = (maxRowSize == 0 ? 500: maxRowSize);
+            while(rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                for(String column : columns) {
+                    row.put(column, rs.getObject(column));
+                }
+                list.add(row);
+                num ++;
+                if (max > 0 && num > max)
+                    break;
+            }
+            log.debug("[ROWS] " + list.size());
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            return list;
+        });
+    }
+
     public Pagination queryForPage(String sqlKey, int maxRowSize, int page, Object...args) throws DataAccessException, ProcessSqlContextException {
         return queryForPage(sqlKey, null, maxRowSize, page, args);
     }
@@ -251,6 +358,77 @@ public class SqlFactory {
 
         String realSql = sql + " limit "+ pagination.getPageSize() + " offset " + (pagination.getPageSize() * pagination.getPageIndex());
         return jdbcTemplate.query(realSql, args, rs -> {
+            Map<String, Object> result = new HashMap<>();
+            // 获取当前记录集的字段数据
+            List<String> columns = new ArrayList<>();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            for (int column = 1; column <= rsmd.getColumnCount(); column++) {
+                columns.add(rsmd.getColumnLabel(column).toUpperCase());
+            }
+            pagination.setColumns(columns);
+
+            // 获取当前记录集的字段数据
+            List<Map<String, Object>> list = new ArrayList<>();
+            while(rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                for(String column : columns) {
+                    row.put(column, rs.getObject(column));
+                }
+                list.add(row);
+            }
+            log.debug("[ROWS] " + list.size());
+            pagination.setFields(list);
+            log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+            return pagination;
+        });
+    }
+
+    public Pagination queryForPage(String sqlKey, Map<String, Object> processContext, int maxRowSize, int page) throws DataAccessException, ProcessSqlContextException {
+        final long start = new Date().getTime();
+        String sql = processSqlContext(sqlKey, processContext);
+        log.debug("[{}][SQL] {}", start, sql);
+
+        List<Object> placeholders = new ArrayList<>();
+        Pattern pattern = Pattern.compile("@(\\w+)");
+        Matcher matcher = pattern.matcher(sql);
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (processContext.containsKey(key))
+                placeholders.add(processContext.get(key));
+            else
+                throw new SqlTemplateNullPointerException(key + " has not injected");
+        }
+        sql = sql.replaceAll("@(\\w+)", "?");
+
+        String countSql = "SELECT COUNT(*) FROM (" + sql + ") PAGER_COUNT_ALIAS";
+        int totalCount = jdbcTemplate.queryForObject(countSql, Integer.class, placeholders.toArray());
+        // 需要分页信息
+        int pageIndex = Math.max(page, 0);
+        int pageSize = Math.min(maxRowSize, 500);
+        // 构建分页内容
+        int pageCount = 0;
+        if (totalCount > 0) {
+            if (totalCount % pageSize == 0)
+                pageCount = totalCount / pageSize;
+            else
+                pageCount = (totalCount / pageSize) + 1;
+        }
+        if (pageCount == 0)
+            pageIndex = 0;
+        else {
+            // 当前页编码，从0开始，如果传的值为Integer.MAX_VALUE为最后一页。 如果当前页超过总页数，也表示最后一页。
+            if (pageIndex == Integer.MAX_VALUE || pageIndex >= pageCount) {
+                pageIndex = pageCount - 1;
+            }
+        }
+        final Pagination pagination = new Pagination();
+        pagination.setPageSize(pageSize);
+        pagination.setPageCount(pageCount);
+        pagination.setPageIndex(pageIndex);
+        pagination.setTotalCount(totalCount);
+
+        String realSql = sql + " limit "+ pagination.getPageSize() + " offset " + (pagination.getPageSize() * pagination.getPageIndex());
+        return jdbcTemplate.query(realSql, placeholders.toArray(), rs -> {
             Map<String, Object> result = new HashMap<>();
             // 获取当前记录集的字段数据
             List<String> columns = new ArrayList<>();
@@ -319,6 +497,23 @@ public class SqlFactory {
 
     public void addBatch(ExecuteBatch batch, Map<String, Object> processContext, String sqlKey, Object...args) throws ProcessSqlContextException {
         batch.add(processSqlContext(sqlKey, processContext), args);
+    }
+
+    public void addBatch(ExecuteBatch batch, Map<String, Object> processContext, String sqlKey) throws ProcessSqlContextException {
+        String sql = processSqlContext(sqlKey, processContext);
+        List<Object> placeholders = new ArrayList<>();
+        Pattern pattern = Pattern.compile("@(\\w+)");
+        Matcher matcher = pattern.matcher(sql);
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (processContext.containsKey(key))
+                placeholders.add(processContext.get(key));
+            else
+                throw new SqlTemplateNullPointerException(key + " has not injected");
+        }
+        sql = sql.replaceAll("@(\\w+)", "?");
+
+        batch.add(sql, placeholders.toArray());
     }
 
     @Test
