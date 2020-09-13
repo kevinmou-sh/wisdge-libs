@@ -1,6 +1,7 @@
 package com.wisdge.dataservice.sql;
 
 import com.wisdge.dataservice.exceptions.ProcessSqlContextException;
+import com.wisdge.dataservice.exceptions.SqlTemplateNullPointerException;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -26,6 +27,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSetMetaData;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class SqlFactory {
@@ -124,12 +127,12 @@ public class SqlFactory {
             processContext = new HashMap<>();
         if ("freemarker".equalsIgnoreCase(sqlTemplate.getProcess())) {
             // process with freemarker
-            return mergeWithFreemarker(sql, processContext);
+            sql =  mergeWithFreemarker(sql, processContext);
         } else if ("velocity".equalsIgnoreCase(sqlTemplate.getProcess())) {
             // process with velocity
-            return mergeWithVelocity(sql, processContext);
-        } else
-            return sql;
+            sql = mergeWithVelocity(sql, processContext);
+        }
+        return sql;
     }
 
     public <T> T queryForObject(String sqlKey, Class<T> requiredType, Object...args) throws DataAccessException, ProcessSqlContextException, IllegalAccessException, InstantiationException {
@@ -275,6 +278,26 @@ public class SqlFactory {
 
     public int execute(String sqlKey, Object...args) throws DataAccessException, ProcessSqlContextException {
         return execute(sqlKey, null, args);
+    }
+
+    public int execute(String sqlKey, Map<String, Object> processContext) throws DataAccessException, ProcessSqlContextException {
+        long start = new Date().getTime();
+        String sql = processSqlContext(sqlKey, processContext);
+        log.debug("[{}][SQL] {}", start, sql);
+        List<Object> placeholders = new ArrayList<>();
+        Pattern pattern = Pattern.compile("@(\\w+)");
+        Matcher matcher = pattern.matcher(sql);
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (processContext.containsKey(key))
+                placeholders.add(processContext.get(key));
+            else
+                throw new SqlTemplateNullPointerException(key + " has not injected");
+        }
+        sql = sql.replaceAll("@(\\w+)", "?");
+        int result = jdbcTemplate.update(sql, placeholders.toArray());
+        log.debug("[{}]Query took {}'ms", start, new Date().getTime() - start);
+        return result;
     }
 
     public int execute(String sqlKey, Map<String, Object> processContext, Object...args) throws DataAccessException, ProcessSqlContextException {
