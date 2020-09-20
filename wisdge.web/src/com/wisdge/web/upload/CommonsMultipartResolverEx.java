@@ -76,17 +76,19 @@ public class CommonsMultipartResolverEx extends CommonsMultipartResolver {
 	public static MultipartHttpServletRequest getMultipartHttpServletRequest(HttpServletRequest request) {
 		try {
 			// 如果配置过了multipartResolver，就不需要手动调用resolveMultipart
-			MultipartHttpServletRequest mr = (MultipartHttpServletRequest) request;
-			return mr;
+			return (MultipartHttpServletRequest) request;
 		} catch (Exception e) {
 			/**
 			 * what if we use JBoss web container, it will throw NullPointerException
 			 * MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
 			 * MultipartHttpServletRequest mr = resolver.resolveMultipart(request);
 			 */
-			MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-			MultipartHttpServletRequest mr = resolver.resolveMultipart(request);
-			return mr;
+			try {
+				MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+				return resolver.resolveMultipart(request);
+			} catch (Exception e2) {
+				return null;
+			}
 		}
 	}
 

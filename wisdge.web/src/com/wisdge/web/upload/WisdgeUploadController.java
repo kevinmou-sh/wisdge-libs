@@ -31,9 +31,9 @@ public class WisdgeUploadController {
 		info.put("left", left);
 		info.put("percent", percent);
 		info.put("elapse", status.getProcessElapseTime() / 1000f);
-		info.put("total", status.getUploadTotalSize());
-		info.put("read", status.getReadTotalSize());
-		return new Result(Result.SUCCESS, "", status);
+		info.put("total", status.getUploadTotalSize() / 1024f);
+		info.put("read", status.getReadTotalSize() / 1024f);
+		return new Result(Result.SUCCESS, "", info);
 	}
 	
 	@GetMapping("/upload/cancel")
