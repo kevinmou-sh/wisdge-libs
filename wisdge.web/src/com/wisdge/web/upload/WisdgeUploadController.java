@@ -2,8 +2,8 @@ package com.wisdge.web.upload;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.wisdge.dataservice.Result;
 
@@ -11,7 +11,7 @@ import com.wisdge.dataservice.Result;
 @RequestMapping(value="/upload")
 public class WisdgeUploadController {
 	
-	@RequestMapping(value="/status", method = RequestMethod.GET)
+	@GetMapping("/status")
 	@ResponseBody
 	public Result uploadStatusQuery(HttpServletRequest request) {
 		FileUploadStatus status = FileUploadListener.getStatusBean(request);
@@ -21,7 +21,7 @@ public class WisdgeUploadController {
 		return new Result(Result.SUCCESS, "", status.toMap());
 	}
 	
-	@RequestMapping(value="/cancel", method = RequestMethod.GET)
+	@GetMapping("/cancel")
 	@ResponseBody
 	public Result uploadCancel(HttpServletRequest request) {
 		FileUploadStatus status = FileUploadListener.getStatusBean(request);
