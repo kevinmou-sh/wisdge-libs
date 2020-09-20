@@ -17,8 +17,7 @@ public class WisdgeUploadController {
 		FileUploadStatus status = FileUploadListener.getStatusBean(request);
 		if (status == null)
 			return new Result(Result.ERROR, "Missing fileUploadStatus ulpid=" + request.getParameter("ulpid"));
-			
-		return new Result(Result.SUCCESS, "", status.toMap());
+		return new Result(Result.SUCCESS, "", status);
 	}
 	
 	@GetMapping("/upload/cancel")
