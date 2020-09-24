@@ -1,5 +1,6 @@
 package com.wisdge.dataservice.sql;
 
+import com.wisdge.dataservice.Result;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -20,7 +21,7 @@ public class ExecuteBatch {
         batches.add(new Batch(sql, objects));
     }
 
-    public void run() throws Exception {
+    public int[] run() throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         // explicitly setting the transaction name is something that can be done only programmatically
 //		def.setName("dataservice.transaction.definition");
@@ -29,11 +30,13 @@ public class ExecuteBatch {
         PlatformTransactionManager txManager = factory.getTransactionManager();
         TransactionStatus status = txManager.getTransaction(def);
         try {
+            int[] count = new int[batches.size()];
             // execute your business logic here
-            for(Batch batch : batches) {
-                factory.getJdbcTemplate().update(batch.getSql(), batch.getObjects());
+            for(int i=0; i<batches.size(); i++) {
+                count[i] = factory.getJdbcTemplate().update(batches.get(i).getSql(), batches.get(i).getObjects());
             }
             txManager.commit(status);
+            return count;
         } catch (Exception e) {
             txManager.rollback(status);
             throw e;
