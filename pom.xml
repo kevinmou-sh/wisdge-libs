@@ -18,7 +18,7 @@
         <module>wisdge.dataservice</module>
         <module>wisdge.web</module>
         <module>wisdge.ezcell</module>
-        <module>wisdge.common</module>
+        <module>wisdge.commons</module>
     </modules>
 
 </project>
