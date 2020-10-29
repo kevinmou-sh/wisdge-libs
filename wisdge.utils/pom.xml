@@ -105,7 +105,7 @@
 	<distributionManagement>
 		<repository>
 			<id>elite_releases</id>
-			<url>http://nexus.wisdge.com/repository/elite/</url>
+			<url>http://nexus.elitecrm.com/repository/elite/</url>
 		</repository>
 	</distributionManagement>
 
