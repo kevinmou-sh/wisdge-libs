@@ -1,5 +1,7 @@
 package com.wisdge.commons.redis;
 
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+
 import java.util.concurrent.TimeUnit;
 
 public interface IRedisTemplate {
@@ -8,4 +10,6 @@ public interface IRedisTemplate {
 	public Object get(String key);
 	public Boolean expire(String key, long timeout, TimeUnit unit);
 	public Boolean delete(String key);
+	public void convertAndSend(String channel, Object obj);
+	public RedisConnectionFactory getConnectionFactory();
 }
