@@ -10,19 +10,19 @@ import com.wisdge.utils.ImageUtils;
 import java.awt.image.BufferedImage;
 
 public class BarCoder {
+	public static byte[] encode(String content, int width, int height) throws Exception {
+		return encode(content, width, height, null);
+	}
+
 	/**
 	 * 条形码编码
-	 * 
+	 *
 	 * @param content String
-	 * @param width int 
+	 * @param width int
 	 * @param height int
 	 * @param format String
 	 * @return byte[] data of BarCode image
 	 */
-	public static byte[] encode(String content, int width, int height) throws Exception {
-		return encode(content, width, height, null);
-	}
-	
 	public static byte[] encode(String content, int width, int height, String format) throws Exception {
 		int codeWidth = 3 + // start guard
 				(7 * 6) + // left bars
