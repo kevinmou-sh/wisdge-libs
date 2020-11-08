@@ -4,16 +4,18 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class WisdgeRedisTemplate extends org.springframework.data.redis.core.RedisTemplate<String, Object> implements IRedisTemplate {
+public class RedisTemplate extends org.springframework.data.redis.core.RedisTemplate<String, Object> implements IRedisTemplate {
     private String scope;
 
     public String getScope() {
         return scope;
     }
 
-    public WisdgeRedisTemplate(String scope) {
+    public RedisTemplate(String scope) {
         this.scope = scope;
 
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
@@ -48,7 +50,7 @@ public class WisdgeRedisTemplate extends org.springframework.data.redis.core.Red
     }
 
     @Override
-    public Object entries(String key) {
+    public Map<Object, Object> entries(String key) {
         return this.opsForHash().entries(scope + ":" + key);
     }
 
