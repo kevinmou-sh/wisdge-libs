@@ -30,8 +30,6 @@ public class RedisTemplate extends org.springframework.data.redis.core.RedisTemp
         Jackson2JsonRedisSerializer<?> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         this.setValueSerializer(jackson2JsonRedisSerializer);
         this.setHashValueSerializer(jackson2JsonRedisSerializer);
-
-        this.afterPropertiesSet();
     }
 
     @Override
