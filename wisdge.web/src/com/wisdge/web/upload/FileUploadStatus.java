@@ -3,13 +3,13 @@ package com.wisdge.web.upload;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.io.Serializable;
 
 @Data
 @ToString
 @NoArgsConstructor
-public class FileUploadStatus {
+public class FileUploadStatus implements Serializable {
 	// 文件上传进度查询id
 	private String ulpId;
 	// 上传总量
@@ -23,11 +23,11 @@ public class FileUploadStatus {
 	// 状态
 	private String status = "";
 	// 处理起始时间
-	private long processStartTime = 0l;
+	private long processStartTime = 0L;
 	// 处理终止时间
-	private long processEndTime = 0l;
+	private long processEndTime = 0L;
 	// 处理执行时长（毫秒）
-	private long processElapseTime = 0l;
+	private long processElapseTime = 0L;
 	// 取消上传
 	private boolean cancel = false;
 }
