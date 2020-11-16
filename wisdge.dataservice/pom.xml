@@ -113,8 +113,8 @@
 
 	<distributionManagement>
 		<repository>
-			<id>elite_releases</id>
-			<url>http://nexus.elitecrm.com/repository/elite/</url>
+			<id>wisdge-releases</id>
+			<url>http://nexus.wisdge.com/repository/wisdge-releases/</url>
 		</repository>
 	</distributionManagement>
 
