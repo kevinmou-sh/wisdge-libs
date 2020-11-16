@@ -24,4 +24,11 @@
         <module>wisdge.commons</module>
     </modules>
 
+    <distributionManagement>
+        <repository>
+            <id>elite_releases</id>
+            <url>http://nexus.elitecrm.com/repository/elite/</url>
+        </repository>
+    </distributionManagement>
+
 </project>
