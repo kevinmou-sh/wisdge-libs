@@ -1,5 +1,6 @@
 package com.wisdge.commons.es;
 
+import com.wisdge.dataservice.utils.JSonUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -145,11 +146,11 @@ public class ESClientFactory {
 		return performRequest(method, endpoint, null, null);
 	}
 
-	public Response performRequest(String method, String endpoint, String entityString) throws Exception {
-		return performRequest(method, endpoint, entityString, null);
+	public Response performRequest(String method, String endpoint, Object entity) throws Exception {
+		return performRequest(method, endpoint, entity, null);
 	}
 
-	public Response performRequest(String method, String endpoint, String entityString, Header header) throws Exception {
+	public Response performRequest(String method, String endpoint, Object entity, Header header) throws Exception {
 		Request request = new Request(method, endpoint);
 		if (header != null) {
 			RequestOptions.Builder options = COMMON_OPTIONS.toBuilder();
@@ -161,8 +162,14 @@ public class ESClientFactory {
 			request.setOptions(COMMON_OPTIONS);
 		}
 
-		if (! StringUtils.isEmpty(entityString))
-			request.setEntity(new StringEntity(entityString, StandardCharsets.UTF_8));
+		if (entity != null) {
+			if (entity instanceof String) {
+				request.setEntity(new StringEntity((String) entity, StandardCharsets.UTF_8));
+			} else {
+				request.setEntity(new StringEntity(JSonUtils.parse(entity), StandardCharsets.UTF_8));
+			}
+		}
+
 		try {
 			return restClient.performRequest(request);
 		} catch (ResponseException e) {
