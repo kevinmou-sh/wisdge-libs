@@ -3,15 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.wisdge</groupId>
-        <artifactId>wisdge.libs</artifactId>
-        <version>1.0.0</version>
-    </parent>
+
+    <groupId>com.wisdge</groupId>
     <artifactId>wisdge.commons</artifactId>
-    <version>1.8.1</version>
+    <version>1.8.2</version>
+
     <properties>
-        <aws.version>1.11.506</aws.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <springframework.version>5.2.6.RELEASE</springframework.version>
+        <springframework.data>2.2.7.RELEASE</springframework.data>
+        <elasticsearch.version>7.6.2</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -173,22 +174,22 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>${aws.version}</version>
+            <version>1.11.506</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-kms</artifactId>
-            <version>${aws.version}</version>
+            <version>1.11.506</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-core</artifactId>
-            <version>${aws.version}</version>
+            <version>1.11.506</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>jmespath-java</artifactId>
-            <version>${aws.version}</version>
+            <version>1.11.506</version>
         </dependency>
 
         <dependency>
@@ -288,8 +289,8 @@
 
     <distributionManagement>
         <repository>
-            <id>elite_releases</id>
-            <url>http://nexus.elitecrm.com/repository/elite/</url>
+            <id>wisdge-releases</id>
+            <url>http://nexus.wisdge.com/repository/wisdge-releases/</url>
         </repository>
     </distributionManagement>
 

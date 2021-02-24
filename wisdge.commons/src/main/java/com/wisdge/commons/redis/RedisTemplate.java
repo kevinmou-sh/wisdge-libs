@@ -43,6 +43,11 @@ public class RedisTemplate extends org.springframework.data.redis.core.RedisTemp
     }
 
     @Override
+    public void putHash(String key, String hashKey, Object hashValue) {
+        this.opsForHash().put(scope + ":" + key, hashKey, hashValue);
+    }
+
+    @Override
     public Object get(String key) {
         return this.opsForValue().get(scope + ":" + key);
     }

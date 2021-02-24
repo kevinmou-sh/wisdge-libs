@@ -2,7 +2,6 @@ package com.wisdge.web.springframework;
 
 import com.wisdge.dataservice.utils.JSonUtils;
 import lombok.extern.slf4j.Slf4j;
-
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
@@ -34,11 +33,8 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-
         final ByteArrayInputStream bais = new ByteArrayInputStream(body);
-
         return new ServletInputStream() {
-
             @Override
             public int read() throws IOException {
                 return bais.read();
@@ -59,6 +55,10 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
 
             }
         };
+    }
+
+    public String getPayload() {
+        return new String(body);
     }
 
     /**
@@ -100,11 +100,11 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     /**
-     * 将前端请求的表单数据转换成json字符串 - 前后端一体的情况下使用
-     * @param request:
-     * @return: java.lang.String
+     * 将前端请求的表单数据转换成json字符串
+     * @param request ServletRequest
+     * @return: Map<String, Object>
      */
-    public String getBodyJsonStrByForm(ServletRequest request){
+    public static Map<String, Object> getJsonByFormData(ServletRequest request){
         Map<String, Object> bodyMap = new HashMap<>(16);
         try {
             // 参数定义
@@ -115,32 +115,31 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
                 paraName = e.nextElement();
                 bodyMap.put(paraName, request.getParameter(paraName));
             }
-            // json对象转json字符串
-            return JSonUtils.parse(bodyMap);
+            return bodyMap;
         } catch(Exception e) {
             log.error("请求参数转换错误!", e);
-            return "{}";
+            return new HashMap<>();
         }
     }
 
     /**
-     * 将前端传递的json数据转换成json字符串 - 前后端分离的情况下使用
-     * @param request:
+     * 读取前端传递的payload
+     * @param request ServletRequest
      * @return: java.lang.String
      */
-    public String getBodyJsonStrByJson(ServletRequest request){
-        StringBuffer json = new StringBuffer();
+    public static String getPayload(ServletRequest request){
+        StringBuffer stringBuffer = new StringBuffer();
         String line = null;
         try {
             BufferedReader reader = request.getReader();
             while((line = reader.readLine()) != null) {
-                json.append(line);
+                stringBuffer.append(line);
             }
         }
         catch(Exception e) {
             log.error("请求参数转换错误!",e);
         }
-        return json.toString();
+        return stringBuffer.toString();
     }
 
 }

@@ -8,7 +8,7 @@
 		<version>1.0.0</version>
 	</parent>
 	<artifactId>wisdge.web</artifactId>
-	<version>1.8.1</version>
+	<version>1.8.2</version>
 
 	<dependencies>
 		<dependency>
@@ -69,8 +69,8 @@
 
 	<distributionManagement>
 		<repository>
-			<id>elite_releases</id>
-			<url>http://nexus.elitecrm.com/repository/elite/</url>
+			<id>wisdge-releases</id>
+			<url>http://nexus.wisdge.com/repository/wisdge-releases/</url>
 		</repository>
 	</distributionManagement>
 
