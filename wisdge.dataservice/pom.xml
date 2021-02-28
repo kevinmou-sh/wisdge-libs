@@ -2,14 +2,15 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>com.wisdge</groupId>
+	<parent>
+		<groupId>com.wisdge</groupId>
+		<artifactId>wisdge.libs</artifactId>
+		<version>1.0.0</version>
+	</parent>
 	<artifactId>wisdge.dataservice</artifactId>
 	<version>1.8.2</version>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<springframework.version>5.2.6.RELEASE</springframework.version>
 		<fasterxml.version>2.10.3</fasterxml.version>
 	</properties>
 
