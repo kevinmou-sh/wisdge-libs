@@ -1,7 +1,7 @@
 package com.wisdge.dataservice.sql;
 
 import com.wisdge.dataservice.exceptions.ProcessSqlContextException;
-import com.wisdge.dataservice.exceptions.SqlTemplateNullPointerException;
+import com.wisdge.dataservice.utils.JdbcUtils;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -16,7 +16,6 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.CollectionUtils;
-
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;

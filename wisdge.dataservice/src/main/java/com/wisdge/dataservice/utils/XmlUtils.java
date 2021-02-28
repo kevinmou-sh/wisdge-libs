@@ -19,20 +19,18 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import com.wisdge.dataservice.exceptions.IllegalFormatException;
 
-public class DSUtils {
+public class XmlUtils {
 	private static final String defaultCharestName = "UTF-8";
 
 	/**
 	 * 将<code>JSON</code>字符串解析为<code>JAVA</code>对象.
-	 * 
+	 *
 	 * @see JSonUtils#read(String)
 	 * @param json
 	 *            JSON字符串
 	 * @return java对象
 	 * @throws IllegalFormatException
 	 * @throws IOException
-	 * @throws JsonMappingException
-	 * @throws JsonParseException
 	 * @see #parserXml(String)
 	 */
 	public static Object parserJson(String json) throws IOException, IllegalFormatException {
@@ -41,7 +39,7 @@ public class DSUtils {
 
 	/**
 	 * 从XML字符串中获取DOM4j的根元素
-	 * 
+	 *
 	 * @param buffer
 	 *            XML的字符串
 	 * @return Root element of Dom4j
@@ -56,7 +54,7 @@ public class DSUtils {
 
 	/**
 	 * 从XML字符串中获取DOM4j的根元素
-	 * 
+	 *
 	 * @param buffer
 	 *            XML的字符串
 	 * @param charsetName
@@ -78,7 +76,7 @@ public class DSUtils {
 
 	/**
 	 * 从XML报文中获取对象值
-	 * 
+	 *
 	 * @param xmlStr
 	 *            XML字符串
 	 * @return XML解析出来的对象
@@ -90,7 +88,7 @@ public class DSUtils {
 
 	/**
 	 * 从XML报文中获取对象值
-	 * 
+	 *
 	 * @param xmlStr
 	 *            XML字符串
 	 * @param charsetName
@@ -109,18 +107,18 @@ public class DSUtils {
 
 	/**
 	 * 从Dom4J的element对象中获得值对象
-	 * 
+	 *
 	 * <pre>
 	 * 对于可重复元素，方法会自动生成list对象。
 	 * 但是对于少于2条重复元素的对象，如果标记有属性type为list，任然可以自动生成list对象。
-	 * 如果元素内没有包含子元素，内容为单独的文本信息，则会将内容信息直接返回，例如： 
+	 * 如果元素内没有包含子元素，内容为单独的文本信息，则会将内容信息直接返回，例如：
 	 * &lt;root&gt;this is test&lt;/root&gt;
 	 * 	转换后获得：root = 'this is test'
 	 * 如果元素包含其他属性，则文本信息内容会被赋到text字段值中，例如：
 	 * &lt;root pro='1'&gt;this is test&lt;/root&gt;
 	 * 	转换后获得： root.text = 'this is test'
 	 * </pre>
-	 * 
+	 *
 	 * @param element
 	 *            Element of dom4j
 	 * @return Object值对象
@@ -180,7 +178,7 @@ public class DSUtils {
 
 	/**
 	 * 读取webservice接口xml中的result片段
-	 * 
+	 *
 	 * @param element
 	 * @return
 	 */
@@ -213,7 +211,7 @@ public class DSUtils {
 
 	/**
 	 * 观察一个Map对象，以JSON对象格式输出到字符串
-	 * 
+	 *
 	 * @param map
 	 *            Verbose target Map
 	 * @return Format string
@@ -266,9 +264,9 @@ public class DSUtils {
 		sb.append(StringUtils.repeat("\t", indit + 1)).append("]");
 		return sb.toString();
 	}
-	
+
 	public void test() throws Exception {
 		String strXML = FileUtils.readFileToString(new File("d:/temp/test.xml"), "GBK");
-		System.out.println(DSUtils.getObjectFromXML(strXML, "GBK"));
+		System.out.println(XmlUtils.getObjectFromXML(strXML, "GBK"));
 	}
 }

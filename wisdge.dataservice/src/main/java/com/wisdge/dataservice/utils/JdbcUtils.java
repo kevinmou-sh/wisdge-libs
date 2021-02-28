@@ -1,9 +1,14 @@
-package com.wisdge.dataservice.sql;
+package com.wisdge.dataservice.utils;
 
+import com.wisdge.dataservice.sql.Pagination;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.sql.Clob;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.*;
 
 @Slf4j
@@ -59,5 +64,22 @@ public class JdbcUtils {
             log.debug("Query {} records, took {}'ms", list.size(), new Date().getTime() - start);
             return pagination;
         });
+    }
+
+    public static String getClobString(Clob clob) throws SQLException, IOException {
+        if (clob == null)
+            return "";
+
+        StringBuilder buf = new StringBuilder();
+        BufferedReader is = new BufferedReader(clob.getCharacterStream());
+        while (true) {
+            String str = is.readLine();
+            if (str == null) {
+                break;
+            }
+            buf.append(str + "\n");
+        }
+        is.close();
+        return buf.toString();
     }
 }
