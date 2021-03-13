@@ -9,6 +9,14 @@ import java.io.File;
 import java.util.Map;
 
 public class FreemarkerUtils {
+
+    /**
+     * 从一个文件进行模版合并
+     * @param templateFilename
+     * @param params
+     * @return
+     * @throws Exception
+     */
     public static String processByTemplate(String templateFilename, Map params) throws Exception {
         // 创建配置类
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
@@ -25,6 +33,13 @@ public class FreemarkerUtils {
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, params);
     }
 
+    /**
+     * 从一段字符串进行模版合并
+     * @param content
+     * @param params
+     * @return
+     * @throws Exception
+     */
     public static String processByString(String content, Map params) throws Exception {
         // 创建配置类
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);

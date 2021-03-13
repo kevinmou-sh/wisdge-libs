@@ -27,7 +27,7 @@ import static com.wisdge.ezcell.analysis.v07.ExcelXmlConstants.*;
 
 public class XlsxRowHandler extends DefaultHandler {
 	private static final Logger logger = LoggerFactory.getLogger(XlsxRowHandler.class);
-	private final DataFormatter formatter = new DataFormatter(); 
+	private final DataFormatter formatter = new DataFormatter();
 
 	private SharedStringsTable sharedStringsTable;
 	private StylesTable stylesTable;
@@ -39,7 +39,7 @@ public class XlsxRowHandler extends DefaultHandler {
 	private String curPosition;
 	private String curContent;
 	private FieldType curType;
-	private short formatIndex; 
+	private short formatIndex;
 	private String formatString;
 	private int realRows = 0;
 
@@ -71,7 +71,7 @@ public class XlsxRowHandler extends DefaultHandler {
 				curRow = nextRow;
 			}
 			analysisContext.setCurrentRowNo(curRow);
-			
+
 			// 添加空列值
 			curCol = PositionUtils.getCol(curPosition) - 1;
 			for(int i = curRowContent.size(); i < curCol; i ++) {
@@ -92,7 +92,7 @@ public class XlsxRowHandler extends DefaultHandler {
 			// 当前行数据读取完毕
 			registerCenter.notifyListeners(curRowContent);
 			curRowContent.clear();
-			
+
 			realRows ++;
 			Map<String, Object> custom = analysisContext.getCustom();
 			if (custom != null && custom.containsKey("previewSize")) {
@@ -103,7 +103,7 @@ public class XlsxRowHandler extends DefaultHandler {
 
 		} else if (CELL_VALUE_TAG.equals(tagName)) {
 			// Process the last contents as required.
-			curRowContent.add(getDataValue(curContent.trim())); 
+			curRowContent.add(getDataValue(curContent.trim()));
 		} else if (CELL_VALUE_TAG_1.equals(tagName)) {
 			curRowContent.add(curContent.trim());
 		}
@@ -113,16 +113,16 @@ public class XlsxRowHandler extends DefaultHandler {
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		curContent += new String(ch, start, length);
 	}
-	
+
 	/**
 	 * 根据element属性设置数据类型
 	 * @param attributes
 	 */
-	public void setCellType(Attributes attributes){ 
+	public void setCellType(Attributes attributes){
 		curType = FieldType.NUMERIC;
-		formatIndex = -1; 
-		formatString = null; 
-		String cellTypeStr = attributes.getValue("t"); 
+		formatIndex = -1;
+		formatString = null;
+		String cellTypeStr = attributes.getValue("t");
 		String cellStyleStr = attributes.getValue("s");
 		if (cellTypeStr != null) {
 			switch(cellTypeStr) {
@@ -143,14 +143,14 @@ public class XlsxRowHandler extends DefaultHandler {
 				break;
 			}
 		}
-		
-		if (curType != FieldType.SSTINDEX && cellStyleStr != null){ 
-			XSSFCellStyle style = stylesTable.getStyleAt(Integer.parseInt(cellStyleStr)); 
-			formatIndex = style.getDataFormat(); 
-			formatString = style.getDataFormatString(); 
-			if (formatString == null){ 
-				curType = FieldType.NULL; 
-				formatString = BuiltinFormats.getBuiltinFormat(formatIndex); 
+
+		if (curType != FieldType.SSTINDEX && cellStyleStr != null){
+			XSSFCellStyle style = stylesTable.getStyleAt(Integer.parseInt(cellStyleStr));
+			formatIndex = style.getDataFormat();
+			formatString = style.getDataFormatString();
+			if (formatString == null){
+				curType = FieldType.NULL;
+				formatString = BuiltinFormats.getBuiltinFormat(formatIndex);
 			} else {
 				if (formatString.contains("yy") || formatString.contains("mm")) {
 					// 日期时间格式
@@ -163,7 +163,7 @@ public class XlsxRowHandler extends DefaultHandler {
 			}
 		}
 	}
-	
+
 	/**
 	 * 根据数据类型获取数据
 	 * @param value
@@ -171,27 +171,27 @@ public class XlsxRowHandler extends DefaultHandler {
 	 */
 	public Object getDataValue(String value) {
 		Object result = value;
-		switch (curType) { 
-		//这几个的顺序不能随便交换，交换了很可能会导致数据错误 
-		case BOOLEAN: 
-			char first = value.charAt(0); 
+		switch (curType) {
+		//这几个的顺序不能随便交换，交换了很可能会导致数据错误
+		case BOOLEAN:
+			char first = value.charAt(0);
 			result = (first != '0');
 			break;
-		case ERROR: 
+		case ERROR:
 			result = "\"ERROR:" + value.toString() + '"';
 			break;
 		case FORMULA:
 			// formula存在在<f/>标签内
 			break;
-		case INLINESTR: 
+		case INLINESTR:
 			result = new XSSFRichTextString(value).toString();
 			break;
-		case SSTINDEX: 
-			result = new XSSFRichTextString(sharedStringsTable.getEntryAt(Integer.parseInt(value))).toString();
+		case SSTINDEX:
+			result = sharedStringsTable.getItemAt(Integer.parseInt(value)).toString();
 			break;
-		case NUMERIC: 
-//			if (formatString != null) { 
-//				value = formatter.formatRawCellContents(Double.parseDouble(value), formatIndex, formatString); 
+		case NUMERIC:
+//			if (formatString != null) {
+//				value = formatter.formatRawCellContents(Double.parseDouble(value), formatIndex, formatString);
 //			}
 //			//value = value.replace("_", "");
 			if (value.indexOf(".") == -1)
@@ -211,16 +211,16 @@ public class XlsxRowHandler extends DefaultHandler {
 				result = value;
 			}
 			// result = value.replace(" ", "");
-			break; 
-		default: 
-			break; 
+			break;
+		default:
+			break;
 		}
-		return result; 
+		return result;
 	}
 
 	/**
 	 * 数据格式校验
-	 * 
+	 *
 	 * @param str
 	 *            验证的字符串对象
 	 * @return true or false

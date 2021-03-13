@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import com.wisdge.utils.FileUtils;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
+
 
 public class EzReaderTest {
 
@@ -14,8 +16,9 @@ public class EzReaderTest {
 	 */
 	@org.junit.Test
 	public void saxReadListObjectsV2007() throws Exception {
-		InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/Documents/temp/2.xlsx"));
+		InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/QQ/保司账号导入--模板2.xlsx"));
 //        InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/Documents/2007.xlsx"));
+		ZipSecureFile.setMinInflateRatio(-1.0d);
 		EzPreview preview = EzCellFactory.getPreview(inputStream, 0);
 		System.out.println("Total rows: " + preview.getTotalRows());
 		System.out.println("Total cols: " + preview.getTotalCols());
@@ -30,7 +33,7 @@ public class EzReaderTest {
 			System.out.println("Usage: jar wisdge.ezcell-1.0.0.jar com.wisdge.ezcell.EzReaderTest filepath <previewSize>");
 			return;
 		}
-		
+
 		int previewSize = 5;
 		if (args.length > 1)
 			previewSize = Integer.parseInt(args[1]);

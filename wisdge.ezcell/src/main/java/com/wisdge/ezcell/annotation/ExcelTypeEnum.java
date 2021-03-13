@@ -2,7 +2,6 @@ package com.wisdge.ezcell.annotation;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.apache.poi.poifs.filesystem.FileMagic;
 
 public enum ExcelTypeEnum {
