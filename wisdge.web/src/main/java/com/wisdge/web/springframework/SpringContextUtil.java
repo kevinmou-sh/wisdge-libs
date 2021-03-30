@@ -28,7 +28,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 	public static ApplicationContext getApplicationContext() {
 		return applicationContext;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T> T getBean(Class<T> clazz, String beanName) {
 		Object object = getBean(beanName);
@@ -42,23 +42,23 @@ public class SpringContextUtil implements ApplicationContextAware {
 			log.error("SpringFramework没有获得有效的上下文对象。");
 			return null;
 		}
-		
+
 		if (applicationContext.containsBean(beanName)) {
 			return applicationContext.getBean(beanName);
 		} else {
-			log.error((new StringBuilder("Cann't find bean (")).append(beanName).append(") from application context.").toString());
+			log.warn((new StringBuilder("Cann't find bean (")).append(beanName).append(") from application context.").toString());
 			return null;
 		}
 	}
-	
+
 	public static boolean containsBean(String beanName) {
 		return applicationContext.containsBean(beanName);
 	}
-	
+
 	public static boolean hasBean(String beanName) {
 		return applicationContext.containsBean(beanName);
 	}
-	
+
 	/**
      * 根据类名获取到bean
      * @param <T>
@@ -74,7 +74,7 @@ public class SpringContextUtil implements ApplicationContextAware {
         String beanName = String.valueOf(cs);
 		return (T) getBean(beanName);
     }
-    
+
     public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
         return applicationContext.isSingleton(name);
     }
