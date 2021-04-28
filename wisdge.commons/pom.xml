@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>wisdge.commons</artifactId>
-    <version>1.8.2</version>
+    <version>1.8.3</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -276,7 +276,11 @@
             <artifactId>wisdge.web</artifactId>
             <version>1.8.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.2.1</version>
+        </dependency>
     </dependencies>
 
     <distributionManagement>
