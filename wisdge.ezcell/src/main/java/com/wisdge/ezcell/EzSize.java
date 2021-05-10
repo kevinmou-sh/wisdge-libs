@@ -3,13 +3,13 @@ package com.wisdge.ezcell;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EzPreview {
-	private int totalRows;
-	private int totalCols;
-	private List<Object> elements;
+@ToString
+public class EzSize {
+    private int rows;
+    private int cols;
 }
