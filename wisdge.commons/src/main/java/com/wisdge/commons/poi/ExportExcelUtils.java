@@ -1,7 +1,9 @@
 package com.wisdge.commons.poi;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.usermodel.HeaderFooter;
+import org.apache.poi.ss.usermodel.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
@@ -113,7 +115,7 @@ public class ExportExcelUtils {
 
         for (Field declaredField : declaredFields) {
             //获取注解对象
-            com.kuangheng.cloud.common.system.excel.ExportEntityMap declaredAnnotation = declaredField.getDeclaredAnnotation(com.kuangheng.cloud.common.system.excel.ExportEntityMap.class);
+            ExportEntityMap declaredAnnotation = declaredField.getDeclaredAnnotation(ExportEntityMap.class);
             if (declaredAnnotation != null) {
                 fieldMap.put(declaredAnnotation.EnName(), declaredAnnotation.CnName());
             }

@@ -3,6 +3,7 @@ package com.wisdge.commons.poi;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDataFormatter;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,11 +12,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.*;
 
-/**
- * author:wuliang
- */
 public class ExcelUtils {
-    private static final Logger logger = LoggerFactory.getLogger(com.kuangheng.cloud.common.system.excel.ExcelUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
     private static Map<String, Integer> getCellIndexs (Row rowheader) {
         int totalCells = rowheader.getPhysicalNumberOfCells();//列数
         Map<String, Integer> filedIndexMap = new HashMap<>();
@@ -30,19 +28,19 @@ public class ExcelUtils {
         return filedIndexMap;
     }
 
-    private static <T> List<T> getObjList (Map<String, List<com.kuangheng.cloud.common.system.excel.KeyValue<Row, T>>> successRows) {
+    private static <T> List<T> getObjList (Map<String, List<KeyValue<Row, T>>> successRows) {
         List<T> objList = new ArrayList<>();
-        for (Map.Entry<String, List<com.kuangheng.cloud.common.system.excel.KeyValue<Row, T>>> entry : successRows.entrySet()) {
-            for (com.kuangheng.cloud.common.system.excel.KeyValue<Row, T> obj : entry.getValue()) {
+        for (Map.Entry<String, List<KeyValue<Row, T>>> entry : successRows.entrySet()) {
+            for (KeyValue<Row, T> obj : entry.getValue()) {
                 objList.add(obj.getV());
             }
         }
         return objList;
     }
 
-    private static <T> boolean isErrorOrder (List<com.kuangheng.cloud.common.system.excel.KeyValue<Row, T>> list) {
+    private static <T> boolean isErrorOrder (List<KeyValue<Row, T>> list) {
         boolean iserr = false;
-        for (com.kuangheng.cloud.common.system.excel.KeyValue<Row, T> obj : list) {
+        for (KeyValue<Row, T> obj : list) {
             if (obj.getV() == null) {
                 iserr = true;
                 break;
@@ -63,11 +61,11 @@ public class ExcelUtils {
         }
     }
 
-    private static <T> int getErrWorkbook (Map<String, List<com.kuangheng.cloud.common.system.excel.KeyValue<Row, T>>> successRows) {
+    private static <T> int getErrWorkbook (Map<String, List<KeyValue<Row, T>>> successRows) {
         int errcount=0;
         List<T> objList = new ArrayList<>();
-        for (Iterator<Map.Entry<String, List<com.kuangheng.cloud.common.system.excel.KeyValue<Row, T>>>> it = successRows.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<String, List<com.kuangheng.cloud.common.system.excel.KeyValue<Row, T>>> item = it.next();
+        for (Iterator<Map.Entry<String, List<KeyValue<Row, T>>>> it = successRows.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<String, List<KeyValue<Row, T>>> item = it.next();
             boolean iserr = isErrorOrder(item.getValue());
             if (iserr) {
                 //移除错误的记录
@@ -102,7 +100,7 @@ public class ExcelUtils {
             int lastCellNum = rowheader.getLastCellNum();//列数
             Map<String, Integer> filedIndexMap = getCellIndexs(rowheader);
             Field[] fields = t.getDeclaredFields();
-            Map<String, List<com.kuangheng.cloud.common.system.excel.KeyValue<Row, T>>> successRows = new HashMap<>();
+            Map<String, List<KeyValue<Row, T>>> successRows = new HashMap<>();
             for (int r = 1; r <= totalRows; r++) {
                 Row row = sheet.getRow(r);
                 T obj = t.newInstance();
@@ -112,7 +110,7 @@ public class ExcelUtils {
                 if (row == null)
                     continue;
                 for (Field field : fields) {
-                    com.kuangheng.cloud.common.system.excel.ExportEntityMap cell = field.getAnnotation(com.kuangheng.cloud.common.system.excel.ExportEntityMap.class);
+                    ExportEntityMap cell = field.getAnnotation(ExportEntityMap.class);
                     if (cell != null) {
                         String cellValue = null;
                         Object indexObj = filedIndexMap.get(cell.CnName());
@@ -136,7 +134,7 @@ public class ExcelUtils {
                         }
                     }
                 }
-                com.kuangheng.cloud.common.system.excel.KeyValue<Row, T> keyValue = new com.kuangheng.cloud.common.system.excel.KeyValue<>();
+                KeyValue<Row, T> keyValue = new KeyValue<>();
                 keyValue.setK(row);
                 if (!error)
                     keyValue.setV(obj);
@@ -146,7 +144,7 @@ public class ExcelUtils {
                     errorCell.setCellValue(errorMsg);
                     errorCell.setCellStyle(cellStyle);
                 }
-                List<com.kuangheng.cloud.common.system.excel.KeyValue<Row, T>> list = successRows.get(primarykey);
+                List<KeyValue<Row, T>> list = successRows.get(primarykey);
                 if (list == null) {
                     list = new ArrayList<>();
                     list.add(keyValue);
