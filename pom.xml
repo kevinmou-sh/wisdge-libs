@@ -40,8 +40,8 @@
 
     <distributionManagement>
         <repository>
-            <id>elite_releases</id>
-            <url>http://nexus.elitecrm.com/repository/elite/</url>
+            <id>zhijue_releases</id>
+            <url>https://nexus.kuangheng.com/repository/zhijue_releases/</url>
         </repository>
     </distributionManagement>
 
