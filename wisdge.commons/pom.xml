@@ -294,7 +294,7 @@
             <version>3.3.2</version>
             <scope>compile</scope>
         </dependency>
-		
+
 		<dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
@@ -305,8 +305,8 @@
 
     <distributionManagement>
         <repository>
-            <id>zhijue_releases</id>
-            <url>https://nexus.kuangheng.com/repository/zhijue_releases/</url>
+            <id>wisdge-releases</id>
+            <url>http://nexus.wisdge.com/repository/wisdge-releases/</url>
         </repository>
     </distributionManagement>
 

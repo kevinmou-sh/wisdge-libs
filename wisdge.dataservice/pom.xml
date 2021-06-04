@@ -107,8 +107,8 @@
 
 	<distributionManagement>
 		<repository>
-			<id>zhijue_releases</id>
-			<url>https://nexus.kuangheng.com/repository/zhijue_releases/</url>
+			<id>wisdge-releases</id>
+			<url>http://nexus.wisdge.com/repository/wisdge-releases/</url>
 		</repository>
 	</distributionManagement>
 
