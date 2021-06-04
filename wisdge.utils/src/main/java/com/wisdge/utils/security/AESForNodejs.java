@@ -13,7 +13,7 @@ public class AESForNodejs {
 
 	/**
 	 * 解密
-	 * 
+	 *
 	 * @param encrypted
 	 * @param key
 	 * @return
@@ -30,7 +30,7 @@ public class AESForNodejs {
 
 	/**
 	 * 加密
-	 * 
+	 *
 	 * @param content
 	 * @param key
 	 * @return
@@ -48,7 +48,7 @@ public class AESForNodejs {
 
 	/**
 	 * 字符串转字节数组
-	 * 
+	 *
 	 * @param hexString
 	 * @return
 	 */
@@ -63,7 +63,7 @@ public class AESForNodejs {
 
 	/**
 	 * 字节转16进制数组
-	 * 
+	 *
 	 * @param buf
 	 * @return
 	 */
@@ -81,11 +81,11 @@ public class AESForNodejs {
 
 	@Test
 	public void test() throws Exception {
-        String content = "test";
-		String key = "BN1ZbZSxElVIhwpN";
-		String encrypt = encrypt(content, key);
+        String content = "15902149343";
+		String key = "bsyDataCenterDpi";
+		String encrypt = AESForNodejs.encrypt(content, key);
 		System.out.println(encrypt);
-		System.out.println(decrypt(encrypt, key));
+		System.out.println(AESForNodejs.decrypt(encrypt, key));
 	}
 
 }

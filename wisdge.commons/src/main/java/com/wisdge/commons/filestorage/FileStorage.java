@@ -22,6 +22,14 @@ public class FileStorage {
         this.fileStorages = fileStorages;
     }
 
+    public void addFileStorage(String key, IFileStorageClient fileStorageClient) {
+        fileStorages.put(key, fileStorageClient);
+    }
+
+    public IFileStorageClient getFileStorage(String key) {
+        return fileStorages.get(key);
+    }
+
     /**
      * 对文件名过滤特殊字符
      * @param filename String 文件名
