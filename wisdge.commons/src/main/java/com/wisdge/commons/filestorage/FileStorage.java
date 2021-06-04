@@ -3,6 +3,8 @@ package com.wisdge.commons.filestorage;
 import com.wisdge.dataservice.Result;
 import com.wisdge.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.map.HashedMap;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -10,9 +12,9 @@ import java.util.Map;
 
 @Slf4j
 public class FileStorage {
+    public final String DEFAULT_STORAGE = "default";
     private final String FILESTORAGE_NOT_EXIST = "文件服务{0}未配置";
-    private final String FIELD_DEFAULT = "default";
-    private Map<String, IFileStorageClient> fileStorages;
+    private Map<String, IFileStorageClient> fileStorages = new HashedMap();
 
     public Map<String, IFileStorageClient> getFileStorages() {
         return fileStorages;
@@ -81,7 +83,7 @@ public class FileStorage {
 
     public boolean isSecurity(String fsKey) {
         if (StringUtils.isEmpty(fsKey))
-            fsKey = FIELD_DEFAULT;
+            fsKey = DEFAULT_STORAGE;
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient != null)
@@ -105,7 +107,7 @@ public class FileStorage {
      * 	Result对象
      */
     public Result saveStream(String uploadPath, String original, String filename, InputStream inputStream, long size, IProgressListener progressListener) {
-        return saveStream(FIELD_DEFAULT, uploadPath, original, filename, inputStream, size, progressListener);
+        return saveStream(DEFAULT_STORAGE, uploadPath, original, filename, inputStream, size, progressListener);
     }
 
     /**
@@ -127,7 +129,7 @@ public class FileStorage {
      */
     public Result saveStream(String fsKey, String uploadPath, String original, String filename, InputStream inputStream, long size, IProgressListener progressListener) {
         if (StringUtils.isEmpty(fsKey))
-            fsKey = FIELD_DEFAULT;
+            fsKey = DEFAULT_STORAGE;
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
@@ -141,13 +143,13 @@ public class FileStorage {
         String requestRemote = concat(uploadPath, filename);
         String remoteRoot = getRemoteRoot(fileStorageClient.getRemoteRoot());
         String finalRemote = concat(remoteRoot, requestRemote);
-        requestRemote = fsKey.equals(FIELD_DEFAULT) ? requestRemote : (fsKey + "@" + requestRemote);
+        requestRemote = fsKey.equals(DEFAULT_STORAGE) ? requestRemote : (fsKey + "@" + requestRemote);
 
         try {
             log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
             String newPath = fileStorageClient.saveStream(finalRemote, inputStream, size, progressListener);
             if (StringUtils.isNotEmpty(newPath))
-                requestRemote = fsKey.equals(FIELD_DEFAULT) ? newPath : (fsKey + "@" + newPath);
+                requestRemote = fsKey.equals(DEFAULT_STORAGE) ? newPath : (fsKey + "@" + newPath);
             return new Result(Result.SUCCESS, original, requestRemote);
         } catch(Exception e) {
             log.error(e.getMessage(), e);
@@ -157,7 +159,7 @@ public class FileStorage {
 
     public void retrieveStream(String fsKey, String filepath, IFileExecutor executor) throws Exception {
         if (StringUtils.isEmpty(fsKey))
-            fsKey = FIELD_DEFAULT;
+            fsKey = DEFAULT_STORAGE;
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
@@ -189,7 +191,7 @@ public class FileStorage {
      */
     public Result saveFile(String fsKey, String uploadPath, String original, String filename, byte[] data) {
         if (StringUtils.isEmpty(fsKey))
-            fsKey = FIELD_DEFAULT;
+            fsKey = DEFAULT_STORAGE;
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
@@ -202,13 +204,13 @@ public class FileStorage {
         String requestRemote = concat(uploadPath, filename);
         String remoteRoot = getRemoteRoot(fileStorageClient.getRemoteRoot());
         String finalRemote = concat(remoteRoot, requestRemote);
-        requestRemote = fsKey.equals(FIELD_DEFAULT) ? requestRemote : (fsKey + "@" + requestRemote);
+        requestRemote = fsKey.equals(DEFAULT_STORAGE) ? requestRemote : (fsKey + "@" + requestRemote);
 
         try {
             log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
             String newPath = fileStorageClient.save(finalRemote, data);
             if (! StringUtils.isEmpty(newPath)) {
-                requestRemote = fsKey.equals(FIELD_DEFAULT) ? newPath : (fsKey + "@" + newPath);
+                requestRemote = fsKey.equals(DEFAULT_STORAGE) ? newPath : (fsKey + "@" + newPath);
             }
             return new Result(Result.SUCCESS, original, requestRemote);
         } catch(Exception e) {
@@ -219,7 +221,7 @@ public class FileStorage {
 
     public byte[] retrieveFile(String fsKey, String filepath) throws Exception {
         if (StringUtils.isEmpty(fsKey))
-            fsKey = FIELD_DEFAULT;
+            fsKey = DEFAULT_STORAGE;
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
