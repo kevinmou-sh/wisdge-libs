@@ -48,8 +48,11 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 			while ((len = reader.read(buff)) != -1) {
 				builder.append(buff, 0, len);
 			}
-			if (reader.markSupported())
-				reader.reset();
+			if (reader.markSupported()){
+				try {
+					reader.reset();
+				} catch(Exception e) {}
+			}
 		} catch (IOException e) {
 			logger.debug(e, e);
 		}
