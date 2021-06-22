@@ -1,15 +1,19 @@
 package com.wisdge.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.*;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
@@ -36,7 +40,12 @@ public class MapUtils {
      */
     public static <T> T toBean(Class<T> classz, Map map) throws Exception {
         T bean = classz.newInstance();
-        BeanUtils.populate(bean, map);;
+        DateTimeConverter dtConverter = new DateTimeConverter();
+        ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
+        convertUtilsBean.deregister(Date.class);
+        convertUtilsBean.register(dtConverter, Date.class);
+        BeanUtilsBean beanUtilsBean = new BeanUtilsBean(convertUtilsBean, new PropertyUtilsBean());
+        beanUtilsBean.populate(bean, map);
         return bean;
     }
 
@@ -111,5 +120,54 @@ public class MapUtils {
             }
         }
         return returnMap;
+    }
+}
+
+
+//日期转换器
+@Slf4j
+class DateTimeConverter implements Converter {
+    private static final String DATE = "yyyy-MM-dd";
+    private static final String DATETIME = "yyyy-MM-dd HH:mm";
+    private static final String DATETIME_WITH_SECONDS = "yyyy-MM-dd HH:mm:ss";
+    private static final String TIMESTAMP = "yyyy-MM-dd HH:mm:ss.SSS";
+
+    @Override
+    public Object convert(Class type, Object value) {
+        // TODO Auto-generated method stub
+        return toDate(type, value);
+    }
+
+    public static Object toDate(Class type, Object value) {
+        if (value == null || "".equals(value))
+            return null;
+        if (value instanceof String) {
+            String dateValue = value.toString().trim();
+            int length = dateValue.length();
+            if (type.equals(java.util.Date.class)) {
+                try {
+                    DateFormat formatter = null;
+                    if (length <= 10) {
+                        formatter = new SimpleDateFormat(DATE, new DateFormatSymbols(Locale.CHINA));
+                        return formatter.parse(dateValue);
+                    }
+                    if (length <= 16) {
+                        formatter = new SimpleDateFormat(DATETIME, new DateFormatSymbols(Locale.CHINA));
+                        return formatter.parse(dateValue);
+                    }
+                    if (length <= 19) {
+                        formatter = new SimpleDateFormat(DATETIME_WITH_SECONDS, new DateFormatSymbols(Locale.CHINA));
+                        return formatter.parse(dateValue);
+                    }
+                    if (length <= 23) {
+                        formatter = new SimpleDateFormat(TIMESTAMP, new DateFormatSymbols(Locale.CHINA));
+                        return formatter.parse(dateValue);
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+        return value;
     }
 }
