@@ -152,7 +152,7 @@ public class ESClientFactory {
 	}
 
 	public Response performRequest(String method, String endpoint, Object entity, Header header) throws Exception {
-		Request request = new Request(method, endpoint);
+		Request request = new Request(method, (StringUtils.isEmpty(space) ? "" : space) + endpoint);
 		if (header != null) {
 			RequestOptions.Builder options = COMMON_OPTIONS.toBuilder();
 			for(HeaderElement head: header.getElements()) {
