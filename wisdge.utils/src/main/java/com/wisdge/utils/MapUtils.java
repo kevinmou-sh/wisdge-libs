@@ -1,5 +1,6 @@
 package com.wisdge.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -7,9 +8,11 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class MapUtils {
     public static Map<String, Object> make(String key, Object value) {
         Map<String, Object> map = new HashMap<>();
@@ -60,9 +63,20 @@ public class MapUtils {
             if (map.containsKey(propertyName)) {
                 // 下面一句可以 try 起来，这样当一个属性赋值失败的时候就不会影响其他属性赋值。
                 Object value = map.get(propertyName);
-                Object[] args = new Object[1];
-                args[0] = value;
-                descriptor.getWriteMethod().invoke(bean, args);
+                if (value == null)
+                    continue;
+                try {
+                    Class<?> classTypes[] = descriptor.getWriteMethod().getParameterTypes();
+                    if (classTypes[0].equals(Date.class)) {
+                        if (value instanceof String)
+                            value = DateUtils.parse((String) value);
+                    }
+                    Object[] args = new Object[1];
+                    args[0] = value;
+                    descriptor.getWriteMethod().invoke(bean, args);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
         return bean;
