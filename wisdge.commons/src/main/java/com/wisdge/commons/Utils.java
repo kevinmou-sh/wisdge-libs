@@ -1,8 +1,6 @@
 package com.wisdge.commons;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -12,7 +10,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class Utils {
-	
+
 	/**
 	 * 连续在多个字符串中按顺序选择一个非空的字符串返回
 	 * @param strings String[] 备选的字符串
@@ -25,11 +23,11 @@ public class Utils {
 		}
 		return "";
 	}
-	
+
 	public static String i18n(String baseName, Locale locale, String key, Object...objects) throws Exception {
 		if (locale == null)
 			locale = Locale.getDefault();
-		
+
 		ResourceBundle bundle = ResourceBundle.getBundle("i18n/" + baseName, locale);
 		if (bundle.containsKey(key)) {
 			String resource = bundle.getString(key);
@@ -51,17 +49,6 @@ public class Utils {
 		PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pathRegex);
 		Path path = Paths.get(file);
 		return matcher.matches(path);
-	}
-
-	@Test
-	public void test() {
-		String ignore = "js/app/**";
-		String name = "js/app/ios.js";
-		String name2 = "js/app/ios/a/b/c.js";
-
-		PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + ignore);
-		System.out.println(matcher.matches(Paths.get(name)));
-		System.out.println(matcher.matches(Paths.get(name2)));
 	}
 
 }

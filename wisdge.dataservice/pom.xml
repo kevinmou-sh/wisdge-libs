@@ -5,10 +5,9 @@
 	<parent>
 		<groupId>com.wisdge</groupId>
 		<artifactId>wisdge.libs</artifactId>
-		<version>1.0.0</version>
+		<version>1.8.5</version>
 	</parent>
 	<artifactId>wisdge.dataservice</artifactId>
-	<version>1.8.2</version>
 
 	<properties>
 		<fasterxml.version>2.10.3</fasterxml.version>
@@ -101,7 +100,7 @@
 		<dependency>
 			<groupId>com.wisdge</groupId>
 			<artifactId>wisdge.utils</artifactId>
-			<version>1.8.1</version>
+			<version>${wisdge.version}</version>
 		</dependency>
 	</dependencies>
 

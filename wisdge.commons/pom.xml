@@ -6,11 +6,9 @@
     <parent>
         <groupId>com.wisdge</groupId>
         <artifactId>wisdge.libs</artifactId>
-        <version>1.0.0</version>
+        <version>1.8.5</version>
     </parent>
-
     <artifactId>wisdge.commons</artifactId>
-    <version>1.8.4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -274,7 +272,7 @@
         <dependency>
             <groupId>com.wisdge</groupId>
             <artifactId>wisdge.web</artifactId>
-            <version>1.8.2</version>
+            <version>${wisdge.version}</version>
         </dependency>
 
         <!-- excel模板-->

@@ -3,7 +3,6 @@ package com.wisdge.commons.qrcode;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +16,7 @@ import java.util.Hashtable;
 
 /**
  * 二维码解码类
- * 
+ *
  * @author Kevin MOU
  */
 public class QRDecoder {
@@ -25,7 +24,7 @@ public class QRDecoder {
 
 	/**
 	 * 对一个目录文件进行解码
-	 * 
+	 *
 	 * @param filepath
 	 *            目标文件的地址
 	 * @return 解码后的字符串
@@ -46,7 +45,7 @@ public class QRDecoder {
 
 	/**
 	 * 对一个BufferedImage对象进行解码
-	 * 
+	 *
 	 * @param image
 	 *            目标BufferedImage对象
 	 * @return 解码后的字符串
@@ -54,7 +53,7 @@ public class QRDecoder {
 	public static String decode(BufferedImage image) {
 		return decode(image, false);
 	}
-	
+
 	public static String decode(BufferedImage image, boolean barCode) {
 		try {
 			LuminanceSource source = new BufferedImageLuminanceSource(image);
@@ -73,7 +72,7 @@ public class QRDecoder {
 
 	/**
 	 * 对一个数组进行解码
-	 * 
+	 *
 	 * @param bytes
 	 *            目标数据byte[]对象
 	 * @return 解码后的字符串
@@ -88,7 +87,7 @@ public class QRDecoder {
 
 	/**
 	 * 对一个Image对象进行解码
-	 * 
+	 *
 	 * @param image
 	 *            目标Image对象
 	 * @return 解码后的字符串
@@ -97,11 +96,11 @@ public class QRDecoder {
 	public static String decode(Image image) {
 		return decode(image2Buffered(image, false));
 	}
-	
+
 
 	/**
 	 * 从数组中获得Image对象.
-	 * 
+	 *
 	 * @param buffer
 	 *            图像数组，可能来自于文件读取或数据库
 	 * @return Image对象.
@@ -118,7 +117,7 @@ public class QRDecoder {
 
 	/**
 	 * This method returns an Image object from a buffered image
-	 * 
+	 *
 	 * @param bufferedImage
 	 *            源BufferedImage对象
 	 * @return 目标Image对象
@@ -129,7 +128,7 @@ public class QRDecoder {
 
 	/**
 	 * This method returns a buffered image from an Image object
-	 * 
+	 *
 	 * @param image
 	 *            目标Image对象
 	 * @param translucent
@@ -149,11 +148,5 @@ public class QRDecoder {
 		g2d.drawImage(image, 0, 0, null);
 		g2d.dispose();
 		return bi;
-	}
-	
-	@Test
-	public void test() {
-		System.out.println(QRDecoder.decode("/Users/kevinmou/Documents/temp/barcode.jpg", true));
-		System.out.println(QRDecoder.decode("/Users/kevinmou/Documents/ftphome/qrcode/2C556F5C_5CD6_497A_8FED_011B1EE9284E.png", true));
 	}
 }

@@ -5,10 +5,9 @@
 	<parent>
 		<groupId>com.wisdge</groupId>
 		<artifactId>wisdge.libs</artifactId>
-		<version>1.0.0</version>
+		<version>1.8.5</version>
 	</parent>
 	<artifactId>wisdge.web</artifactId>
-	<version>1.8.2</version>
 
 	<dependencies>
 		<dependency>
@@ -57,13 +56,8 @@
 
 		<dependency>
 			<groupId>com.wisdge</groupId>
-			<artifactId>wisdge.utils</artifactId>
-			<version>1.8.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.wisdge</groupId>
 			<artifactId>wisdge.dataservice</artifactId>
-			<version>1.8.2</version>
+			<version>${wisdge.version}</version>
 		</dependency>
 	</dependencies>
 
