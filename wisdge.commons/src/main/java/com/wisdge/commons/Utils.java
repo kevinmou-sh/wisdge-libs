@@ -24,6 +24,16 @@ public class Utils {
 		return "";
 	}
 
+	/**
+	 * 国际化资源
+	 * @param baseName String 资源名称（改资源必须位于i18n子目录下）
+	 * @param locale Locale 语言
+	 * @param key String 资源Key
+	 * @param objects Object[] 入参，使用MessageFormat入参
+	 * @return
+	 * @throws Exception
+	 * @see MessageFormat
+	 */
 	public static String i18n(String baseName, Locale locale, String key, Object...objects) throws Exception {
 		if (locale == null)
 			locale = Locale.getDefault();
