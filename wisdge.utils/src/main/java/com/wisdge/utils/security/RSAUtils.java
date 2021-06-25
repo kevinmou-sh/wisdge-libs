@@ -1,17 +1,24 @@
 package com.wisdge.utils.security;
 
-import org.apache.commons.net.util.Base64;
-import org.junit.Test;
-
-import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.crypto.Cipher;
+
+import org.apache.commons.net.util.Base64;
+import org.junit.Test;
 
 public class RSAUtils {
 	/**
@@ -34,15 +41,15 @@ public class RSAUtils {
 	 */
 	private static final String PRIVATE_KEY = "RSAPrivateKey";
 
-//	/**
-//	 * RSA最大加密明文大小
-//	 */
-//	private static final int MAX_ENCRYPT_BLOCK = 117;
-//
-//	/**
-//	 * RSA最大解密密文大小
-//	 */
-//	private static final int MAX_DECRYPT_BLOCK = 128;
+	/**
+	 * RSA最大加密明文大小
+	 */
+	private static final int MAX_ENCRYPT_BLOCK = 117;
+
+	/**
+	 * RSA最大解密密文大小
+	 */
+	private static final int MAX_DECRYPT_BLOCK = 128;
 
 	/**
 	 * <p>
@@ -52,25 +59,16 @@ public class RSAUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Map<String, Object> genKeyPair(int keySize) throws Exception {
+	public static Map<String, Object> genKeyPair() throws Exception {
 		KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
-		keyPairGen.initialize(keySize);
+		keyPairGen.initialize(1024);
 		KeyPair keyPair = keyPairGen.generateKeyPair();
 		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 		RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-		Map<String, Object> keyMap = new HashMap<>(2);
+		Map<String, Object> keyMap = new HashMap<String, Object>(2);
 		keyMap.put(PUBLIC_KEY, publicKey);
 		keyMap.put(PRIVATE_KEY, privateKey);
 		return keyMap;
-	}
-
-	/**
-	 * 默认key长度为1024 bit
-	 * @return
-	 * @throws Exception
-	 */
-	public static Map<String, Object> genKeyPair() throws Exception {
-		return genKeyPair(1024);
 	}
 
 	/**
@@ -154,17 +152,16 @@ public class RSAUtils {
 		int offSet = 0;
 		byte[] cache;
 		int i = 0;
-		int maxBlock = getMaxBlock(privateKey, Cipher.DECRYPT_MODE, true);
 		// 对数据分段解密
 		while (inputLen - offSet > 0) {
-			if (inputLen - offSet > maxBlock) {
-				cache = cipher.doFinal(encryptedData, offSet, maxBlock);
+			if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
+				cache = cipher.doFinal(encryptedData, offSet, MAX_DECRYPT_BLOCK);
 			} else {
 				cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
 			i++;
-			offSet = i * maxBlock;
+			offSet = i * MAX_DECRYPT_BLOCK;
 		}
 		byte[] decryptedData = out.toByteArray();
 		out.close();
@@ -200,17 +197,16 @@ public class RSAUtils {
 		int offSet = 0;
 		byte[] cache;
 		int i = 0;
-		int maxBlock = getMaxBlock(publicKey, Cipher.DECRYPT_MODE, false);
 		// 对数据分段解密
 		while (inputLen - offSet > 0) {
-			if (inputLen - offSet > maxBlock) {
-				cache = cipher.doFinal(encryptedData, offSet, maxBlock);
+			if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
+				cache = cipher.doFinal(encryptedData, offSet, MAX_DECRYPT_BLOCK);
 			} else {
 				cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
 			i++;
-			offSet = i * maxBlock;
+			offSet = i * MAX_DECRYPT_BLOCK;
 		}
 		byte[] decryptedData = out.toByteArray();
 		out.close();
@@ -247,17 +243,16 @@ public class RSAUtils {
 		int offSet = 0;
 		byte[] cache;
 		int i = 0;
-		int maxBlock = getMaxBlock(publicKey, Cipher.ENCRYPT_MODE, false);
 		// 对数据分段加密
 		while (inputLen - offSet > 0) {
-			if (inputLen - offSet > maxBlock) {
-				cache = cipher.doFinal(data, offSet, maxBlock);
+			if (inputLen - offSet > MAX_ENCRYPT_BLOCK) {
+				cache = cipher.doFinal(data, offSet, MAX_ENCRYPT_BLOCK);
 			} else {
 				cache = cipher.doFinal(data, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
 			i++;
-			offSet = i * maxBlock;
+			offSet = i * MAX_ENCRYPT_BLOCK;
 		}
 		byte[] encryptedData = out.toByteArray();
 		out.close();
@@ -265,7 +260,7 @@ public class RSAUtils {
 	}
 
 	public static String encryptByPublicKey(String content, String publicKey) throws Exception {
-		byte[] encryptBytes = encryptByPublicKey(content.getBytes(StandardCharsets.UTF_8), publicKey);
+		byte[] encryptBytes = encryptByPublicKey(content.getBytes("UTF-8"), publicKey);
 		return Base64.encodeBase64String(encryptBytes);
 	}
 	
@@ -293,31 +288,35 @@ public class RSAUtils {
 		int offSet = 0;
 		byte[] cache;
 		int i = 0;
-		int maxBlock = getMaxBlock(privateKey, Cipher.ENCRYPT_MODE, true);
 		// 对数据分段加密
 		while (inputLen - offSet > 0) {
-			if (inputLen - offSet > maxBlock) {
-				cache = cipher.doFinal(data, offSet, maxBlock);
+			if (inputLen - offSet > MAX_ENCRYPT_BLOCK) {
+				cache = cipher.doFinal(data, offSet, MAX_ENCRYPT_BLOCK);
 			} else {
 				cache = cipher.doFinal(data, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
 			i++;
-			offSet = i * maxBlock;
+			offSet = i * MAX_ENCRYPT_BLOCK;
 		}
 		byte[] encryptedData = out.toByteArray();
 		out.close();
 		return encryptedData;
 	}
 	public static String encryptByPrivateKey(String content, String privateKey) throws Exception {
-		byte[] encryptBytes = encryptByPrivateKey(content.getBytes(StandardCharsets.UTF_8), privateKey);
+		byte[] encryptBytes = encryptByPrivateKey(content.getBytes("UTF-8"), privateKey);
 		return Base64.encodeBase64String(encryptBytes);
 	}
-
+	
 	/**
+	 * <p>
 	 * 获取私钥
-	 * @param keyMap 密钥对
-	 * @return 私钥base64字符串
+	 * </p>
+	 * 
+	 * @param keyMap
+	 *            密钥对
+	 * @return
+	 * @throws Exception
 	 */
 	public static String getPrivateKey(Map<String, Object> keyMap) throws Exception {
 		Key key = (Key) keyMap.get(PRIVATE_KEY);
@@ -325,58 +324,20 @@ public class RSAUtils {
 	}
 
 	/**
+	 * <p>
 	 * 获取公钥
-	 * @param keyMap 密钥对
-	 * @return 公钥base64字符串
+	 * </p>
+	 * 
+	 * @param keyMap
+	 *            密钥对
+	 * @return
+	 * @throws Exception
 	 */
-	public static String getPublicKey(Map<String, Object> keyMap) {
+	public static String getPublicKey(Map<String, Object> keyMap) throws Exception {
 		Key key = (Key) keyMap.get(PUBLIC_KEY);
 		return Base64.encodeBase64String(key.getEncoded());
 	}
 
-	private static RSAPublicKey getRSAPublidKey(String publicKeyStr) throws NoSuchAlgorithmException, InvalidKeySpecException {
-		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decodeBase64(publicKeyStr));
-		KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
-		return (RSAPublicKey)keyFactory.generatePublic(keySpec);
-	}
-
-	private static RSAPrivateKey getRSAPrivateKey(String privateKeyStr) throws NoSuchAlgorithmException, InvalidKeySpecException {
-		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKeyStr));
-		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-		return (RSAPrivateKey)keyFactory.generatePrivate(keySpec);
-	}
-
-	/**
-	 * 根据密钥计算加解密时候分段最大长度
-	 * @param key 密码base64字符串
-	 * @param mode 加密还是解密
-	 * @param isPrivate 私钥还是公钥
-	 * @return 最大分段长度
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 */
-	private static int getMaxBlock(String key, int mode, boolean isPrivate) throws NoSuchAlgorithmException, InvalidKeySpecException {
-		KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
-		int keySize;
-		if (isPrivate) {
-			RSAPrivateKey rsaPrivateKey = getRSAPrivateKey(key);
-			RSAPrivateKeySpec keySpec = keyFactory.getKeySpec(rsaPrivateKey, RSAPrivateKeySpec.class);
-			keySize = keySpec.getModulus().bitLength();
-		} else {
-			RSAPublicKey rsaPublidKey = getRSAPublidKey(key);
-			RSAPublicKeySpec keySpec = keyFactory.getKeySpec(rsaPublidKey, RSAPublicKeySpec.class);
-			keySize = keySpec.getModulus().bitLength();
-		}
-		int maxBlock;
-		if (mode == Cipher.DECRYPT_MODE) {
-			maxBlock = keySize / 8;
-		} else {
-			maxBlock = keySize / 8 - 11;
-		}
-		return maxBlock;
-	}
-
-	@Test
 	public void test() throws Exception {
 		String publicKey = null;
 		String privateKey = null;
@@ -403,7 +364,7 @@ public class RSAUtils {
 		String publicKey = null;
 		String privateKey = null;
 		try {
-			Map<String, Object> keyMap = RSAUtils.genKeyPair(2048);
+			Map<String, Object> keyMap = RSAUtils.genKeyPair();
 			publicKey = RSAUtils.getPublicKey(keyMap);
 			privateKey = RSAUtils.getPrivateKey(keyMap);
 			System.err.println("公钥: \n\r" + publicKey);
@@ -413,19 +374,7 @@ public class RSAUtils {
 		}
 
         System.out.println("\r\n私钥加密——公钥解密");
-        String content = "这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字," +
-				"这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,";
+        String content = "这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,这是一行测试RSA数字签名的无意义文字,";
         System.out.println("\r加密前文字：\r\n" + content);
         String encrypted = RSAUtils.encryptByPrivateKey(content, privateKey);
         System.out.println("加密后文字：\r\n" + encrypted);
@@ -438,8 +387,7 @@ public class RSAUtils {
         boolean status = RSAUtils.verify(encrypted, publicKey, sign);
         System.out.println("验证结果:\r" + status);
     }
-
-	@Test
+	
 	public static void keys() {
 		String publicKey = null;
 		String privateKey = null;

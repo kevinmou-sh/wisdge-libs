@@ -19,5 +19,4 @@ target/
 *.iml
 *.ipr
 /logs/
-/elite.vp.web/logs/
 
