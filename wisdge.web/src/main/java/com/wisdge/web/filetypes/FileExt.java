@@ -25,7 +25,7 @@ public class FileExt {
 	private static java.util.Vector<Map<String, String>> extVT = null;
 
 	private static synchronized void initialize() {
-		buildConfig("FileExtType.xml");
+		buildConfig("/com/wisdge/web/filetypes/FileExtType.xml");
 	}
 
 	private static void buildConfig(String source) {
