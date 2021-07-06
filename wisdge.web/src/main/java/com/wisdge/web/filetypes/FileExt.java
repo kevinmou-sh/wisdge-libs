@@ -25,10 +25,6 @@ public class FileExt {
 	private static java.util.Vector<Map<String, String>> extVT = null;
 
 	private static synchronized void initialize() {
-		buildConfig("/com/wisdge/web/filetypes/FileExtType.xml");
-	}
-
-	private static void buildConfig(String source) {
 		if (extVT != null) {
 			return;
 		}
@@ -37,7 +33,7 @@ public class FileExt {
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = dbf.newDocumentBuilder();
-			InputStream in = FileExt.class.getResourceAsStream(source);
+			InputStream in = FileExt.class.getClassLoader().getResourceAsStream("FileExtType.xml");
 			Document doc = builder.parse(in);
 			Element root = doc.getDocumentElement();
 
@@ -114,7 +110,7 @@ public class FileExt {
 			}
 		}
 
-		try (InputStream in = FileExt.class.getResourceAsStream("/com/wisdge/web/filetypes/imgs/" + imgFilename)) {
+		try (InputStream in = FileExt.class.getClassLoader().getResourceAsStream("file-types-images/" + imgFilename)) {
 			return IOUtils.toByteArray(in);
 		} catch (Exception e) {
 			throw e;
