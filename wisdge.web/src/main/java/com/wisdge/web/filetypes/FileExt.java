@@ -1,5 +1,6 @@
 package com.wisdge.web.filetypes;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class FileExt {
 	 * @param ext String 文件名后缀
 	 * @return byte[] LOGO图片
 	 */
-	public static byte[] getImgByExt(String ext) {
+	public static byte[] getImgByExt(String ext) throws IOException {
 		String imgFilename = "shb.gif";
 
 		if (StringUtils.isNotEmpty(ext)) {
@@ -116,7 +117,7 @@ public class FileExt {
 		try (InputStream in = FileExt.class.getResourceAsStream("/com/wisdge/web/filetypes/imgs/" + imgFilename)) {
 			return IOUtils.toByteArray(in);
 		} catch (Exception e) {
-			return new byte[0];
+			throw e;
 		}
 	}
 
@@ -126,7 +127,7 @@ public class FileExt {
 	 * @param filename String 文件名
 	 * @return byte[] LOGO图片
 	 */
-	public static byte[] getImgByFilename(String filename) {
+	public static byte[] getImgByFilename(String filename) throws IOException {
 		return getImgByExt(FilenameUtils.getExtension(filename));
 	}
 

@@ -12,10 +12,12 @@ public class ExtImageController {
     @GetMapping("/file-ext-image")
     public void fileExtImage(HttpServletRequest request, HttpServletResponse response) throws java.io.IOException {
         String ext = WebUtils.getString(request, "ext", "");
-        byte[] bmp = FileExt.getImgByExt(ext);
+        byte[] data = FileExt.getImgByExt(ext);
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
-        response.getOutputStream().write(bmp);
+        response.setContentLength(data.length);
+        response.getOutputStream().write(data);
+        response.flushBuffer();
     }
 }
