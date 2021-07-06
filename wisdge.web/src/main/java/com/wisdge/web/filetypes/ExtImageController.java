@@ -16,6 +16,7 @@ public class ExtImageController {
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
+        response.setContentType(FileExt.getContentTypeByExt(ext));
         response.setContentLength(data.length);
         response.getOutputStream().write(data);
         response.flushBuffer();
