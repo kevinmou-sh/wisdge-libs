@@ -26,33 +26,33 @@ import org.springframework.util.StringUtils;
  * (i.e. XSS) from the Query String
  */
 public class XSSPreventionFilter implements Filter {
-	private static final String[] filterLabels = {"applet", "blink", "frameset", "iframe", "object", 
-			"base", "body", "head", "layer", "style", "basefont", "embed", "html", "link", 
+	private static final String[] filterLabels = {"applet", "blink", "frameset", "iframe", "object",
+			"base", "body", "head", "layer", "style", "basefont", "embed", "html", "link",
 			"title", "bgsound", "frame", "ilayer", "meta", "script"};
 	private static final String[] filterAttributes = {"dynsrc", "action", "background", "bgsound", "lowsrc",
 			"value"}; // src和href暂时不过滤
-	private static final String[] filterKeywords = {"vbscript:", "ms-its:", "firefoxurl:", "javascript:", 
+	private static final String[] filterKeywords = {"vbscript:", "ms-its:", "firefoxurl:", "javascript:",
 			"mhtml:", "mocha:", "data:", "livescript:"};
-	
+
 	private FilterConfig filterConfig;
-	
+
 	class XSSRequestWrapper extends HttpServletRequestWrapper {
 
 		private String allowDomains;
 		private Map<String, String[]> sanitizedQueryString;
-		
+
 		public XSSRequestWrapper(HttpServletRequest request, String allowDomains) {
 			super(request);
 			this.allowDomains = allowDomains;
 		}
-		
+
 		//QueryString overrides
-		
+
 		@Override
 		public String getParameter(String name) {
 			String parameter = null;
-			String[] vals = getParameterMap().get(name); 
-			
+			String[] vals = getParameterMap().get(name);
+
 			if (vals != null && vals.length > 0) {
 				parameter = vals[0];
 			}
@@ -63,7 +63,7 @@ public class XSSPreventionFilter implements Filter {
 		public String[] getParameterValues(String name) {
 			return getParameterMap().get(name);
 		}
-		
+
 		@Override
 		public Enumeration<String> getParameterNames() {
 			return Collections.enumeration(getParameterMap().keySet());
@@ -99,7 +99,7 @@ public class XSSPreventionFilter implements Filter {
 			String cleanValue = null;
 			if (value != null) {
 				cleanValue = filter(value);
-				
+
 				// 如果配置了允许的域，则过滤src属性中的其他域
 				if(allowDomains != null && !allowDomains.equals("")){
 					String[] allDomainsArr = allowDomains.toLowerCase().split(",");
@@ -122,7 +122,7 @@ public class XSSPreventionFilter implements Filter {
 										}
 									}
 								}
-								if(!findAllowDomain){//未找到，就过滤掉
+								if(!findAllowDomain) {//未找到，就过滤掉
 									scriptPattern = Pattern.compile("src[\r\n\\s]*=[\r\n\\s]*(\\\"|'|\\\\\")" + gp +  "(\\\"|'|\\\\\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 									cleanValue = scriptPattern.matcher(cleanValue).replaceAll("");
 								}
@@ -140,7 +140,7 @@ public class XSSPreventionFilter implements Filter {
 	}
 
 	public void destroy() {
-		
+
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -174,20 +174,20 @@ public class XSSPreventionFilter implements Filter {
 
 		// Avoid null characters
 		cleanValue = cleanValue.replaceAll("\0", "").replaceAll("'", "");
-		
+
 		// Avoid anything between script tags
 		Pattern scriptPattern = Pattern.compile("<script>(.*?)</script>", Pattern.CASE_INSENSITIVE);
 		cleanValue = scriptPattern.matcher(cleanValue).replaceAll("");
- 
+
 
 		// Avoid eval(...) expressions
 		scriptPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 		cleanValue = scriptPattern.matcher(cleanValue).replaceAll(" ");
-		
+
 		// Avoid expression(...) expressions
 		scriptPattern = Pattern.compile("expression\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 		cleanValue = scriptPattern.matcher(cleanValue).replaceAll(" ");
-		
+
 		// Avoid onload= expressions
 		scriptPattern = Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 		cleanValue = scriptPattern.matcher(cleanValue).replaceAll(" ");
