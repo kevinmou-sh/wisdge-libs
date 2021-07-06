@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <file-type>
 	<suffix ext="doc" image="doc.gif" contentType="application/msword"/>
+	<suffix ext="docx" image="doc.gif" contentType="application/msword"/>
 	<suffix ext="xls" image="xls.gif" contentType="application/msword"/>
+	<suffix ext="xlsx" image="xls.gif" contentType="application/msword"/>
 	<suffix ext="java" image="java.gif" contentType="application/java"/>
 	<suffix ext="ppt" image="ppt.gif" contentType="application/msword"/>
 	<suffix ext="rar" image="rar.gif" contentType="application/zip"/>
@@ -21,6 +23,7 @@
 	<suffix ext="htm" image="html.gif" contentType="text/html"/>
 	<suffix ext="html" image="html.gif" contentType="text/html"/>
 	<suffix ext="jpg" image="mdi.gif" contentType="image/jpeg"/>
+	<suffix ext="jpeg" image="mdi.gif" contentType="image/jpeg"/>
 	<suffix ext="pdf" image="pdf.gif" contentType="application/pdf"/>
 	<suffix ext="ps" image="ps.gif" contentType="application/photoshop"/>
 	<suffix ext="swf" image="html.gif" contentType="application/x-shockwave-flash"/>
