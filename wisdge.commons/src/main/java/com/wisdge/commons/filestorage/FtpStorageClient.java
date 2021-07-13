@@ -33,7 +33,7 @@ public class FtpStorageClient extends FTPConfig implements IFileStorageClient {
 	public String getRemoteRoot() {
 		return remoteRoot;
 	}
-	
+
 	public void setRemoteRoot(String remoteRoot) {
 		this.remoteRoot = remoteRoot;
 	}
@@ -64,28 +64,33 @@ public class FtpStorageClient extends FTPConfig implements IFileStorageClient {
 	public void retrieveStream(String filepath, IFileExecutor executor) throws Exception {
 		FileMetadata metadata = new FileMetadata();
 		if (this.isSsh()) {
-			ChannelSftp sftp = FtpUtils.getChannel(this);
-			SftpATTRS attrs = sftp.lstat(filepath);
-			try (InputStream is = FtpUtils.retrieveStream(sftp, filepath)) {
-				if (attrs != null) {
-					metadata.setContentLength(attrs.getSize());
-				} else {
-					log.debug("lstat file {} failed, cannot get file size", filepath);
+			ChannelSftp sftp = null;
+			try {
+				sftp = FtpUtils.getChannel(this);
+				SftpATTRS attrs = sftp.lstat(filepath);
+				try (InputStream is = FtpUtils.retrieveStream(sftp, filepath)) {
+					if (attrs != null) {
+						metadata.setContentLength(attrs.getSize());
+					} else {
+						log.debug("lstat file {} failed, cannot get file size", filepath);
+					}
+					executor.execute(is, metadata);
 				}
-				executor.execute(is, metadata);
 			} finally {
 				FtpUtils.closeChannel(sftp);
 			}
 		} else {
 			FTPClient ftpClient = FtpUtils.getClient(this);
-			FTPFile file = ftpClient.mlistFile(filepath);
-			try (InputStream is = FtpUtils.retrieveStream(ftpClient, filepath)) {
-				if (file != null) {
-					metadata.setContentLength(file.getSize());
-				} else {
-					log.debug("List file {} failed, cannot get file size", filepath);
+			try {
+				FTPFile file = ftpClient.mlistFile(filepath);
+				try (InputStream is = FtpUtils.retrieveStream(ftpClient, filepath)) {
+					if (file != null) {
+						metadata.setContentLength(file.getSize());
+					} else {
+						log.debug("List file {} failed, cannot get file size", filepath);
+					}
+					executor.execute(is, metadata);
 				}
-				executor.execute(is, metadata);
 			} finally {
 				ftpClient.disconnect();
 			}
@@ -94,7 +99,7 @@ public class FtpStorageClient extends FTPConfig implements IFileStorageClient {
 
 	@Override
 	public void delete(String filepath) throws Exception {
-		FtpUtils.deleteFile(this, filepath); 
+		FtpUtils.deleteFile(this, filepath);
 	}
 
 	@Override

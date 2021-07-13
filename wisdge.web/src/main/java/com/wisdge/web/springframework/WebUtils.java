@@ -12,10 +12,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -24,9 +23,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.wisdge.dataservice.utils.JSonUtils;
 import com.wisdge.utils.ByteUtils;
 
+@Slf4j
 public class WebUtils extends org.springframework.web.util.WebUtils {
-	private static final Log logger = LogFactory.getLog(WebUtils.class);
-
 	/**
 	 * 从request请求中读取payload字符串。不同于getRequestPayload, 该方法支持重复读取
 	 * @param request HttpServletRequest
@@ -54,17 +52,16 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 				} catch(Exception e) {}
 			}
 		} catch (IOException e) {
-			logger.debug(e, e);
+			log.debug(e.getMessage(), e);
 		}
 		return builder.toString();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Map<String, Object> getRequestPayloadBean(HttpServletRequest request) {
 		try {
 			return getRequestPayloadBean(request, Map.class);
 		} catch (Exception e) {
-			logger.error("Convert payload string to map failed", e);
+			log.error("Convert payload string to map failed", e);
 			return Collections.emptyMap();
 		}
 	}
@@ -75,10 +72,13 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 	}
 
 	public static String getContentType(String extension) throws IOException {
-		InputStream is = WebUtils.class.getClassLoader().getResourceAsStream("contentType.properties");
-		Properties properties = new Properties();
-		properties.load(is);
-		return properties.getProperty(extension);
+		try (InputStream is = WebUtils.class.getClassLoader().getResourceAsStream("contentType.properties")) {
+			Properties properties = new Properties();
+			properties.load(is);
+			return properties.getProperty(extension);
+		} catch(Exception e) {
+			throw e;
+		}
 	}
 
 	public static String getString(HttpServletRequest request, String parameter) {
@@ -147,19 +147,18 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 				try {
 					return mFile.getBytes();
 				} catch (IOException e) {
-					logger.error(e, e);
+					log.error(e.getMessage(), e);
 				}
 			} else
-				logger.error("文件不存在:" + filename);
+				log.error("文件不存在:" + filename);
 		}
 		return null;
 	}
 
     /**
      * 断点续传支持
-     * @param file
+     * @param data byte[]
      * @param request
-     * @param response
      * @return 跳过多少字节
      */
     private static RangeSettings getRange(byte[] data, HttpServletRequest request) {
@@ -220,7 +219,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 			if (!rangeSettings.isRange()) {
 				response.addHeader("Content-Length", String.valueOf(rangeSettings.getTotalLength()));
 			} else {
-				logger.info("Find seeking: " + rangeSettings.getStart());
+				log.info("Find seeking: " + rangeSettings.getStart());
 				long start = rangeSettings.getStart();
 				long end = rangeSettings.getEnd();
 				long contentLength = rangeSettings.getContentLength();

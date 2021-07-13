@@ -10,8 +10,11 @@ import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.wisdge.utils.StringUtils;
+import com.wisdge.web.springframework.WebUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,6 +39,7 @@ public class AliOSSStorageClient implements IFileStorageClient {
 	@Override
 	public void init() {
 		log.debug("Aliyun OSS service initializing remoteRoot： {}", remoteRoot);
+		log.debug("Endpoint: {}, WanEndpoint: {} ", endpoint, wanEndpoint);
 		ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 		if (ossClient.doesBucketExist(bucketName)) {
 			log.debug("已创建Bucket：{}", bucketName);
@@ -55,11 +59,11 @@ public class AliOSSStorageClient implements IFileStorageClient {
 	}
 
 	@Override
-	public String save(String filepath, byte[] data) throws Exception {
-		if (filepath.startsWith("/"))
-			filepath = filepath.substring(1);
+	public String save(String filePath, byte[] data) throws Exception {
+		if (filePath.startsWith("/"))
+			filePath = filePath.substring(1);
 		try (InputStream is = new ByteArrayInputStream(data)) {
-			ossClient.putObject(bucketName, filepath, is);
+			ossClient.putObject(bucketName, filePath, is);
 			return "";
 		}
 	}
@@ -70,6 +74,7 @@ public class AliOSSStorageClient implements IFileStorageClient {
 			filePath = filePath.substring(1);
 		try (InputStream source = inputStream) {
 			ObjectMetadata metadata = new ObjectMetadata();
+			metadata.setContentType(WebUtils.getContentType(FilenameUtils.getExtension(filePath)));
 			metadata.setContentLength(size);
 			ossClient.putObject(bucketName, filePath, source, metadata);
 		}
@@ -89,31 +94,37 @@ public class AliOSSStorageClient implements IFileStorageClient {
 	}
 
 	@Override
-	public byte[] retrieve(String filepath) throws Exception {
-		if (filepath.startsWith("/"))
-			filepath = filepath.substring(1);
-		try (OSSObject ossObject = ossClient.getObject(bucketName, filepath)) {
+	public byte[] retrieve(String filePath) throws Exception {
+		if (filePath.startsWith("/"))
+			filePath = filePath.substring(1);
+		try (OSSObject ossObject = ossClient.getObject(bucketName, filePath)) {
 			// 这里ossObject.getObjectContent()的输入流，在OSSObject的close就会关闭了，不需要再次关闭
 			return toByteArray(ossObject.getObjectContent());
 		}
 	}
 
 	@Override
-	public void retrieveStream(String filepath, IFileExecutor executor) throws Exception {
-		if (filepath.startsWith("/"))
-			filepath = filepath.substring(1);
+	public void retrieveStream(String filePath, IFileExecutor executor) throws Exception {
+		if (filePath.startsWith("/"))
+			filePath = filePath.substring(1);
 		FileMetadata metadata = new FileMetadata();
 		if (this.isDownloadFromURL()) {
-			URL url = ossClient.generatePresignedUrl(bucketName, filepath, getExpiredDate());
+			URL url = ossClient.generatePresignedUrl(bucketName, filePath, getExpiredDate());
 			String urlString = url.toString();
-			if (StringUtils.isNotEmpty(wanEndpoint))
-				urlString = urlString.replace(endpoint, wanEndpoint);
+			if (StringUtils.isNotEmpty(wanEndpoint)) {
+				String internalEndpoint = endpoint.substring(endpoint.indexOf("//") + 2);
+				urlString = urlString.replace(internalEndpoint, wanEndpoint);
+			} else {
+				urlString = urlString.replace("http:", "").replace("https:", "");
+			}
+			log.debug("UrlString:{}, Endpoint:{}, WanEndpoint:{}", urlString, endpoint, wanEndpoint);
 			metadata.setDownloadURL(urlString);
 			executor.execute(null, metadata);
 		} else {
-			try (OSSObject ossObject = ossClient.getObject(bucketName, filepath)) {
+			try (OSSObject ossObject = ossClient.getObject(bucketName, filePath)) {
 				ObjectMetadata objectMetadata = ossObject.getObjectMetadata();
 				metadata.setContentLength(objectMetadata.getContentLength());
+				metadata.setContentType(objectMetadata.getContentType());
 				metadata.setLastModified(objectMetadata.getLastModified().getTime());
 				// 这里ossObject.getObjectContent()的输入流，在OSSObject的close就会关闭了，不需要再次关闭
 				executor.execute(ossObject.getObjectContent(), metadata);
@@ -122,10 +133,10 @@ public class AliOSSStorageClient implements IFileStorageClient {
 	}
 
 	@Override
-	public void delete(String filepath) throws Exception {
-		if (filepath.startsWith("/"))
-			filepath = filepath.substring(1);
-		ossClient.deleteObject(bucketName, filepath);
+	public void delete(String filePath) throws Exception {
+		if (filePath.startsWith("/"))
+			filePath = filePath.substring(1);
+		ossClient.deleteObject(bucketName, filePath);
 	}
 
 	private byte[] toByteArray(InputStream in) throws IOException {

@@ -34,7 +34,7 @@ import com.wisdge.utils.StringUtils;
 
 /**
  * FTP操作类，快速读取下载文件
- * 
+ *
  * @author MOU
  *
  */
@@ -44,19 +44,19 @@ public class FtpUtils {
 	 * FTP协议里面，规定文件名编码为ISO-8859-1
 	 */
 	private static String SERVER_CHARSET = "ISO-8859-1";
-	 
+
 	public static FTPClient getClient(FTPConfig config) throws SocketException, IOException, FTPException {
 		return getClient(config, System.out);
 	}
-	
+
 	public static FTPClient getClient(FTPConfig config, OutputStream out) throws SocketException, IOException, FTPException {
 		return getClient(config, new PrintWriter(out));
 	}
-	
+
 	public static FTPClient getClient(FTPConfig config, PrintWriter writer) throws SocketException, IOException, FTPException {
 		return getClient(config, new PrintCommandListener(writer, true));
 	}
-		
+
 	public static FTPClient getClient(FTPConfig config, ProtocolCommandListener listener) throws SocketException, IOException, FTPException {
 		FTPClient ftpClient;
 
@@ -83,11 +83,11 @@ public class FtpUtils {
 
 		return ftpClient;
 	}
-	
+
 	public static void connect(FTPClient ftpClient, FTPConfig config) throws IOException, FTPException {
 		if (ftpClient.isConnected())
 			return;
-		
+
 		ftpClient.connect(config.getHostname(), config.getPort());
 
 		if (! FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
@@ -102,7 +102,7 @@ public class FtpUtils {
 			((FTPSClient) ftpClient).execPBSZ(0);
 			((FTPSClient) ftpClient).execPROT("P");
 		}
-		
+
 		// 开启服务器对UTF-8的支持
 		ftpClient.sendCommand("OPTS UTF8", "ON");
 		ftpClient.setControlEncoding("UTF-8");
@@ -113,8 +113,9 @@ public class FtpUtils {
 
 	public static byte[] retrieveFile(FTPConfig config, String remote) throws SocketException, IOException, FTPException, JSchException, SftpException {
 		if (config.isSsh()) {
-			ChannelSftp sftp = getChannel(config);
+			ChannelSftp sftp = null;
 			try {
+				sftp = getChannel(config);
 				return retrieveFile(sftp, remote);
 			} finally {
 				closeChannel(sftp);
@@ -200,8 +201,9 @@ public class FtpUtils {
 
 	public static void storeFile(FTPConfig config, String remote, byte[] data) throws SftpException, JSchException, IOException, FTPException {
 		if (config.isSsh()) {
-			ChannelSftp sftp = getChannel(config);
+			ChannelSftp sftp = null;
 			try {
+				sftp = getChannel(config);
 				storeFile(sftp, remote, data);
 			} finally {
 				closeChannel(sftp);
@@ -218,8 +220,9 @@ public class FtpUtils {
 
 	public static void storeStream(FTPConfig config, String remote, InputStream inputStream) throws SftpException, JSchException, IOException, FTPException {
 		if (config.isSsh()) {
-			ChannelSftp sftp = getChannel(config);
+			ChannelSftp sftp = null;
 			try {
+				sftp = getChannel(config);
 				storeStream(sftp, remote, inputStream);
 			} finally {
 				closeChannel(sftp);
@@ -294,8 +297,9 @@ public class FtpUtils {
 
 	public static void deleteFile(FTPConfig config, String remote) throws SftpException, JSchException, SocketException, IOException, FTPException {
 		if (config.isSsh()) {
-			ChannelSftp sftp = getChannel(config);
+			ChannelSftp sftp = null;
 			try {
+				sftp = getChannel(config);
 				sftp.rm(remote);
 			} finally {
 				closeChannel(sftp);
@@ -315,8 +319,9 @@ public class FtpUtils {
 
 	public static void moveFile(FTPConfig config, String source, String target) throws SftpException, JSchException, SocketException, IOException, FTPException {
 		if (config.isSsh()) {
-			ChannelSftp sftp = getChannel(config);
+			ChannelSftp sftp = null;
 			try {
+				sftp = getChannel(config);
 				String path = FilenameUtils.getPath(target);
 				sftp.cd("/");
 				if (! StringUtils.isEmpty(path)) {
@@ -331,33 +336,32 @@ public class FtpUtils {
 		} else {
 			source = new String(source.getBytes(StandardCharsets.UTF_8), SERVER_CHARSET);
 			target = new String(target.getBytes(StandardCharsets.UTF_8), SERVER_CHARSET);
-			
-			FTPClient ftpClient = getClient(config);
-			String path = FilenameUtils.getPath(target);
-			ftpClient.changeWorkingDirectory("/");
-			if (! StringUtils.isEmpty(path)) {
-				if (! cwd(ftpClient, path)) {
-					throw new FTPException("Create directory faild: " + path);
-				}
-			}
 
-			ftpClient.changeWorkingDirectory("/");
+			FTPClient ftpClient = getClient(config);
 			try {
+				String path = FilenameUtils.getPath(target);
+				ftpClient.changeWorkingDirectory("/");
+				if (! StringUtils.isEmpty(path)) {
+					if (! cwd(ftpClient, path)) {
+						throw new FTPException("Create directory failed: " + path);
+					}
+				}
+				ftpClient.changeWorkingDirectory("/");
 				if (ftpClient.rename(source, target)) {
-					throw new FTPException("Move file faild: " + source + " to " + target);
+					throw new FTPException("Move file failed: " + source + " to " + target);
 				}
 			} finally {
 				ftpClient.disconnect();
 			}
 		}
 	}
-	
+
 	public static void clearFolder(FTPConfig config, String folder) throws JSchException, SftpException, SocketException, IOException, FTPException {
 		folder = new String(folder.getBytes(StandardCharsets.UTF_8), SERVER_CHARSET);
 		if (config.isSsh()) {
-			ChannelSftp sftp = FtpUtils.getChannel(config);
+			ChannelSftp sftp = null;
 			try {
-				@SuppressWarnings("unchecked")
+				sftp = FtpUtils.getChannel(config);
 				final List<ChannelSftp.LsEntry> files = sftp.ls(folder);
 			    for (ChannelSftp.LsEntry le : files) {
 			        final String name = le.getFilename();
@@ -384,7 +388,7 @@ public class FtpUtils {
 			}
 		}
 	}
-	
+
 	private static boolean cwd(FTPClient ftpClient, String directory) {
 		String root = "";
 		for(String dir : directory.split("/")) {
@@ -437,10 +441,10 @@ public class FtpUtils {
 			}
 		}
 	}
-	
+
 	public static ChannelSftp getChannel(FTPConfig config) throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession(config.getUsername(), config.getHostname(), config.getPort()); 
+        Session session = jsch.getSession(config.getUsername(), config.getHostname(), config.getPort());
         if (! StringUtils.isEmpty(config.getPassword())) {
             session.setPassword(config.getPassword()); // 设置密码
         }
@@ -467,11 +471,11 @@ public class FtpUtils {
 
 class SSLSessionReuseFTPSClient extends FTPSClient {
 	private final Logger logger = LoggerFactory.getLogger(SSLSessionReuseFTPSClient.class);
-	
+
 	public SSLSessionReuseFTPSClient(String protocal, boolean isImpicit) {
 		super(protocal, isImpicit);
 	}
-	
+
     @Override
     protected void _prepareDataSocket_(final Socket socket) throws IOException {
         if(socket instanceof SSLSocket) {
