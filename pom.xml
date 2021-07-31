@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springframework.version>5.2.9.RELEASE</springframework.version>
         <springframework.data>2.2.8.RELEASE</springframework.data>
-        <wisdge.version>1.8.5</wisdge.version>
+        <wisdge.version>1.8.6</wisdge.version>
     </properties>
 
     <modules>
