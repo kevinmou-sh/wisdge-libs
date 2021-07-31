@@ -18,7 +18,7 @@ public class JSonUtils {
 
 	/**
 	 * 将一个<code>JAVA</code>对象转义为<code>JSON</code>字符串
-	 * 
+	 *
 	 * @param object
 	 * @return String
 	 * @throws IOException
@@ -39,7 +39,7 @@ public class JSonUtils {
 	 * <li>正常格式的json返回为List或者Map对象</li>
 	 * </ol>
 	 * </p>
-	 * 
+	 *
 	 * @param json
 	 *            被转义的字符串
 	 * @return Java对象
@@ -54,7 +54,11 @@ public class JSonUtils {
 			return null;
 		}
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+		mapper.configure(Feature.ALLOW_COMMENTS, true);
+		mapper.configure(Feature.ALLOW_SINGLE_QUOTES, true);
+		mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+		mapper.configure(Feature.ALLOW_YAML_COMMENTS, true);
+		mapper.configure(Feature.IGNORE_UNDEFINED, true);
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		mapper.setDateFormat(format);
 		if (json.trim().startsWith("[")) {
@@ -69,24 +73,17 @@ public class JSonUtils {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public static <T> T read(String json, Class<T> valueType) throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+		mapper.configure(Feature.ALLOW_COMMENTS, true);
+		mapper.configure(Feature.ALLOW_SINGLE_QUOTES, true);
+		mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+		mapper.configure(Feature.ALLOW_YAML_COMMENTS, true);
+		mapper.configure(Feature.IGNORE_UNDEFINED, true);
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		mapper.setDateFormat(format);
 		return mapper.readValue(json.getBytes("UTF-8"), valueType);
-	}
-
-	public void test() throws Exception {
-		Result result = new Result(Result.ERROR, "Hello world!", new Date());
-		String parseString = JSonUtils.parse(result);
-		System.out.println(parseString);
-		System.out.println(JSonUtils.read(parseString));
-		
-		String test = "{\"date\":\"2018-02-26 23:35:26\"}";
-		System.out.println(JSonUtils.read(test, Map.class));
-		
 	}
 }
