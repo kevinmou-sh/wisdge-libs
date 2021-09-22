@@ -819,6 +819,35 @@ public class XHRPoolService {
 	}
 
 	/**
+	 * 从XHR接口以POST方式获得byte数组
+	 *
+	 * @param url
+	 *            String HTTP接口地址
+	 * @param entity
+	 *            HttpEntity POST方法中提交的参数MAP对象
+	 * @return byte[]
+	 * @throws IllegalUrlException
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
+	public byte[] postForBytes(String url, HttpEntity entity) throws IllegalUrlException, XhrException, IOException {
+		if (null == url || !url.toLowerCase().startsWith("http")) {
+			throw new IllegalUrlException(404, url);
+		}
+
+		url = url.trim().replaceAll("\n", "");
+		HttpPost httpPost = new HttpPost(url);
+		httpPost.setEntity(entity);
+		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		try {
+			return entity2Bytes(httpResponse, url);
+		} finally {
+			httpResponse.close();
+			httpPost.releaseConnection();
+		}
+	}
+
+	/**
 	 * 从XHR接口以POST方式获得文件
 	 *
 	 * @param url
