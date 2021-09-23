@@ -48,7 +48,7 @@ import com.wisdge.utils.DomUtils;
 
 /**
  * XHR数据接口服务类
- * 
+ *
  * @author Kevin MOU
  */
 public class XHRService {
@@ -66,7 +66,7 @@ public class XHRService {
 
 	/**
 	 * 创建SSL连接
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	private static SSLConnectionSocketFactory createSSLConnSocketFactory() throws Exception {
@@ -96,9 +96,8 @@ public class XHRService {
 
 	/**
 	 * 为httpClient赋予SSL安全连接特性
-	 * 
-	 * @param ProxyConfig
-	 *            代理服务配置
+	 *
+	 * @param proxyConfig 代理服务配置
 	 * @return CloseableHttpClient
 	 * @throws Exception
 	 */
@@ -133,7 +132,7 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口通过GET方法获得字符串对象值
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口地址
 	 * @param params
@@ -147,7 +146,7 @@ public class XHRService {
 	public static String get(String url, Map<String, Object> params, ProxyConfig proxyConfig) throws IllegalUrlException, IOException {
 		return get(url, params, proxyConfig, null);
 	}
-	
+
 	public static String get(String url, Map<String, Object> params, ProxyConfig proxyConfig, Map<String, String> heads) throws IllegalUrlException, IOException {
 		if (null == url || !url.toLowerCase().startsWith("http")) {
 			throw new IllegalUrlException(404, null);
@@ -168,7 +167,7 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口以GET方式获得一个字符串的返回值
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口的地址
 	 * @param params
@@ -224,7 +223,7 @@ public class XHRService {
 			return URLEncoder.encode(object.toString(), "UTF-8");
 		}
 	}
-	
+
 	public static String post(String url) throws IllegalUrlException, IOException {
 		return post(url, new HashMap<String, Object>(), null);
 	}
@@ -235,7 +234,7 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口通过POST方法获得一个字符串对象值
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口地址
 	 * @param params
@@ -252,7 +251,7 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口通过POST方法获得一个字符串对象值
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口地址
 	 * @param params
@@ -272,7 +271,7 @@ public class XHRService {
 			httpClient.close();
 		}
 	}
-	
+
 	public static String post(String url, String jsonBody) throws IOException, IllegalUrlException {
 		return post(url, jsonBody, null);
 	}
@@ -280,7 +279,7 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口通过POST JSON方法获得一个字符串对象值
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口地址
 	 * @param jsonBody
@@ -288,7 +287,7 @@ public class XHRService {
 	 * @param proxyConfig
 	 *            Proxy配置
 	 * @return String
-	 * @throws ClientProtocolException 
+	 * @throws ClientProtocolException
 	 * @throws IllegalUrlException
 	 * @throws IOException
 	 */
@@ -302,7 +301,7 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口通过POST XML方法获得一个字符串对象值
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口地址
 	 * @param xmlBody
@@ -310,7 +309,7 @@ public class XHRService {
 	 * @param proxyConfig
 	 *            Proxy配置
 	 * @return String
-	 * @throws ClientProtocolException 
+	 * @throws ClientProtocolException
 	 * @throws IllegalUrlException
 	 * @throws IOException
 	 */
@@ -338,7 +337,7 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口以POST方式获得一个字符串的返回值
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口地址
 	 * @param params
@@ -375,11 +374,8 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口以POST方式获得一个字符串的返回值
-	 * 
-	 * @param url
-	 *            HTTP接口地址
-	 * @param params
-	 *            POST方法中提交的参数MAP对象
+	 *
+	 * @param httpPost
 	 * @param httpClient
 	 *            执行HTTP的CloseableHttpClient对象
 	 * @return CloseableHttpResponse
@@ -393,7 +389,7 @@ public class XHRService {
 
 	/**
 	 * 从XHR接口通过POST JSON方法获得CloseableHttpResponse对象
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口地址
 	 * @param jsonBody
@@ -401,9 +397,9 @@ public class XHRService {
 	 * @param httpClient
 	 *            执行HTTP的CloseableHttpClient对象
 	 * @return CloseableHttpResponse
-	 * @throws IllegalUrlException 
-	 * @throws IOException 
-	 * @throws ClientProtocolException 
+	 * @throws IllegalUrlException
+	 * @throws IOException
+	 * @throws ClientProtocolException
 	 */
 	public static CloseableHttpResponse postResponse(String url, String jsonBody, String payloadType, CloseableHttpClient httpClient, Map<String, String> heads) throws IllegalUrlException, ClientProtocolException, IOException {
 		if (null == url || !url.toLowerCase().startsWith("http")) {
@@ -419,7 +415,7 @@ public class XHRService {
 		} else {
 			throw new IllegalArgumentException("不识别的PAYLOAD类型-" + payloadType);
 		}
-		
+
 		if (heads != null) {
 			Iterator<String> iter = heads.keySet().iterator();
 			while(iter.hasNext()) {
@@ -427,15 +423,15 @@ public class XHRService {
 				httpPost.setHeader(name, heads.get(name));
 			}
 		}
-		
+
 		httpPost.setEntity(se);
 		return httpClient.execute(httpPost, HttpClientContext.create());
 	}
 
 	/**
 	 * 从HttpResponse中获得字符串返回值
-	 * 
-	 * @param response
+	 *
+	 * @param httpResponse
 	 *            HttpResponse对象
 	 * @return 字符串
 	 * @throws IOException
@@ -480,10 +476,10 @@ public class XHRService {
 
 	/**
 	 * 从接口读取byte对象
-	 * 
+	 *
 	 * @param url
 	 *            HTTP接口地址
-	 * @param body
+	 * @param params
 	 *            POST到接口的正文
 	 * @param method
 	 *            接口类型，GET或者POST

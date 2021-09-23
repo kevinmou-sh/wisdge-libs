@@ -19,7 +19,7 @@ public class SignatureFactory {
 	public static final String TYPE_GET = "get";
 	private String key;
 	private String encType;
-	
+
 	public SignatureFactory() {
 		encType = "SHA";
 	}
@@ -46,13 +46,13 @@ public class SignatureFactory {
 			String paramKey = it.next();
 		    map.put(paramKey, map.get(paramKey));
 		}
-		
+
 		StringBuilder builder = new StringBuilder();
 		for (Iterator<String> it = params.keySet().iterator(); it.hasNext();) {
 			String paramKey = it.next();
 			builder.append(paramKey).append(map.get(paramKey).toString());
 		}
-		
+
 		String sign = "";
 		if (encType.equalsIgnoreCase("SHA"))
 			sign = (StringUtils.isEmpty(key) ? SHA.encrypt(builder.toString()) : SHA.hmac(builder.toString(), key)).toUpperCase();
@@ -61,7 +61,7 @@ public class SignatureFactory {
 		else
 			sign = (StringUtils.isEmpty(key) ? MD5.encrypt(builder.toString()) : MD5.hmac(builder.toString(), key)).toUpperCase();
 		params.put("sign", sign);
-		
+
 		if (httpType.equalsIgnoreCase(TYPE_GET))
 			return service.get(url, params, heads);
 		else if (httpType.equalsIgnoreCase(TYPE_POST))
@@ -69,8 +69,8 @@ public class SignatureFactory {
 		else
 			throw new HttpException("不能识别的http服务请求类型：" + httpType);
 	}
-	
-	public String post(String url, String payload, Map<String, String> heads, XHRPoolService service) throws Exception {
+
+	public String post(String url, String payload, Map<String, String> headers, XHRPoolService service) throws Exception {
 		String sign = "";
 		if (encType.equalsIgnoreCase("SHA"))
 			sign = (StringUtils.isEmpty(key) ? SHA.encrypt(payload) : SHA.hmac(payload, key)).toUpperCase();
@@ -78,8 +78,8 @@ public class SignatureFactory {
 			sign = (StringUtils.isEmpty(key) ? SM3Util.hash(payload) : SM3Util.hmac(payload, key)).toUpperCase();
 		else
 			sign = (StringUtils.isEmpty(key) ? MD5.encrypt(payload) : MD5.hmac(payload, key)).toUpperCase();
-		heads.put("sign", sign);
-		return service.post(url, payload, heads);
+		headers.put("sign", sign);
+		return service.post(url, payload, headers);
 	}
 
 }

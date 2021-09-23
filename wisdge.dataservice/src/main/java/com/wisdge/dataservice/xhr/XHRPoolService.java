@@ -502,6 +502,20 @@ public class XHRPoolService {
 	 *
 	 * @param url
 	 *            HTTP接口地址
+	 * @return byte[]
+	 * @throws IllegalUrlException
+	 * @throws IOException
+	 * @throws ClientProtocolException
+	 */
+	public byte[] getForBytes(String url) throws IllegalUrlException, XhrException, IOException {
+		return getForBytes(url, null, null);
+	}
+
+	/**
+	 * 从XHR接口通过GET方法获得byte数组
+	 *
+	 * @param url
+	 *            HTTP接口地址
 	 * @param params
 	 *            GET参数的MAP对象
 	 * @return byte[]
@@ -510,6 +524,22 @@ public class XHRPoolService {
 	 * @throws ClientProtocolException
 	 */
 	public byte[] getForBytes(String url, Map<String, Object> params) throws IllegalUrlException, XhrException, IOException {
+		return getForBytes(url, params, null);
+	}
+
+	/**
+	 * 从XHR接口通过GET方法获得byte数组
+	 *
+	 * @param url
+	 *            HTTP接口地址
+	 * @param params
+	 *            GET参数的MAP对象
+	 * @return byte[]
+	 * @throws IllegalUrlException
+	 * @throws IOException
+	 * @throws ClientProtocolException
+	 */
+	public byte[] getForBytes(String url, Map<String, Object> params, Map<String, String> headers) throws IllegalUrlException, XhrException, IOException {
 		if (null == url || !url.toLowerCase().startsWith("http")) {
 			throw new IllegalUrlException(404, url);
 		}
@@ -517,6 +547,13 @@ public class XHRPoolService {
 		url = makeGetMethodUrl(url, params);
 		logger.debug(XHR_GET_LOGHEAD + url);
 		HttpGet httpGet = new HttpGet(url);
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
+			while(iter.hasNext()) {
+				String name = iter.next();
+				httpGet.setHeader(name, headers.get(name));
+			}
+		}
 		CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
 		try {
 			return entity2Bytes(httpResponse, url);
@@ -604,36 +641,10 @@ public class XHRPoolService {
 	 * @throws IOException
 	 */
 	public String post(String url, Map<String, Object> params) throws XhrException, IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
-		url = url.trim().replaceAll("\n", "");
-		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-
-		// add parameters extend
-		if (params != null) {
-			Iterator<String> iter = params.keySet().iterator();
-			while (iter.hasNext()) {
-				String key = iter.next();
-				Object value = params.get(key);
-				nvps.add(new BasicNameValuePair(key, value == null ? "" : value.toString()));
-			}
-		}
-
-		logger.debug(XHR_POST_LOGHEAD + url);
-		HttpPost httpPost = new HttpPost(url);
-		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
-		try {
-			return entity2String(httpResponse, url);
-		} finally {
-			httpResponse.close();
-			httpPost.releaseConnection();
-		}
+		return post(url, params, new HashMap<>());
 	}
 
-	public String post(String url, Map<String, Object> params, Map<String, String> heads) throws XhrException, IllegalUrlException, IOException {
+	public String post(String url, Map<String, Object> params, Map<String, String> headers) throws XhrException, IllegalUrlException, IOException {
 		if (null == url || !url.toLowerCase().startsWith("http")) {
 			throw new IllegalUrlException(404, url);
 		}
@@ -654,11 +665,11 @@ public class XHRPoolService {
 		logger.debug(XHR_POST_LOGHEAD + url);
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
-		if (heads != null) {
-			Iterator<String> iter = heads.keySet().iterator();
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
 			while(iter.hasNext()) {
 				String name = iter.next();
-				httpPost.setHeader(name, heads.get(name));
+				httpPost.setHeader(name, headers.get(name));
 			}
 		}
 
@@ -693,7 +704,7 @@ public class XHRPoolService {
 	 * @throws IllegalUrlException
 	 * @throws IOException
 	 */
-	public void post(String url, Map<String, Object> params, IResponseHandler handler) throws IllegalUrlException, IOException {
+	public void post(String url, Map<String, Object> params, Map<String, String> headers, IResponseHandler handler) throws IllegalUrlException, IOException {
 		if (null == url || !url.toLowerCase().startsWith("http")) {
 			throw new IllegalUrlException(404, url);
 		}
@@ -774,14 +785,14 @@ public class XHRPoolService {
 	 *            HTTP接口地址
 	 * @param params
 	 *            POST方法中提交的参数MAP对象
-	 * @param heads
+	 * @param headers
 	 *            POST方法中提交的请求头heads
 	 * @return byte[]
 	 * @throws IllegalUrlException
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public byte[] postForBytes(String url, Map<String, Object> params, Map<String, String> heads) throws IllegalUrlException, XhrException, IOException {
+	public byte[] postForBytes(String url, Map<String, Object> params, Map<String, String> headers) throws IllegalUrlException, XhrException, IOException {
 		if (null == url || !url.toLowerCase().startsWith("http")) {
 			throw new IllegalUrlException(404, url);
 		}
@@ -802,11 +813,47 @@ public class XHRPoolService {
 		logger.debug(XHR_POST_LOGHEAD + url);
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
-		if (heads != null) {
-			Iterator<String> iter = heads.keySet().iterator();
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
 			while(iter.hasNext()) {
 				String name = iter.next();
-				httpPost.setHeader(name, heads.get(name));
+				httpPost.setHeader(name, headers.get(name));
+			}
+		}
+		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		try {
+			return entity2Bytes(httpResponse, url);
+		} finally {
+			httpResponse.close();
+			httpPost.releaseConnection();
+		}
+	}
+
+	/**
+	 * 从XHR接口以POST方式获得byte数组
+	 *
+	 * @param url
+	 *            String HTTP接口地址
+	 * @param entity
+	 *            HttpEntity POST方法中提交的参数MAP对象
+	 * @return byte[]
+	 * @throws IllegalUrlException
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
+	public byte[] postForBytes(String url, HttpEntity entity,  Map<String, String> headers) throws IllegalUrlException, XhrException, IOException {
+		if (null == url || !url.toLowerCase().startsWith("http")) {
+			throw new IllegalUrlException(404, url);
+		}
+
+		url = url.trim().replaceAll("\n", "");
+		HttpPost httpPost = new HttpPost(url);
+		httpPost.setEntity(entity);
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
+			while(iter.hasNext()) {
+				String name = iter.next();
+				httpPost.setHeader(name, headers.get(name));
 			}
 		}
 		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
@@ -831,20 +878,7 @@ public class XHRPoolService {
 	 * @throws IOException
 	 */
 	public byte[] postForBytes(String url, HttpEntity entity) throws IllegalUrlException, XhrException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
-		url = url.trim().replaceAll("\n", "");
-		HttpPost httpPost = new HttpPost(url);
-		httpPost.setEntity(entity);
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
-		try {
-			return entity2Bytes(httpResponse, url);
-		} finally {
-			httpResponse.close();
-			httpPost.releaseConnection();
-		}
+		return postForBytes(url, entity, null);
 	}
 
 	/**
@@ -915,15 +949,15 @@ public class XHRPoolService {
 	}
 
 	public String post(String url, String jsonBody, String contentType) throws XhrException, IllegalUrlException, IOException {
-		return post(url, jsonBody, contentType, new HashMap<String, String>());
+		return post(url, jsonBody, contentType, new HashMap<>());
 	}
 
-	public String post(String url, String jsonBody, String contentType, Map<String, String> heads) throws XhrException, IllegalUrlException, IOException {
-		heads.put("Content-type", contentType);
-		return post(url, jsonBody, heads);
+	public String post(String url, String jsonBody, String contentType, Map<String, String> headers) throws XhrException, IllegalUrlException, IOException {
+		headers.put("Content-type", contentType);
+		return post(url, jsonBody, headers);
 	}
 
-	public String post(String url, String jsonBody, Map<String, String> heads) throws XhrException, IllegalUrlException, IOException {
+	public String post(String url, String jsonBody, Map<String, String> headers) throws XhrException, IllegalUrlException, IOException {
 		if (null == url || !url.toLowerCase().startsWith("http")) {
 			throw new IllegalUrlException(404, url);
 		}
@@ -931,11 +965,11 @@ public class XHRPoolService {
 		logger.debug(XHR_POST_LOGHEAD + url);
 		HttpPost httpPost = new HttpPost(url);
 		StringEntity se = new StringEntity(jsonBody, UTF_8);
-		if (heads != null) {
-			Iterator<String> iter = heads.keySet().iterator();
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
 			while(iter.hasNext()) {
 				String name = iter.next();
-				httpPost.setHeader(name, heads.get(name));
+				httpPost.setHeader(name, headers.get(name));
 			}
 		}
 		httpPost.setEntity(se);
