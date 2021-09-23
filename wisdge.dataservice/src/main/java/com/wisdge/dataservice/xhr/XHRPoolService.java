@@ -1049,8 +1049,19 @@ public class XHRPoolService {
 	}
 
 	public String postEntity(String url, HttpEntity entity) throws IOException, XhrException {
+		return postEntity(url, entity, null);
+	}
+
+	public String postEntity(String url, HttpEntity entity, Map<String, String> headers) throws IOException, XhrException {
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(entity);
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
+			while(iter.hasNext()) {
+				String name = iter.next();
+				httpPost.setHeader(name, headers.get(name));
+			}
+		}
 		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
 		try {
 			return entity2String(httpResponse, url);
