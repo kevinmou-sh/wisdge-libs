@@ -71,11 +71,16 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 		return JSonUtils.read(payload, beanClass);
 	}
 
+	private static Properties ContentTypeProperties = null;
 	public static String getContentType(String extension) throws IOException {
+		if (ContentTypeProperties != null)
+			return ContentTypeProperties.getProperty(extension);
+
 		try (InputStream is = WebUtils.class.getClassLoader().getResourceAsStream("contentType.properties")) {
-			Properties properties = new Properties();
-			properties.load(is);
-			return properties.getProperty(extension);
+			if (is == null) throw new NullPointerException("contentType资源文件丢失");
+			ContentTypeProperties = new Properties();
+			ContentTypeProperties.load(is);
+			return ContentTypeProperties.getProperty(extension);
 		} catch(Exception e) {
 			throw e;
 		}
