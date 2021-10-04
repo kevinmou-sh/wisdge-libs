@@ -1,6 +1,6 @@
 package com.wisdge.dataservice.utils;
 
-import com.wisdge.dataservice.sql.Pagination;
+import com.wisdge.dataservice.sql.page.Pagination;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

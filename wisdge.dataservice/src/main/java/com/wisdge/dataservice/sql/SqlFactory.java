@@ -1,6 +1,7 @@
 package com.wisdge.dataservice.sql;
 
 import com.wisdge.dataservice.exceptions.ProcessSqlContextException;
+import com.wisdge.dataservice.sql.page.Pagination;
 import com.wisdge.dataservice.utils.JdbcUtils;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
