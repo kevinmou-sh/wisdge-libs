@@ -22,11 +22,12 @@ public class PageJdbcTemplate {
         if (pageIndex < 1)
             pageIndex = 1;
         if (pageSize >= 5000) {
-            log.warn("PageJdbcTemplate query pageSize has overhead 5000, actually is {}", + pageSize);
+            log.warn("Page query size has overhead 5000, actually is {}", + pageSize);
         }
         final Pagination pagination = new Pagination(totalRows, pageIndex, pageSize);
         int offset = pagination.getPageIndex() * pagination.getPageSize();
         String pageSql = PageHelper.getLimitString(sql, offset, pageSize);
+        log.debug("Query page: {}", pageSql);
         jdbcTemplate.query(pageSql, params, rch -> {
             // 获取当前记录集的字段数据
             List<String> columns = new ArrayList<>();
