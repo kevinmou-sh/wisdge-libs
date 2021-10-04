@@ -24,30 +24,30 @@ public class PageJdbcTemplate {
         if (pageSize >= 5000) {
             log.warn("Page query size has overhead 5000, actually is {}", + pageSize);
         }
-        final Pagination pagination = new Pagination(totalRows, pageIndex, pageSize);
-        int offset = pagination.getPageIndex() * pagination.getPageSize();
+        Pagination pagination = new Pagination(totalRows, pageIndex, pageSize);
+        int offset = (pagination.getPageIndex() - 1) * pagination.getPageSize();
         String pageSql = PageHelper.getLimitString(sql, offset, pageSize);
-        log.debug("Query page: {}", pageSql);
-        jdbcTemplate.query(pageSql, params, rch -> {
+        // log.debug("Query page: {}", pageSql);
+        return jdbcTemplate.query(pageSql, params, rse -> {
             // 获取当前记录集的字段数据
             List<String> columns = new ArrayList<>();
-            ResultSetMetaData rsmd = rch.getMetaData();
+            ResultSetMetaData rsmd = rse.getMetaData();
             for (int column = 1; column <= rsmd.getColumnCount(); column++) {
                 columns.add(rsmd.getColumnLabel(column).toUpperCase());
             }
+            pagination.setColumns(columns);
 
             int size = columns.size();
             List<Object[]> fields = new ArrayList<>();
-            while(rch.next()) {
+            while(rse.next()) {
                 Object[] record = new Object[size];
                 for(int i = 0; i < size; i ++)
-                    record[i] = rch.getObject(i + 1);
+                    record[i] = rse.getObject(i + 1);
                 fields.add(record);
             }
-
-            pagination.setColumns(columns);
             pagination.setFields(fields);
+
+            return pagination;
         });
-        return pagination;
     }
 }
