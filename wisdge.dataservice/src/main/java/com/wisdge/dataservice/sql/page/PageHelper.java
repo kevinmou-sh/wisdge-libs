@@ -1,8 +1,5 @@
 package com.wisdge.dataservice.sql.page;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class PageHelper {
     /**
      * 得到查询总数的sql

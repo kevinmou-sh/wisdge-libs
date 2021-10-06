@@ -64,17 +64,18 @@ public class PageJdbcTemplate {
         Pagination pagination = new Pagination(totalRows, pageIndex, pageSize);
         int offset = (pagination.getPageIndex() - 1) * pagination.getPageSize();
         String pageSql = PageHelper.getLimitString(sql, offset, pageSize);
+
         // log.debug("Query page: {}", pageSql);
-        jdbcTemplate.query(pageSql, params, rse -> {
+        Map<String, List> rsResult = jdbcTemplate.query(pageSql, params, rse -> {
+            Map<String, List> result = new HashMap<>();
             // 获取当前记录集的字段数据
             List<String> columns = new ArrayList<>();
             ResultSetMetaData rsmd = rse.getMetaData();
             for (int column = 1; column <= rsmd.getColumnCount(); column++) {
                 columns.add(rsmd.getColumnLabel(column).toUpperCase());
             }
-            pagination.setColumns(columns);
+            result.put("columns", columns);
 
-            rse.first();
             int size = columns.size();
             List<Object[]> fields = new ArrayList<>();
             while(rse.next()) {
@@ -83,8 +84,14 @@ public class PageJdbcTemplate {
                     record[i] = rse.getObject(i + 1);
                 fields.add(record);
             }
-            pagination.setFields(fields);
+            result.put("fields", fields);
+
+            log.info("<==\tTotal:{}", fields.size());
+            return result;
         });
+
+        pagination.setColumns(rsResult.get("columns"));
+        pagination.setFields(rsResult.get("fields"));
         return pagination;
     }
 }
