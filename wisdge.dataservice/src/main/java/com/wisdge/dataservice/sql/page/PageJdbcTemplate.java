@@ -61,7 +61,7 @@ public class PageJdbcTemplate {
         if (pageSize >= 5000) {
             log.warn("Page query size has overhead 5000, actually is {}", + pageSize);
         }
-        final Pagination pagination = new Pagination(totalRows, pageIndex, pageSize);
+        Pagination pagination = new Pagination(totalRows, pageIndex, pageSize);
         int offset = (pagination.getPageIndex() - 1) * pagination.getPageSize();
         String pageSql = PageHelper.getLimitString(sql, offset, pageSize);
         // log.debug("Query page: {}", pageSql);
@@ -74,6 +74,7 @@ public class PageJdbcTemplate {
             }
             pagination.setColumns(columns);
 
+            rse.first();
             int size = columns.size();
             List<Object[]> fields = new ArrayList<>();
             while(rse.next()) {
