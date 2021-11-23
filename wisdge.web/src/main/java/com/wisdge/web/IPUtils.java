@@ -5,19 +5,18 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
+
+import com.wisdge.utils.StringUtils;
 import org.junit.Test;
 
 public class IPUtils {
 	/**
 	 * 获取远端真实IP
-	 * 
+	 *
 	 * @param request
 	 *            HttpServletRequest
 	 * @return String ipAddress
@@ -39,15 +38,12 @@ public class IPUtils {
 
 		if (!StringUtils.isEmpty(ip))
 			ip = ip.split(",")[0];
-		
+
 		return ip.equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : ip;
 	}
 
 	/**
-	 * IP转成数字类型
-	 * 
-	 * @param strIP
-	 * @return long
+	 * 将IP转成10进制整数
 	 */
 	public static long ipToLong(String strIP) {
 		long[] ip = new long[4];
@@ -63,8 +59,25 @@ public class IPUtils {
 	}
 
 	/**
+	 * 将10进制整数形式转换成127.0.0.1形式的IP地址
+	 */
+	public static String longToIP(long longIP) {
+		StringBuilder sb = new StringBuilder("");
+		// 直接右移24位
+		sb.append(String.valueOf(longIP >>> 24));
+		sb.append(".");
+		// 将高8位置0，然后右移16位
+		sb.append(String.valueOf((longIP & 0x00FFFFFF) >>> 16));
+		sb.append(".");
+		sb.append(String.valueOf((longIP & 0x0000FFFF) >>> 8));
+		sb.append(".");
+		sb.append(String.valueOf(longIP & 0x000000FF));
+		return sb.toString();
+	}
+
+	/**
 	 * 是否是本地IP
-	 * 
+	 *
 	 * @param strIp
 	 * @return boolean
 	 */
@@ -99,7 +112,7 @@ public class IPUtils {
 
 	/**
 	 * IP格式校验
-	 * 
+	 *
 	 * @param str
 	 *            验证的字符串对象
 	 * @return true or false
@@ -134,6 +147,182 @@ public class IPUtils {
 		return System.getProperty("os.name").toLowerCase();
 	}
 
+	// IP的正则
+	private static final Pattern pattern = Pattern.compile("(1\\d{1,2}|2[0-4]\\d|25[0-5]|\\d{1,2})\\." + "(1\\d{1,2}|2[0-4]\\d|25[0-5]|\\d{1,2})\\." + "(1\\d{1,2}|2[0-4]\\d|25[0-5]|\\d{1,2})\\." + "(1\\d{1,2}|2[0-4]\\d|25[0-5]|\\d{1,2})");
+	private static final String DEFAULT_ALLOW_ALL_FLAG = "*";// 允许所有ip标志位
+	private static final String DEFAULT_DENY_ALL_FLAG = "0"; // 禁止所有ip标志位
+
+	/**
+	 * isPermited: (根据IP地址，及IP白名单设置规则判断IP是否包含在白名单).
+	 * @param ip String 需要验证的IP地址
+	 * @param ipWhiteConfigs Set<String> 验证格式队列
+	 */
+	public static boolean isPermited(String ip, Set<String> ipWhiteConfigs) {
+		if (StringUtils.isEmpty(ip))
+			return false;
+		if (!pattern.matcher(ip).matches())
+			return false;
+
+		for(String ipWhiteConfig: ipWhiteConfigs) {
+			if (_isPermited(ip, ipWhiteConfig))
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * isPermited: (根据IP地址，及IP白名单设置规则判断IP是否包含在白名单).
+	 * @param ip String 需要验证的IP地址
+	 * @param ipWhiteConfig String 验证格式
+	 */
+	public static boolean isPermited(String ip, String ipWhiteConfig) {
+		if (StringUtils.isEmpty(ip) || StringUtils.isEmpty(ipWhiteConfig))
+			return false;
+
+		if (!pattern.matcher(ip).matches())
+			return false;
+
+		if (DEFAULT_ALLOW_ALL_FLAG.equals(ipWhiteConfig))
+			return true;
+		if (DEFAULT_DENY_ALL_FLAG.equals(ipWhiteConfig))
+			return false;
+
+		return _isPermited(ip, ipWhiteConfig);
+	}
+
+	private static boolean _isPermited(String ip, String ipWhiteConfig) {
+		if (StringUtils.isEmpty(ipWhiteConfig))
+			return false;
+
+		if (ipWhiteConfig.indexOf("-") > -1) {// 处理 类似 192.168.0.0-192.168.2.1
+			String[] tempAllow = ipWhiteConfig.split("-");
+			String[] from = tempAllow[0].split("\\.");
+			String[] end = tempAllow[1].split("\\.");
+			String[] tag = ip.split("\\.");
+			boolean check = true;
+			for (int i = 0; i < 4; i++) {// 对IP从左到右进行逐段匹配
+				int s = Integer.valueOf(from[i]);
+				int t = Integer.valueOf(tag[i]);
+				int e = Integer.valueOf(end[i]);
+				if (!(s <= t && t <= e)) {
+					check = false;
+					break;
+				}
+			}
+			if (check)
+				return true;
+		} else if (ipWhiteConfig.contains("/")) {// 处理 网段 xxx.xxx.xxx./24
+			int splitIndex = ipWhiteConfig.indexOf("/");
+			// 取出子网段
+			String ipSegment = ipWhiteConfig.substring(0, splitIndex); // 192.168.3.0
+			// 子网数
+			String netmask = ipWhiteConfig.substring(splitIndex + 1);// 24
+			// ip 转二进制
+			long ipLong = ipToLong(ip);
+			// 子网二进制
+			long maskLong = (2L << 32 - 1) - (2L << Integer.valueOf(32 - Integer.valueOf(netmask)) - 1);
+			// ip与和子网相与 得到 网络地址
+			String calcSegment = longToIP(ipLong & maskLong);
+			// 如果计算得出网络地址和库中网络地址相同 则合法
+			if (ipSegment.equals(calcSegment))
+				return true;
+		} else if (ipWhiteConfig.contains("*")) {// 处理通配符 *
+			String[] ips = ipWhiteConfig.split("\\.");
+			String[] from = new String[] { "0", "0", "0", "0" };
+			String[] end = new String[] { "255", "255", "255", "255" };
+			List<String> temp = new ArrayList<>();
+			for (int i = 0; i < ips.length; i++) {
+				if (ips[i].indexOf("*") > -1) {
+					temp = complete(ips[i]);
+					from[i] = null;
+					end[i] = null;
+				} else {
+					from[i] = ips[i];
+					end[i] = ips[i];
+				}
+			}
+
+			StringBuilder fromIP = new StringBuilder();
+			StringBuilder endIP = new StringBuilder();
+			for (int i = 0; i < 4; i++) {
+				if (from[i] != null) {
+					fromIP.append(from[i]).append(".");
+					endIP.append(end[i]).append(".");
+				} else {
+					fromIP.append("[*].");
+					endIP.append("[*].");
+				}
+			}
+
+			fromIP.deleteCharAt(fromIP.length() - 1);
+			endIP.deleteCharAt(endIP.length() - 1);
+
+			for (String s : temp) {
+				String vip = fromIP.toString().replace("[*]", s.split(";")[0]) + "-" + endIP.toString().replace("[*]", s.split(";")[1]);
+				if (validate(vip) && _isPermited(ip, vip)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * 对单个IP节点进行范围限定
+	 * @return 返回限定后的IP范围，格式为List[10;19, 100;199]
+	 */
+	private static List<String> complete(String arg) {
+		List<String> com = new ArrayList<>();
+		int len = arg.length();
+		if (len == 1) {
+			com.add("0;255");
+		} else if (len == 2) {
+			String s1 = complete(arg, 1);
+			if (s1 != null)
+				com.add(s1);
+			String s2 = complete(arg, 2);
+			if (s2 != null)
+				com.add(s2);
+		} else {
+			String s1 = complete(arg, 1);
+			if (s1 != null)
+				com.add(s1);
+		}
+		return com;
+	}
+
+	private static String complete(String arg, int length) {
+		String from = "";
+		String end = "";
+		if (length == 1) {
+			from = arg.replace("*", "0");
+			end = arg.replace("*", "9");
+		} else {
+			from = arg.replace("*", "00");
+			end = arg.replace("*", "99");
+		}
+		if (Integer.valueOf(from) > 255)
+			return null;
+		if (Integer.valueOf(end) > 255)
+			end = "255";
+		return from + ";" + end;
+	}
+
+	/**
+	 * 在添加至白名单时进行格式校验
+	 *
+	 * @param ip
+	 * @return
+	 */
+	private static boolean validate(String ip) {
+		String[] temp = ip.split("-");
+		for (String s : temp)
+			if (!pattern.matcher(s).matches()) {
+				return false;
+			}
+		return true;
+	}
+
 	@Test
 	public void test() throws SocketException {
 		List<String> ips = IPUtils.getLocalIPs();
@@ -141,5 +330,23 @@ public class IPUtils {
 
 		System.out.println("OS: " + getOSName());
 		System.out.println("HostName: " + getHostName());
+
+
+		System.out.println("192.168.0".matches("192.*.*.0"));
+		System.out.println(isPermited("192.168.0.1", "192.*"));
+		System.out.println("\n\n");
+
+		Set<String> ipWhiteConfigs = new HashSet<>();
+		ipWhiteConfigs.add("1.168.1.*");
+		ipWhiteConfigs.add("10.*");
+		ipWhiteConfigs.add("192.168.3.15-192.168.3.38");
+		ipWhiteConfigs.add("192.168.1.0/24");
+
+		System.out.println(isPermited("1.168.1.1", ipWhiteConfigs));
+		System.out.println(isPermited("192.168.1.2", ipWhiteConfigs));
+		System.out.println(isPermited("192.168.2.1", ipWhiteConfigs));
+		System.out.println(isPermited("192.168.3.16", ipWhiteConfigs));
+		System.out.println(isPermited("10.168.3.37", ipWhiteConfigs));
+		System.out.println(isPermited("192.168.4.1", ipWhiteConfigs));
 	}
 }
