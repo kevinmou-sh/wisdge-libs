@@ -10,10 +10,6 @@
     </parent>
     <artifactId>wisdge.ezcell</artifactId>
 
-    <properties>
-        <poi-version>5.0.0</poi-version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.poi</groupId>
