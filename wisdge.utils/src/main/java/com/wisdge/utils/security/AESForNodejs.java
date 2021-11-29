@@ -79,13 +79,4 @@ public class AESForNodejs {
 		return sb.toString();
 	}
 
-	@Test
-	public void test() throws Exception {
-        String content = "15902149343";
-		String key = "bsyDataCenterDpi";
-		String encrypt = AESForNodejs.encrypt(content, key);
-		System.out.println(encrypt);
-		System.out.println(AESForNodejs.decrypt(encrypt, key));
-	}
-
 }

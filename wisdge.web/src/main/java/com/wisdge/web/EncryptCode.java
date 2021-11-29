@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 在网页中使用验证码的类<br />
- * 
+ *
  * HTML page example: http://www.example.com/encImg?style=digit&length=6&ecsid=TESTID
  */
 @WebServlet(displayName = "VerifyCode", name = "VerifyCode", urlPatterns = { "/verifyCode" }, loadOnStartup = 1)
@@ -32,7 +32,7 @@ public class EncryptCode extends HttpServlet {
 	private static final String CHOOSE_CHAR_UPCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final int defaultLength = 4;
 	private static final int defaultFontSize = 18;
-	public static String SESSION_ATTRIBUTE = "Wisdge_EncryptCode_1.1";
+	public static final String SESSION_ATTRIBUTE = "Wisdge_EncryptCode_1.1";
 
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws java.io.IOException {
@@ -102,7 +102,7 @@ public class EncryptCode extends HttpServlet {
 		Random random = new Random();
 		return random.nextInt(30) * (random.nextBoolean() ? 1: -1);
 	}
-	
+
 	private Color getRandColor(int fc, int bc) {
 		Random random = new Random();
 		if (fc > 255) {

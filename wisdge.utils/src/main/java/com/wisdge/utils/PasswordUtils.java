@@ -10,33 +10,33 @@ import java.util.regex.Pattern;
 
 @Slf4j
 public class PasswordUtils {
-	public static int RULE_NONE = 0;					// 无规则
-	public static int RULE_CHAR = 1 << 0;				// 必须包含英语字母
-	public static int RULE_ALLCASE = 1 << 1;			// 必须包含大小写字符
-	public static int RULE_DIGIT = 1 << 2;				// 必须包含数字
-	public static int RULE_SPECIAL = 1 << 3;			// 必须包含特殊字符
-	public static int RULE_CONTINUOUS_NATURE = 1 << 4;	// 必须少于3个以上连续相邻字符
-	public static int RULE_CONTINUOUS_KEYBOARD = 1 << 5;// 必须少于3个以上连续键盘相邻字符
+	public static final int RULE_NONE = 0;					// 无规则
+	public static final int RULE_CHAR = 1 << 0;				// 必须包含英语字母
+	public static final int RULE_ALLCASE = 1 << 1;			// 必须包含大小写字符
+	public static final int RULE_DIGIT = 1 << 2;				// 必须包含数字
+	public static final int RULE_SPECIAL = 1 << 3;			// 必须包含特殊字符
+	public static final int RULE_CONTINUOUS_NATURE = 1 << 4;	// 必须少于3个以上连续相邻字符
+	public static final int RULE_CONTINUOUS_KEYBOARD = 1 << 5;// 必须少于3个以上连续键盘相邻字符
 
-	public static int ERROR_EMPTY = 0;	// 密码为空
-	public static int ERROR_LESS = -1; // 小于最小长度要求
-	public static int ERROR_OVERFLOW = -2; // 大于最大长度要求
-	public static int ERROR_CASE_SENSITIVE = -3;	// 缺少大小写字母
-	public static int ERROR_DIGIT_MISSING = -4;	// 缺少数字
-	public static int ERROR_SPECIAL_MISSING = -5;	// 缺少特殊字符
-	public static int ERROR_CONTINUOUS_NATURE = -6;	// 连续相邻3个以上字符
-	public static int ERROR_CONTINUOUS_KEYBOARD = -7;	// 连续相邻3个以上键盘字符
-	public static int ERROR_WORD_SENSITIVE = -8;	// 出现关键敏感词
-	public static int ERROR_CHAR = -9;	// 缺少字母
+	public static final int ERROR_EMPTY = 0;	// 密码为空
+	public static final int ERROR_LESS = -1; // 小于最小长度要求
+	public static final int ERROR_OVERFLOW = -2; // 大于最大长度要求
+	public static final int ERROR_CASE_SENSITIVE = -3;	// 缺少大小写字母
+	public static final int ERROR_DIGIT_MISSING = -4;	// 缺少数字
+	public static final int ERROR_SPECIAL_MISSING = -5;	// 缺少特殊字符
+	public static final int ERROR_CONTINUOUS_NATURE = -6;	// 连续相邻3个以上字符
+	public static final int ERROR_CONTINUOUS_KEYBOARD = -7;	// 连续相邻3个以上键盘字符
+	public static final int ERROR_WORD_SENSITIVE = -8;	// 出现关键敏感词
+	public static final int ERROR_CHAR = -9;	// 缺少字母
 
-	public static int SUCCESS = 1;
+	public static final int SUCCESS = 1;
 
 	public PasswordUtils () {
 	}
 
 	/**
 	 * 密码是否是正序或反序连续4位及以上相邻字符
-	 * 
+	 *
 	 * @param password String
 	 * @return boolean
 	 */
@@ -85,7 +85,7 @@ public class PasswordUtils {
 
 	/**
 	 * 是否是正序连续
-	 * 
+	 *
 	 * @param str1
 	 * @param str2
 	 * @return
@@ -111,7 +111,7 @@ public class PasswordUtils {
 
 	/**
 	 * 是否是反序连续
-	 * 
+	 *
 	 * @param str1
 	 * @param str2
 	 * @return

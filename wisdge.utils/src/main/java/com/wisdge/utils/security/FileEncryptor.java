@@ -17,8 +17,8 @@ import org.junit.Test;
 
 public class FileEncryptor {
 	private Key key;
-	public static int AES_256KEY= 256;
-	public static int AES_128KEY=128;
+	public static final int AES_256KEY = 256;
+	public static final int AES_128KEY = 128;
 
 	public FileEncryptor(String strKey) {
 		this(strKey, AES_128KEY);
@@ -39,11 +39,10 @@ public class FileEncryptor {
 //			_generator = null;
 			// 初始化秘钥
 			KeyGenerator kgen = KeyGenerator.getInstance("AES");
-	        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG" );  
-	        secureRandom.setSeed(strKey.getBytes());  
+	        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+	        secureRandom.setSeed(strKey.getBytes());
 			kgen.init(keyLength, secureRandom);
 			this.key = kgen.generateKey();
-			kgen = null;
 		} catch (Exception e) {
 			throw new RuntimeException("Error getKey, Cause: " + e);
 		}
@@ -98,7 +97,7 @@ public class FileEncryptor {
 
 	/**
 	 * 文件file进行加密并保存目标文件destFile中
-	 * 
+	 *
 	 * @param file
 	 *            要加密的文件 如c:/test/srcFile.txt
 	 * @param destFile
@@ -131,7 +130,7 @@ public class FileEncryptor {
 
 	/**
 	 * 文件采用DES算法解密文件
-	 * 
+	 *
 	 * @param file
 	 *            已加密的文件 如c:/加密后文件.txt * @param destFile 解密后存放的文件名 如c:/
 	 *            test/解密后文件.txt

@@ -116,13 +116,4 @@ public class MvnoDecryptor {
         }
         return builder.toString();
     }
-
-    public static void main(String[] args) throws Exception {
-        String key = "mvno_ser"; // 联调阶段密钥为"mvno_ser"，生产环境的密钥上线前由核心集中系统提供
-        MvnoDecryptor des = new MvnoDecryptor(key);//key(密钥)
-        String code = des.encrypt("abc_123");
-        System.out.println(code);
-        System.out.println(des.decrypt(code));
-    }
-
 }

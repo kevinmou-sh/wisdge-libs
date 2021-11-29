@@ -14,7 +14,7 @@ import org.junit.Test;
 
 /**
  * DES算法基础类，计算结果为字符串数组，应用中调用DESPlus
- * 
+ *
  * @author Kevin MOU
  * @see DESPlus
  */
@@ -34,8 +34,8 @@ public class DES {
 	 */
 	public static SecretKey initSecretKey(byte[] password) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		KeyGenerator kgen = KeyGenerator.getInstance("DES");
-        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG" );  
-        secureRandom.setSeed(password);  
+        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG" );
+        secureRandom.setSeed(password);
 		kgen.init(secureRandom);
 		return kgen.generateKey();
 	}
@@ -57,7 +57,7 @@ public class DES {
         cipher.init(Cipher.ENCRYPT_MODE, initSecretKey(key), new SecureRandom());
         return cipher.doFinal(data);
         */
-    	
+
     	// 本方法与crypto-js兼容
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
         SecretKey secretKey = keyFactory.generateSecret(new DESKeySpec(key));
@@ -85,7 +85,7 @@ public class DES {
         cipher.init(Cipher.DECRYPT_MODE, initSecretKey(key), new SecureRandom());
         return cipher.doFinal(data);
         */
-        
+
     	// 本方法与crypto-js兼容
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
         SecretKey secretKey = keyFactory.generateSecret(new DESKeySpec(key));
@@ -93,7 +93,7 @@ public class DES {
         cipher.init(Cipher.DECRYPT_MODE, secretKey, new SecureRandom());
         return cipher.doFinal(data);
     }
-    
+
 	public static String byte2hex(byte[] b) {
 		StringBuffer hs = new StringBuffer("");
 		String stmp = "";
@@ -119,14 +119,4 @@ public class DES {
 		}
 		return b2;
 	}
-   
-	@Test
-	public void test() throws Exception {
-		String str = "测试内容";
-		String password = "elite.ngs";
-		String result = DES.encrypt(str, password);
-		System.out.println("加密后内容为：" + result);
-		System.out.println("解密后内容为：" + DES.decrypt(result, password));
-	}
-
 }
