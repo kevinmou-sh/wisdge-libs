@@ -38,7 +38,13 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
+    <repositories>
+	    <repository>
+		    <id>wisdgerepo</id>
+	            <name>wisdgerepo></name>
+	            <url>http://nexus.wisdge.com/repository/maven-public/</url>
+            </repository>
+    </repositories>
     <distributionManagement>
         <repository>
             <id>wisdge-releases</id>
