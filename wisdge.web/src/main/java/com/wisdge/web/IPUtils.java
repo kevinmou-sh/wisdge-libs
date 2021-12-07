@@ -193,6 +193,8 @@ public class IPUtils {
 	private static boolean _isPermited(String ip, String ipWhiteConfig) {
 		if (StringUtils.isEmpty(ipWhiteConfig))
 			return false;
+		if (ip.equals(ipWhiteConfig))
+			return true;
 
 		if (ipWhiteConfig.indexOf("-") > -1) {// 处理 类似 192.168.0.0-192.168.2.1
 			String[] tempAllow = ipWhiteConfig.split("-");
@@ -341,6 +343,7 @@ public class IPUtils {
 		ipWhiteConfigs.add("10.*");
 		ipWhiteConfigs.add("192.168.3.15-192.168.3.38");
 		ipWhiteConfigs.add("192.168.1.0/24");
+		ipWhiteConfigs.add("127.0.0.1");
 
 		System.out.println(isPermited("1.168.1.1", ipWhiteConfigs));
 		System.out.println(isPermited("192.168.1.2", ipWhiteConfigs));
@@ -348,5 +351,7 @@ public class IPUtils {
 		System.out.println(isPermited("192.168.3.16", ipWhiteConfigs));
 		System.out.println(isPermited("10.168.3.37", ipWhiteConfigs));
 		System.out.println(isPermited("192.168.4.1", ipWhiteConfigs));
+		System.out.println(isPermited("127.0.0.1", ipWhiteConfigs));
+
 	}
 }
