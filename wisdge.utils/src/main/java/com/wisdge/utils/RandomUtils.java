@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RandomUtils extends org.apache.commons.lang3.RandomUtils {
 	private static final SecureRandom secureRandom = new SecureRandom();
+	private static final String ALPHABETIC_CHOOSE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private static final String STRING_CHOOSE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 	/**
 	 * 获得一个指定长度的随机数字串
@@ -38,11 +40,10 @@ public class RandomUtils extends org.apache.commons.lang3.RandomUtils {
 	 * @return String 随机字符串
 	 */
 	public static String getAlphabetic(int codeLength) {
-		final String CHOOSE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		StringBuffer buf = new StringBuffer();
 
 		for (int i = 0; i < codeLength; i++) {
-			buf.append(CHOOSE.charAt(secureRandom.nextInt(CHOOSE.length())));
+			buf.append(ALPHABETIC_CHOOSE.charAt(secureRandom.nextInt(ALPHABETIC_CHOOSE.length())));
 		}
 		return buf.toString();
 	}
@@ -55,11 +56,10 @@ public class RandomUtils extends org.apache.commons.lang3.RandomUtils {
 	 * @return String 随机字符串
 	 */
 	public static String getString(int codeLength) {
-		final String CHOOSE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		StringBuffer buf = new StringBuffer();
 
 		for (int i = 0; i < codeLength; i++) {
-			buf.append(CHOOSE.charAt(secureRandom.nextInt(CHOOSE.length())));
+			buf.append(STRING_CHOOSE.charAt(secureRandom.nextInt(STRING_CHOOSE.length())));
 		}
 		return buf.toString();
 	}
