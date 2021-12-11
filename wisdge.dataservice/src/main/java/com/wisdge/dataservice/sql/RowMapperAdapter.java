@@ -1,14 +1,11 @@
 package com.wisdge.dataservice.sql;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public abstract class RowMapperAdapter implements IRowMapper {
@@ -17,7 +14,7 @@ public abstract class RowMapperAdapter implements IRowMapper {
     public void rowMap(Map<String, Object> map) {
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(this.getClass());
-            List<PropertyDescriptor> propertyDescriptors = CollectionUtils.arrayToList(beanInfo.getPropertyDescriptors());
+            List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
             // log.info("PropertyDescriptors count is {}", propertyDescriptors.size());
             Iterator<String> iter = map.keySet().iterator();
             while(iter.hasNext()) {

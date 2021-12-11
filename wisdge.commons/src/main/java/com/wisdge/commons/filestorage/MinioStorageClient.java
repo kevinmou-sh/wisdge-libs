@@ -6,7 +6,7 @@ import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.errors.ErrorResponseException;
-import lombok.SneakyThrows;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.BeanUtils;
@@ -18,12 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * minio客户端
- */
 @Slf4j
+@Data
 public class MinioStorageClient implements IFileStorageClient {
-
     /**
      * 访问的地址和端口
      */
@@ -55,12 +52,17 @@ public class MinioStorageClient implements IFileStorageClient {
     /**
      * 索引下标
      */
-    private AtomicInteger indexAtomic = new AtomicInteger(0);
+    private int index = 0;
+    private AtomicInteger indexAtomic = new AtomicInteger(index);
 
-    @SneakyThrows
+    private String remoteRoot;
+    private boolean security;
+
     @Override
-    public void init() {
-        log.debug("init MinIoStorageClient oos endpoint:{}, accessKey: {}, secretSecret: {}, bucketName:{}, region:{}",
+    public void init(boolean security) {
+        this.security = security;
+
+        log.debug("Init MinIoStorageClient oos endpoint:{}, accessKey: {}, secretSecret: {}, bucketName:{}, region:{}",
                 new Object[]{this.endpoint, this.accessKey, this.accessSecret, this.bucketName, this.region});
         minioClientList = new ArrayList<>();
         String[] arr = endpoint.split(",");
@@ -101,11 +103,6 @@ public class MinioStorageClient implements IFileStorageClient {
             throw new RuntimeException("没有可用的minio服务器，请联系管理员!");
         }
         return client;
-    }
-
-    @Override
-    public String getRemoteRoot() {
-        return null;
     }
 
     @Override
@@ -231,12 +228,6 @@ public class MinioStorageClient implements IFileStorageClient {
         }
     }
 
-
-    @Override
-    public boolean isSecurity() {
-        return false;
-    }
-
     @Override
     public void destroy() {
 
@@ -278,7 +269,7 @@ public class MinioStorageClient implements IFileStorageClient {
         }
     }
 
-
+    @Data
     class MinioClient {
         /**
          * minio客户端
@@ -294,94 +285,6 @@ public class MinioStorageClient implements IFileStorageClient {
          * 访问的地址和端口
          */
         private String endpoint;
-
-        public String getEndpoint() {
-            return endpoint;
-        }
-
-        public void setEndpoint(String endpoint) {
-            this.endpoint = endpoint;
-        }
-
-        public io.minio.MinioClient getMinioClient() {
-            return minioClient;
-        }
-
-        public void setMinioClient(io.minio.MinioClient minioClient) {
-            this.minioClient = minioClient;
-        }
-
-        public boolean isAvailable() {
-            return available;
-        }
-
-        public void setAvailable(boolean available) {
-            this.available = available;
-        }
-    }
-
-    public String getEndpoint() {
-        return endpoint;
-    }
-
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
-    }
-
-    public String getAccessKey() {
-        return accessKey;
-    }
-
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
-    }
-
-    public String getAccessSecret() {
-        return accessSecret;
-    }
-
-    public void setAccessSecret(String accessSecret) {
-        this.accessSecret = accessSecret;
-    }
-
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
-
-    public String getRegion() {
-        return region;
-    }
-
-    public void setRegion(String region) {
-        this.region = region;
-    }
-
-    public boolean isHttps() {
-        return isHttps;
-    }
-
-    public void setHttps(boolean https) {
-        isHttps = https;
-    }
-
-    public List<MinioClient> getMinioClientList() {
-        return minioClientList;
-    }
-
-    public void setMinioClientList(List<MinioClient> minioClientList) {
-        this.minioClientList = minioClientList;
-    }
-
-    public AtomicInteger getIndexAtomic() {
-        return indexAtomic;
-    }
-
-    public void setIndexAtomic(AtomicInteger indexAtomic) {
-        this.indexAtomic = indexAtomic;
     }
 
     @Override

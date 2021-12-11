@@ -37,7 +37,9 @@ public class AliOSSStorageClient implements IFileStorageClient {
 	private boolean security;
 
 	@Override
-	public void init() {
+	public void init(boolean security) {
+		this.security = security;
+
 		log.debug("Aliyun OSS service initializing remoteRoot： {}", remoteRoot);
 		log.debug("Endpoint: {}, WanEndpoint: {} ", endpoint, wanEndpoint);
 		ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);

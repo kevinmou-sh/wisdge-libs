@@ -1,6 +1,7 @@
 package com.wisdge.commons.filestorage;
 
 import com.wisdge.utils.FileUtils;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import java.io.File;
@@ -9,38 +10,22 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 @Slf4j
+@Data
 public class LocalStorageClient implements IFileStorageClient {
 	private String remoteRoot;
 	private boolean security;
 
-	@Override
-	public boolean isSecurity() {
-		return security;
-	}
 
-	public void setSecurity(boolean security) {
+	@Override
+	public void init(boolean security) {
 		this.security = security;
-	}
-
-	@Override
-	public void init() {
-
-	}
-
-	@Override
-	public String getRemoteRoot() {
-		return remoteRoot;
-	}
-	
-	public void setRemoteRoot(String remoteRoot) {
-		this.remoteRoot = remoteRoot;
 	}
 
 	@Override
 	public String save(String filepath, byte[] data) throws Exception {
 		String encoding = System.getProperty("file.encoding");
 		filepath = encodingFilename(filepath, encoding);
-		
+
 		String path = FilenameUtils.getFullPathNoEndSeparator(filepath);
 		FileUtils.forceMkdir(new File(path));
 		File file = new File(filepath);

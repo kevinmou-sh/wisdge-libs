@@ -9,9 +9,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-
 import com.wisdge.utils.StringUtils;
-import org.junit.Test;
 
 public class IPUtils {
 	/**
@@ -323,35 +321,5 @@ public class IPUtils {
 				return false;
 			}
 		return true;
-	}
-
-	@Test
-	public void test() throws SocketException {
-		List<String> ips = IPUtils.getLocalIPs();
-		System.out.println(ips);
-
-		System.out.println("OS: " + getOSName());
-		System.out.println("HostName: " + getHostName());
-
-
-		System.out.println("192.168.0".matches("192.*.*.0"));
-		System.out.println(isPermited("192.168.0.1", "192.*"));
-		System.out.println("\n\n");
-
-		Set<String> ipWhiteConfigs = new HashSet<>();
-		ipWhiteConfigs.add("1.168.1.*");
-		ipWhiteConfigs.add("10.*");
-		ipWhiteConfigs.add("192.168.3.15-192.168.3.38");
-		ipWhiteConfigs.add("192.168.1.0/24");
-		ipWhiteConfigs.add("127.0.0.1");
-
-		System.out.println(isPermited("1.168.1.1", ipWhiteConfigs));
-		System.out.println(isPermited("192.168.1.2", ipWhiteConfigs));
-		System.out.println(isPermited("192.168.2.1", ipWhiteConfigs));
-		System.out.println(isPermited("192.168.3.16", ipWhiteConfigs));
-		System.out.println(isPermited("10.168.3.37", ipWhiteConfigs));
-		System.out.println(isPermited("192.168.4.1", ipWhiteConfigs));
-		System.out.println(isPermited("127.0.0.1", ipWhiteConfigs));
-
 	}
 }

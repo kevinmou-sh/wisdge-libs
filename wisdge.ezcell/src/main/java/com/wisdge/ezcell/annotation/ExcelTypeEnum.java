@@ -1,8 +1,8 @@
 package com.wisdge.ezcell.annotation;
 
+import org.apache.poi.poifs.filesystem.FileMagic;
 import java.io.IOException;
 import java.io.InputStream;
-import org.apache.poi.poifs.filesystem.FileMagic;
 
 public enum ExcelTypeEnum {
 	XLS(".xls"), XLSX(".xlsx");

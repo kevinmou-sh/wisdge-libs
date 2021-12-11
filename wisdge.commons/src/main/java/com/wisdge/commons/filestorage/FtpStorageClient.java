@@ -4,38 +4,21 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpATTRS;
 import com.wisdge.ftp.FTPConfig;
 import com.wisdge.ftp.FtpUtils;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import java.io.InputStream;
 
 @Slf4j
+@Data
 public class FtpStorageClient extends FTPConfig implements IFileStorageClient {
-	private static final long serialVersionUID = 1L;
 	private String remoteRoot;
 	private boolean security;
 
 	@Override
-	public boolean isSecurity() {
-		return security;
-	}
-
-	public void setSecurity(boolean security) {
+	public void init(boolean security) {
 		this.security = security;
-	}
-
-	@Override
-	public void init() {
-
-	}
-
-	@Override
-	public String getRemoteRoot() {
-		return remoteRoot;
-	}
-
-	public void setRemoteRoot(String remoteRoot) {
-		this.remoteRoot = remoteRoot;
 	}
 
 	@Override

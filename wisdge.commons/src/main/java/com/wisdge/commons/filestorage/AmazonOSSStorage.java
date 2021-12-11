@@ -31,7 +31,9 @@ public class AmazonOSSStorage implements IFileStorageClient {
     public boolean security;
     public String remoteRoot;
 
-    public void init() {
+    public void init(boolean security) {
+        this.security = security;
+
         log.debug("init AmazonS3Client oos  oosDomain:{} accessKey: {}  secretSecret: {} bucketName:{} region:{}", this.oosDomain, this.accessKey, this.secretSecret, bucketName, region);
         ClientConfiguration config = new ClientConfiguration();
         AwsClientBuilder.EndpointConfiguration endpointConfig = new AwsClientBuilder.EndpointConfiguration(oosDomain, this.region);

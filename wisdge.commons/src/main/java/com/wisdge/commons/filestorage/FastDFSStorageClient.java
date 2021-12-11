@@ -1,5 +1,6 @@
 package com.wisdge.commons.filestorage;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.csource.common.NameValuePair;
@@ -13,6 +14,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+@Data
 @Slf4j
 public class FastDFSStorageClient implements IFileStorageClient {
 	private int connectTimeout = 2000;
@@ -23,78 +25,9 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	private int httpTrackerHttpPort;
 	private String httpTrackerServers;
 	private ConnectionPool connectionPool;
+	private String remoteRoot;
 	private int poolSize = 5;
 	private boolean security;
-
-	public int getConnectTimeout() {
-		return connectTimeout;
-	}
-
-	public void setConnectTimeout(int connectTimeout) {
-		this.connectTimeout = connectTimeout;
-	}
-
-	public int getNetworkTimeout() {
-		return networkTimeout;
-	}
-
-	public void setNetworkTimeout(int networkTimeout) {
-		this.networkTimeout = networkTimeout;
-	}
-
-	public String getCharset() {
-		return charset;
-	}
-
-	public void setCharset(String charset) {
-		this.charset = charset;
-	}
-
-	public boolean isHttpAntiStealToken() {
-		return httpAntiStealToken;
-	}
-
-	public void setHttpAntiStealToken(boolean httpAntiStealToken) {
-		this.httpAntiStealToken = httpAntiStealToken;
-	}
-
-	public String getHttpSecretKey() {
-		return httpSecretKey;
-	}
-
-	public void setHttpSecretKey(String httpSecretKey) {
-		this.httpSecretKey = httpSecretKey;
-	}
-
-	public int getHttpTrackerHttpPort() {
-		return httpTrackerHttpPort;
-	}
-
-	public void setHttpTrackerHttpPort(int httpTrackerHttpPort) {
-		this.httpTrackerHttpPort = httpTrackerHttpPort;
-	}
-
-	public String getHttpTrackerServers() {
-		return httpTrackerServers;
-	}
-
-	public void setHttpTrackerServers(String httpTrackerServers) {
-		this.httpTrackerServers = httpTrackerServers;
-	}
-
-	@Override
-	public String getRemoteRoot() {
-		return "";
-	}
-
-	@Override
-	public boolean isSecurity() {
-		return security;
-	}
-
-	public void setSecurity(boolean security) {
-		this.security = security;
-	}
 
 	class ConnectionPool {
 	    //被使用的连接
@@ -102,13 +35,13 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	    //空闲的连接
 	    private ArrayBlockingQueue<StorageClient1> idleConnectionPool = null;
 	    private Object obj = new Object();
-	    
+
 	    public ConnectionPool(){
 	        busyConnectionPool = new ConcurrentHashMap<StorageClient1, Object>();
 	        idleConnectionPool = new ArrayBlockingQueue<StorageClient1>(poolSize);
 	        init();
 	    }
-	    
+
 	    // 初始化连接池
 	    private void init(){
 	        initClientGlobal();
@@ -136,7 +69,7 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	            }
 	        }
 	    }
-	    
+
 	    // 初始化客户端
 	    private void initClientGlobal(){
 	        // 连接超时时间
@@ -149,7 +82,7 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	        ClientGlobal.setSecretKey(httpSecretKey);
 	        // HTTP访问服务的端口号
 	        ClientGlobal.setTrackerHttpPort(httpTrackerHttpPort);
-	         
+
 	        String[] servers = httpTrackerServers.split(";");
 	        InetSocketAddress[] trackerServers = new InetSocketAddress[servers.length];
 	        for(int i=0; i<servers.length; i++) {
@@ -175,14 +108,14 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	        }
 	        return storageClient1;
 	    }
-	    
+
 	    //回收连接
 	    public void checkin(StorageClient1 storageClient1){
 	        if(busyConnectionPool.remove(storageClient1) != null){
 	            idleConnectionPool.add(storageClient1);
 	        }
 	    }
-	    
+
 	    //如果连接无效则抛弃，新建连接来补充到池里
 	    public void drop(StorageClient1 storageClient1){
 	        if(busyConnectionPool.remove(storageClient1) != null){
@@ -209,7 +142,8 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	}
 
 	@Override
-	public void init() {
+	public void init(boolean security) {
+		this.security = security;
 		connectionPool = new ConnectionPool();
 	}
 
@@ -217,13 +151,13 @@ public class FastDFSStorageClient implements IFileStorageClient {
 	public String save(String filepath, byte[] data) throws Exception {
 		String fileext = FilenameUtils.getExtension(filepath);
 		String filename = FilenameUtils.getName(filepath);
-		
+
 	    NameValuePair[] metaList = new NameValuePair[4];
 	    metaList[0] = new NameValuePair("fileName", filename);
 	    metaList[1] = new NameValuePair("fileLength", String.valueOf(data.length));
 	    metaList[2] = new NameValuePair("fileExt", fileext);
 	    metaList[3] = new NameValuePair("fileAuthor", "wisdge");
-	    
+
         StorageClient1 storageClient1 = connectionPool.checkout(10);
         try {
             return storageClient1.uploadFile1(data, fileext, metaList);

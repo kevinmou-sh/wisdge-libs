@@ -2,6 +2,7 @@ package com.wisdge.commons.filestorage;
 
 import com.wisdge.dataservice.Result;
 import com.wisdge.utils.StringUtils;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
 
@@ -9,19 +10,23 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
+@Data
 public class FileStorage {
-    public final String DEFAULT_STORAGE = "default";
-    private final String FILESTORAGE_NOT_EXIST = "文件服务{0}未配置";
+    public static final String DEFAULT_STORAGE = "default";
+    private static final String FILESTORAGE_NOT_EXIST = "文件服务{0}未配置";
+
     private Map<String, IFileStorageClient> fileStorages = new HashedMap();
+    private Set<String> whiteList;
+    private Set<String> forbidden;
+    private Set<String> accept;
 
-    public Map<String, IFileStorageClient> getFileStorages() {
-        return fileStorages;
-    }
-
-    public void setFileStorages(Map<String, IFileStorageClient> fileStorages) {
-        this.fileStorages = fileStorages;
+    public FileStorage(Set<String> whiteList, Set<String> forbidden, Set<String> accept) {
+        this.whiteList = whiteList;
+        this.forbidden = forbidden;
+        this.accept = accept;
     }
 
     public void addFileStorage(String key, IFileStorageClient fileStorageClient) {

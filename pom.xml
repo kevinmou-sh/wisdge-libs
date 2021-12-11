@@ -6,16 +6,18 @@
 
     <groupId>com.wisdge</groupId>
     <artifactId>wisdge.libs</artifactId>
-    <version>1.8.9</version>
+    <version>1.9.0</version>
     <packaging>pom</packaging>
 
     <properties>
         <java.version>1.8</java.version>
         <poi.version>5.1.0</poi.version>
+        <wisdge.version>1.9.0</wisdge.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springframework.version>5.2.9.RELEASE</springframework.version>
-        <springframework.data>2.2.8.RELEASE</springframework.data>
-        <wisdge.version>1.8.9</wisdge.version>
+        <springframework.version>5.3.13</springframework.version>
+        <springframework.data>2.6.0</springframework.data>
+        <elasticsearch.version>7.15.2</elasticsearch.version>
+        <fasterxml.version>2.13.0</fasterxml.version>
     </properties>
 
     <modules>

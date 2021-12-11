@@ -7,13 +7,13 @@ public interface IFileStorageClient {
 	/**
 	 * 初始化服务
 	 */
-	void init();
+	void init(boolean security);
 
 	/**
 	 * @return String 文件服务的根路径
 	 */
 	String getRemoteRoot();
-	
+
 	/**
 	 * 保存文件
 	 * @param filepath String 文件路径
@@ -59,7 +59,7 @@ public interface IFileStorageClient {
 	 * @throws Exception
 	 */
 	void retrieveStream(String filepath, IFileExecutor executor) throws Exception;
-	
+
 	/**
 	 * 删除文件
 	 * @param filepath String 文件路径
