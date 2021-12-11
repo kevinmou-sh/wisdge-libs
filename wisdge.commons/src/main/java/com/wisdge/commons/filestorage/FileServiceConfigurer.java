@@ -1,5 +1,6 @@
 package com.wisdge.commons.filestorage;
 
+import com.wisdge.utils.StringUtils;
 import lombok.Data;
 
 import java.nio.charset.StandardCharsets;
@@ -9,11 +10,11 @@ import java.util.Set;
 public class FileServiceConfigurer {
     private FileStorageConfig[] storages;
     private Set<String> whiteList;
-    private Set<String> forbidden;
-    private Set<String> accept;
+    private String forbidden;
+    private String accept;
 
     public FileStorage getFileStorage() {
-        FileStorage fileStorage = new FileStorage(whiteList, forbidden, accept);
+        FileStorage fileStorage = new FileStorage(whiteList, StringUtils.toSet(forbidden, ","), StringUtils.toSet(accept, ","));
         for(FileStorageConfig config : storages) {
             String name = config.getName();
             String type = config.getType();

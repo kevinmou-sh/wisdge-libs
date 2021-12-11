@@ -2,9 +2,7 @@ package com.wisdge.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,14 +13,14 @@ import java.util.regex.Pattern;
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 	/**
 	 * The empty String {@code ""}.
-	 * 
+	 *
 	 * @since 1.0
 	 */
 	public static final String EMPTY = "";
 
 	/**
 	 * Represents a failed index search.
-	 * 
+	 *
 	 * @since 1.0
 	 */
 	public static final int INDEX_NOT_FOUND = -1;
@@ -44,7 +42,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * HTML encoding (does not convert line breaks). Replaces all '&gt;' '&lt;' '&amp;' and '"' with entity reference
-	 * 
+	 *
 	 * @param htmlStr
 	 *            html字符串
 	 * @return 编译后的字符串
@@ -105,7 +103,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * XML Encoding. Replaces all '&gt;' '&lt;' '&amp;', "'" and '"' with entity reference
-	 * 
+	 *
 	 * @param xmlStr
 	 *            xml字符串
 	 * @return 编译后的字符串
@@ -172,7 +170,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * XML encoding without replacing apostrophes and quotation marks.
-	 * 
+	 *
 	 * @param xmlStr
 	 *            编译后的xml字符串
 	 * @return 原始xml字符串
@@ -228,7 +226,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 将字符串按照分割符分解成队列
-	 * 
+	 *
 	 * @param delimitedString
 	 *            被分割的字符串
 	 * @param delim
@@ -251,7 +249,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 复写指定的字符串
-	 * 
+	 *
 	 * @param srcString
 	 *            被复写的字符串
 	 * @param numberOfCopies
@@ -272,7 +270,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 强制转换字符串到long整型数字
-	 * 
+	 *
 	 * @param str
 	 *            被转义的字符串
 	 * @return long 转义后的long型数字，转换错误返回默认值 0
@@ -291,7 +289,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 强制转换字符串到int整型数字
-	 * 
+	 *
 	 * @param str
 	 *            被转义的字符串
 	 * @return int 转义后的int型数字，转换错误返回默认值 0
@@ -310,7 +308,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 强制转换字符串到Boolean型
-	 * 
+	 *
 	 * @param str
 	 *            被转义的字符串
 	 * @return int 转义后的boolean型值，字符串为none 或不为"true"时返回 false
@@ -321,7 +319,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 强制转换字符串到Boolean型
-	 * 
+	 *
 	 * @param str
 	 *            被转义的字符串
 	 * @param defaultValue
@@ -351,7 +349,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 对字符串进行校验检查
-	 * 
+	 *
 	 * @param srcString
 	 *            需要校验检查的字符串
 	 * @param validTarget
@@ -369,7 +367,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 判断是否中文字符
-	 * 
+	 *
 	 * @param string
 	 *            被检测的字符串
 	 * @return boolean 是中文字符返回true，否则返回false
@@ -383,7 +381,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 计算字符串内某一个char的总数
-	 * 
+	 *
 	 * @param srcString
 	 *            进行计算的字符串
 	 * @param searchChar
@@ -404,7 +402,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 对字符串进行前段截除操作，截除起始符合目标的前段部分
-	 * 
+	 *
 	 * @param srcString
 	 *            目标字符串
 	 * @param token
@@ -424,7 +422,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 对字符串进行截除操作，截除最后一个符合目标的尾部部分
-	 * 
+	 *
 	 * @param srcString
 	 *            目标字符串
 	 * @param token
@@ -444,7 +442,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 对字符串前部进行截取
-	 * 
+	 *
 	 * @param srcString
 	 *            目标字符串
 	 * @param token
@@ -465,7 +463,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 对字符串尾部进行截取
-	 * 
+	 *
 	 * @param srcString
 	 *            目标字符串
 	 * @param token
@@ -486,7 +484,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 对字符串进行Unicode编码
-	 * 
+	 *
 	 * @param srcString
 	 *            进行编码的字符串
 	 * @return String 编码后的字符串
@@ -518,7 +516,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 获得字符串的字节数，有利于计算机字符串中英文混排后的实际长度
-	 * 
+	 *
 	 * @param srcString
 	 *            进行计算的字符串
 	 * @return int 字符串的byte长度
@@ -529,7 +527,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 获得字符串的字节数，有利于计算机字符串中英文混排后的实际长度
-	 * 
+	 *
 	 * @param srcString
 	 *            进行计算的字符串
 	 * @param encode
@@ -550,7 +548,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 截取字符串的前部，长度为BYTE数量。如果遇到双字节chat，则自动多截取一个字节。本方法仅支持双字节编码的字符串，例如UTF-8,ISO-8859-1,GBK
-	 * 
+	 *
 	 * @param strString
 	 *            目标字符串
 	 * @param length
@@ -582,7 +580,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换ISO8859-1字符集到GBK字符集
-	 * 
+	 *
 	 * @param str
 	 *            ISO8859-1字符串
 	 * @return String GBK编码字符串
@@ -601,7 +599,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换ISO8859-1字符集到BIG5字符集
-	 * 
+	 *
 	 * @param str
 	 *            ISO8859-1字符串
 	 * @return String BIG5编码字符串
@@ -620,7 +618,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换ISO8859-1字符集到UTF-8字符集
-	 * 
+	 *
 	 * @param str
 	 *            ISO8859-1字符串
 	 * @return String UTF-8编码字符串
@@ -639,7 +637,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换GBK字符集到ISO8859-1字符集
-	 * 
+	 *
 	 * @param str
 	 *            GBK编码字符串
 	 * @return String ISO8859-1字符串
@@ -658,7 +656,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换GBK字符集到BIG5字符集
-	 * 
+	 *
 	 * @param str
 	 *            GBK编码字符串
 	 * @return String BIG5字符串
@@ -677,7 +675,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换GBK字符集到UTF-8字符集
-	 * 
+	 *
 	 * @param str
 	 *            GBK编码字符串
 	 * @return String UTF-8字符串
@@ -696,7 +694,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换UTF-8字符集ISO-8859-1字符集
-	 * 
+	 *
 	 * @param str
 	 *            UTF-8编码字符串
 	 * @return String ISO-8859-1字符串
@@ -715,7 +713,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换UTF-8字符集GBK字符集
-	 * 
+	 *
 	 * @param str
 	 *            UTF-8编码字符串
 	 * @return String GBK字符串
@@ -734,7 +732,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换UTF-8字符集BIG5字符集
-	 * 
+	 *
 	 * @param str
 	 *            UTF-8编码字符串
 	 * @return String BIG5字符串
@@ -753,7 +751,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换BIG5字符集ISO-8859-1字符集
-	 * 
+	 *
 	 * @param str
 	 *            BIG5编码字符串
 	 * @return String ISO-8859-1字符串
@@ -772,7 +770,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换BIG5字符集UTF-8字符集
-	 * 
+	 *
 	 * @param str
 	 *            BIG5编码字符串
 	 * @return String UTF-8字符串
@@ -791,7 +789,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 转换BIG5字符集GBK字符集
-	 * 
+	 *
 	 * @param str
 	 *            BIG5编码字符串
 	 * @return String GBK字符串
@@ -810,7 +808,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 对字符串进行遍历转换
-	 * 
+	 *
 	 * @param str
 	 *            编码字符串
 	 * @return String 以ISO-8859-1,GBK,UTF-8,BIG5四种编码转换后的字符串样例
@@ -837,7 +835,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 对字符串进行长度格式操作,对操作指定长度的字符串进行缩略。如：I have to take...
-	 * 
+	 *
 	 * @param str
 	 *            需要格式化的字符串
 	 * @param maxLength
@@ -884,7 +882,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 	 * <p>
 	 * Returns padding using the specified delimiter repeated to a given length.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * StringUtils.repeat(0, 'e')  = ""
 	 * StringUtils.repeat(3, 'e')  = "eee"
@@ -895,7 +893,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 	 * Characters</a> as they require a pair of {@code char}s to be represented. If you are needing to support full I18N of your applications consider using
 	 * {@link #repeat(String, int)} instead.
 	 * </p>
-	 * 
+	 *
 	 * @param ch
 	 *            character to repeat
 	 * @param repeat
@@ -915,7 +913,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 	 * <p>
 	 * Repeat a String {@code repeat} times to form a new String.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * StringUtils.repeat(null, 2) = null
 	 * StringUtils.repeat("", 0)   = ""
@@ -924,7 +922,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 	 * StringUtils.repeat("ab", 2) = "abab"
 	 * StringUtils.repeat("a", -2) = ""
 	 * </pre>
-	 * 
+	 *
 	 * @param str
 	 *            the String to repeat, may be null
 	 * @param repeat
@@ -970,17 +968,25 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 		}
 	}
 
-	public static void main(String argv[]) throws Exception {
-		System.out.println(URLEncoder.encode("正在读取文件信息，请稍等...", "GBK"));
+	public static Set<String> toSet(String source, String regex) {
+		Set<String> set = new HashSet<>();
+		if (StringUtils.isEmpty(source))
+			return set;
 
-		System.out.println(StringUtils.duplicate("te.", 8));
-		System.out.println(StringUtils.encodeUnicode("test我们3"));
-		System.out.println(StringUtils.getByteLength("ASDF哈哈"));
-		System.out.println(StringUtils.stripTrailing("test.haha", "ha"));
-		System.out.println(StringUtils.stripLeft("test.haha", "tes"));
-		System.out.println(StringUtils.splitLeft("test.haha", "."));
-		System.out.println(StringUtils.splitTrailing("test.haha", "."));
+		for(String sub : source.split(regex)) {
+			set.add(sub.trim());
+		}
+		return set;
+	}
 
-		System.out.println(StringUtils.getBoolean("0"));
+	public static List<String> toList(String source, String regex) {
+		List<String> set = new ArrayList<>();
+		if (StringUtils.isEmpty(source))
+			return set;
+
+		for(String sub : source.split(regex)) {
+			set.add(sub.trim());
+		}
+		return set;
 	}
 }
