@@ -18,8 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.wisdge.dataservice.utils.JSonUtils;
 import com.wisdge.utils.ByteUtils;
 
@@ -66,7 +64,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 		}
 	}
 
-	public static <T> T getRequestPayloadBean(HttpServletRequest request, Class<T> beanClass) throws JsonParseException, JsonMappingException, IOException {
+	public static <T> T getRequestPayloadBean(HttpServletRequest request, Class<T> beanClass) throws Exception {
 		String payload = getRequestPayload(request);
 		return JSonUtils.read(payload, beanClass);
 	}
