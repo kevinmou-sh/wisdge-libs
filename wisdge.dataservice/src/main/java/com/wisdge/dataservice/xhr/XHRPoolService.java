@@ -23,6 +23,13 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import com.wisdge.utils.LogUtils;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
@@ -33,9 +40,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.NoHttpResponseException;
-import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -60,13 +65,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.wisdge.dataservice.exceptions.IllegalUrlException;
 import com.wisdge.dataservice.exceptions.XhrException;
 import com.wisdge.utils.DomUtils;
@@ -76,23 +76,23 @@ import com.wisdge.utils.DomUtils;
  *
  * @author Kevin MOU
  */
+@Slf4j
+@Data
 public class XHRPoolService {
-	private static final Logger logger = LoggerFactory.getLogger(XHRPoolService.class);
-
-	private static final String XHR_GET_LOGHEAD = "[XHR-GET] ";
-	private static final String XHR_POST_LOGHEAD = "[XHR-POST] ";
+	private static final String XHR_GET_LOG_HEAD = "[XHR-GET] {}";
+	private static final String XHR_POST_LOG_HEAD = "[XHR-POST] {}";
 	private static final String UTF_8 = "UTF-8";
-	private static final String CONTENTTYPE_JSON_UTF8 = "application/json;charset=UTF-8";
+	private static final String CONTENT_TYPE_JSON_UTF8 = "application/json;charset=UTF-8";
 
 	public static final int RESULT_XML = 0;
 	public static final int RESULT_JSON = 1;
 
 	public static final String METHOD_GET = "GET";
 	public static final String METHOD_POST = "POST";
-	public static final String METHOD_WSGET = "WSGET";
-	public static final String METHOD_WSPOST = "WSPOST";
+	public static final String METHOD_WS_GET = "WS_GET";
+	public static final String METHOD_WS_POST = "WS_POST";
 
-	private String protocal = "TLSv1.2";
+	private String protocols = "TLSv1.2";
 
 	/**
 	 * 连接超时时间 （单位毫秒）
@@ -116,133 +116,43 @@ public class XHRPoolService {
 	 */
 	private int maxRetryCount = 3;
 
-	private PoolingHttpClientConnectionManager connManager = null;
-	private CloseableHttpClient httpClient = null;
-	private IdleConnectionMonitorThread thread;
+	/**
+	 * 代理配置
+	 */
 	private ProxyConfig proxyConfig;
 
-	public int getRequestTimeout() {
-		return requestTimeout;
-	}
-
-	public int getConnectTimeout() {
-		return connectTimeout;
-	}
-
-	public int getSocketTimeout() {
-		return socketTimeout;
-	}
-
-	public int getMaxConnection() {
-		return maxConnection;
-	}
-
-	public int getMaxPerRoute() {
-		return maxPerRoute;
-	}
-
-	public int getMaxRetryCount() {
-		return maxRetryCount;
-	}
-
-	public String getProtocal() {
-		return protocal;
-	}
-
-	public void setProtocal(String protocal) {
-		this.protocal = protocal;
-	}
-
-	public XHRPoolService(int maxConnection, int maxPerRoute, int maxRetryCount, int maxTimeout, ProxyConfig proxyConfig) {
-		this.maxConnection = maxConnection;
-		this.maxPerRoute = maxPerRoute;
-		this.maxRetryCount = maxRetryCount;
-		this.requestTimeout = this.connectTimeout = this.socketTimeout = maxTimeout;
-		this.proxyConfig = proxyConfig;
-		initialize();
-	}
-
-	public XHRPoolService(int maxConnection, int maxPerRoute, int maxRetryCount, int maxTimeout) {
-		this.maxConnection = maxConnection;
-		this.maxPerRoute = maxPerRoute;
-		this.maxRetryCount = maxRetryCount;
-		this.requestTimeout = this.connectTimeout = this.socketTimeout = maxTimeout;
-		initialize();
-	}
-
-	public XHRPoolService(int maxConnection, int maxPerRoute, int maxRetryCount,  int requestTimeout, int connectTimeout, int socketTimeout) {
-		this.maxConnection = maxConnection;
-		this.maxPerRoute = maxPerRoute;
-		this.maxRetryCount = maxRetryCount;
-		this.requestTimeout = requestTimeout;
-		this.connectTimeout = connectTimeout;
-		this.socketTimeout = socketTimeout;
-		initialize();
-	}
-
-	public XHRPoolService(int maxConnection, int maxPerRoute, int maxRetryCount,  int requestTimeout, int connectTimeout, int socketTimeout, ProxyConfig proxyConfig) {
-		this.maxConnection = maxConnection;
-		this.maxPerRoute = maxPerRoute;
-		this.maxRetryCount = maxRetryCount;
-		this.requestTimeout = requestTimeout;
-		this.connectTimeout = connectTimeout;
-		this.socketTimeout = socketTimeout;
-		this.proxyConfig = proxyConfig;
-		initialize();
-	}
-
-	public XHRPoolService(int maxConnection, int maxPerRoute, int maxRetryCount,  int requestTimeout, int connectTimeout, int socketTimeout, String protocal) {
-		this.maxConnection = maxConnection;
-		this.maxPerRoute = maxPerRoute;
-		this.maxRetryCount = maxRetryCount;
-		this.requestTimeout = requestTimeout;
-		this.connectTimeout = connectTimeout;
-		this.socketTimeout = socketTimeout;
-		this.protocal = protocal;
-		initialize();
-	}
-
-	public XHRPoolService(int maxConnection, int maxPerRoute, int maxRetryCount,  int requestTimeout, int connectTimeout, int socketTimeout, String protocal, ProxyConfig proxyConfig) {
-		this.maxConnection = maxConnection;
-		this.maxPerRoute = maxPerRoute;
-		this.maxRetryCount = maxRetryCount;
-		this.requestTimeout = requestTimeout;
-		this.connectTimeout = connectTimeout;
-		this.socketTimeout = socketTimeout;
-		this.protocal = protocal;
-		this.proxyConfig = proxyConfig;
-		initialize();
-	}
-
-	public XHRPoolService(ProxyConfig proxyConfig) {
-		this.proxyConfig = proxyConfig;
-		initialize();
-	}
-
-	public XHRPoolService() {
-		initialize();
-	}
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	private PoolingHttpClientConnectionManager connectionManager;
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
+	private CloseableHttpClient httpClient;
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	private IdleConnectionMonitorThread thread;
 
 	/**
 	 * 设置HttpClient连接池
 	 */
-	private void initialize() {
+	public CloseableHttpClient getHttpClient() {
+		if (httpClient != null) return httpClient;
+
 		try {
-			Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory> create()
+			Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
 					.register("http", PlainConnectionSocketFactory.getSocketFactory())
 					.register("https", createSSLConnSocketFactory()).build();
 
 			// 创建连接管理器
-			connManager = new PoolingHttpClientConnectionManager(registry);
-			connManager.setMaxTotal(maxConnection);// 设置最大连接数
-			logger.debug("maxConnection: " + maxConnection);
-			connManager.setDefaultMaxPerRoute(maxPerRoute);// 设置每个路由默认连接数
-			logger.debug("maxPerRoute: " + maxPerRoute);
-			logger.debug("maxRetryCount: " + maxRetryCount);
+			connectionManager = new PoolingHttpClientConnectionManager(registry);
+			connectionManager.setMaxTotal(maxConnection);// 设置最大连接数
+			log.debug("maxConnection: " + maxConnection);
+			connectionManager.setDefaultMaxPerRoute(maxPerRoute);// 设置每个路由默认连接数
+			log.debug("maxPerRoute: " + maxPerRoute);
+			log.debug("maxRetryCount: " + maxRetryCount);
 
 
 			// 设置目标主机的连接数
-			// HttpHost host = new HttpHost("account.dafy.service");//针对的主机
+			// HttpHost host = new HttpHost("account.daffy.service");//针对的主机
 			// connManager.setMaxPerRoute(new HttpRoute(host), 50);//每个路由器对每个服务器允许最大50个并发访问
 
 			RequestConfig config = RequestConfig.custom()
@@ -251,12 +161,12 @@ public class XHRPoolService {
 					.setSocketTimeout(socketTimeout)// 设置数据读取超时
 					.build();
 			HttpClientBuilder clientBuilder = HttpClients.custom()
-					.setConnectionManager(connManager)
+					.setConnectionManager(connectionManager)
 					.setRetryHandler(httpRequestRetry())
 					.setDefaultRequestConfig(config);
 
 			// 创建httpClient对象
-			if (proxyConfig != null && proxyConfig.avaliable()) {
+			if (proxyConfig != null) {
 				HttpHost proxyHost = new HttpHost(proxyConfig.getHost(), proxyConfig.getPort());
 				DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
 				httpClient = clientBuilder.setRoutePlanner(routePlanner).build();
@@ -264,11 +174,13 @@ public class XHRPoolService {
 				httpClient = clientBuilder.build();
 			}
 
-			thread = new IdleConnectionMonitorThread(connManager);
+			thread = new IdleConnectionMonitorThread(connectionManager);
 			thread.start();
-			logger.info("Initialize XhrPoolService succeeded");
+			log.info("Initialize XhrPoolService succeeded");
+			return httpClient;
 		} catch (Exception e) {
-			logger.error("获取httpClient(https)对象池异常:" + e.getMessage(), e);
+			log.error(e.getMessage(), e);
+			return null;
 		}
 	}
 
@@ -295,7 +207,7 @@ public class XHRPoolService {
 				return null;
 			}
 		};
-		SSLContext ctx = SSLContext.getInstance(protocal);
+		SSLContext ctx = SSLContext.getInstance(protocols);
 		ctx.init(null, new TrustManager[] { xtm }, null);
 
 		return new SSLConnectionSocketFactory(ctx, NoopHostnameVerifier.INSTANCE);
@@ -305,52 +217,49 @@ public class XHRPoolService {
 	 * 配置请求连接重试机制
 	 */
 	private HttpRequestRetryHandler httpRequestRetry() {
-		return new HttpRequestRetryHandler() {
-			@Override
-			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-				if (executionCount >= maxRetryCount) {
-					// 已经重试MAX_EXECUT_COUNT次，放弃
-					return false;
-				}
-				if (exception instanceof NoHttpResponseException) {
-					// 如果服务器丢掉了连接，需要重试
-					logger.error("httpclient 服务器连接丢失");
-					return true;
-				}
-				if (exception instanceof SSLHandshakeException) {
-					// SSL握手异常，无需重试
-					logger.error("httpclient SSL握手异常");
-					return false;
-				}
-				if (exception instanceof InterruptedIOException) {
-					// 超时，无需重试
-					logger.error("httpclient 连接超时");
-					return false;
-				}
-				if (exception instanceof UnknownHostException) {
-					// 目标服务器不可达，无需重试
-					logger.error("httpclient 目标服务器不可达");
-					return false;
-				}
-				if (exception instanceof ConnectTimeoutException) {
-					// 连接被拒绝，无需重试
-					logger.error("httpclient 连接被拒绝");
-					return false;
-				}
-				if (exception instanceof SSLException) {
-					// SSL异常，无需重试
-					logger.error("httpclient SSL异常");
-					return false;
-				}
-
-				// 如果请求是幂等的，就再次尝试
-				HttpClientContext clientContext = HttpClientContext.adapt(context);
-				HttpRequest request = clientContext.getRequest();
-				if (!(request instanceof HttpEntityEnclosingRequest)) {
-					return true;
-				}
+		return (exception, executionCount, context) -> {
+			if (executionCount >= maxRetryCount) {
+				// 已经重试MAX_EXECUT_COUNT次，放弃
 				return false;
 			}
+			if (exception instanceof NoHttpResponseException) {
+				// 如果服务器丢掉了连接，需要重试
+				log.error("httpclient 服务器连接丢失");
+				return true;
+			}
+			if (exception instanceof SSLHandshakeException) {
+				// SSL握手异常，无需重试
+				log.error("httpclient SSL握手异常");
+				return false;
+			}
+			if (exception instanceof InterruptedIOException) {
+				// 超时，无需重试
+				log.error("httpclient 连接超时");
+				return false;
+			}
+			if (exception instanceof UnknownHostException) {
+				// 目标服务器不可达，无需重试
+				log.error("httpclient 目标服务器不可达");
+				return false;
+			}
+			if (exception instanceof ConnectTimeoutException) {
+				// 连接被拒绝，无需重试
+				log.error("httpclient 连接被拒绝");
+				return false;
+			}
+			if (exception instanceof SSLException) {
+				// SSL异常，无需重试
+				log.error("httpclient SSL异常");
+				return false;
+			}
+
+			// 如果请求是幂等的，就再次尝试
+			HttpClientContext clientContext = HttpClientContext.adapt(context);
+			HttpRequest request = clientContext.getRequest();
+			if (!(request instanceof HttpEntityEnclosingRequest)) {
+				return true;
+			}
+			return false;
 		};
 	}
 
@@ -359,19 +268,21 @@ public class XHRPoolService {
 	 */
 	public void destroy() {
 		try {
-			thread.shutdown();
+			if (thread != null)
+				thread.shutdown();
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 		}
 
-		if (connManager == null) {
+		if (connectionManager == null) {
 			return;
 		}
 		// 关闭连接池
-		connManager.shutdown();
+		connectionManager.shutdown();
 		// 设置httpClient失效
 		httpClient = null;
-		connManager = null;
-		logger.info("XhrPoolService destroyed");
+		connectionManager = null;
+		log.info("XhrPoolService destroyed");
 	}
 
 	/**
@@ -380,12 +291,9 @@ public class XHRPoolService {
 	 * @param url
 	 *            HTTP接口地址
 	 * @return String
-	 * @throws IllegalUrlException
-	 * @throws IOException
-	 * @throws XhrException
 	 * @throws Exception
 	 */
-	public String get(String url) throws XhrException, IOException, IllegalUrlException {
+	public String get(String url) throws Exception {
 		return get(url, null);
 	}
 
@@ -397,12 +305,10 @@ public class XHRPoolService {
 	 * @param params
 	 *            GET参数的MAP对象
 	 * @return String
-	 * @throws IllegalUrlException
-	 * @throws IOException
-	 * @throws ClientProtocolException
+	 * @throws Exception
 	 */
-	public String get(String url, Map<String, Object> params) throws XhrException, IOException, IllegalUrlException {
-		return this.get(url, params, new HashMap<String, String>());
+	public String get(String url, Map<String, Object> params) throws Exception {
+		return get(url, params, new HashMap<>());
 	}
 
 	/**
@@ -413,17 +319,11 @@ public class XHRPoolService {
 	 * @param params
 	 *            GET参数的MAP对象
 	 * @return String
-	 * @throws IllegalUrlException
-	 * @throws IOException
-	 * @throws ClientProtocolException
+	 * @throws Exception
 	 */
-	public String get(String url, Map<String, Object> params, Map<String, String> heads) throws XhrException, IOException, IllegalUrlException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public String get(String url, Map<String, Object> params, Map<String, String> heads) throws Exception {
 		url = makeGetMethodUrl(url, params);
-		logger.debug(XHR_GET_LOGHEAD + url);
+		log.debug(XHR_GET_LOG_HEAD, LogUtils.forging(url));
 		HttpGet httpGet = new HttpGet(url);
 		if (heads != null) {
 			Iterator<String> iter = heads.keySet().iterator();
@@ -433,9 +333,9 @@ public class XHRPoolService {
 			}
 		}
 
-		CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpGet);
 		try {
-			return entity2String(httpResponse, url);
+			return entity2String(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpGet.releaseConnection();
@@ -450,19 +350,13 @@ public class XHRPoolService {
 	 *            GET参数的MAP对象
 	 * @param handler
 	 *            IResponseHandler
-	 * @throws ClientProtocolException
-	 * @throws IllegalUrlException
 	 * @throws IOException
 	 */
-	public void get(String url, Map<String, Object> params, IResponseHandler handler) throws IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public void get(String url, Map<String, Object> params, IResponseHandler handler) throws Exception {
 		url = makeGetMethodUrl(url, params);
-		logger.debug(XHR_GET_LOGHEAD + url);
+		log.debug(XHR_GET_LOG_HEAD, LogUtils.forging(url));
 		HttpGet httpGet = new HttpGet(url);
-		CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpGet);
 		try {
 			handler.doHandle(httpResponse);
 		} finally {
@@ -471,7 +365,7 @@ public class XHRPoolService {
 		}
 	}
 
-	public CloseableHttpResponse getResponse(String url) throws IllegalUrlException, IOException {
+	public CloseableHttpResponse getResponse(String url) throws Exception {
 		return getResponse(url, null);
 	}
 	/**
@@ -482,19 +376,13 @@ public class XHRPoolService {
 	 * @param params
 	 *            GET参数的MAP对象
 	 * @return CloseableHttpResponse
-	 * @throws IllegalUrlException
-	 * @throws IOException
-	 * @throws ClientProtocolException
+	 * @throws Exception
 	 */
-	public CloseableHttpResponse getResponse(String url, Map<String, Object> params) throws IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public CloseableHttpResponse getResponse(String url, Map<String, Object> params) throws Exception {
 		url = makeGetMethodUrl(url, params);
-		logger.debug(XHR_GET_LOGHEAD + url);
+		log.debug(XHR_GET_LOG_HEAD, LogUtils.forging(url));
 		HttpGet httpGet = new HttpGet(url);
-		return httpClient.execute(httpGet);
+		return getHttpClient().execute(httpGet);
 	}
 
 	/**
@@ -503,11 +391,9 @@ public class XHRPoolService {
 	 * @param url
 	 *            HTTP接口地址
 	 * @return byte[]
-	 * @throws IllegalUrlException
-	 * @throws IOException
-	 * @throws ClientProtocolException
+	 * @throws Exception
 	 */
-	public byte[] getForBytes(String url) throws IllegalUrlException, XhrException, IOException {
+	public byte[] getForBytes(String url) throws Exception {
 		return getForBytes(url, null, null);
 	}
 
@@ -519,11 +405,9 @@ public class XHRPoolService {
 	 * @param params
 	 *            GET参数的MAP对象
 	 * @return byte[]
-	 * @throws IllegalUrlException
-	 * @throws IOException
-	 * @throws ClientProtocolException
+	 * @throws Exception
 	 */
-	public byte[] getForBytes(String url, Map<String, Object> params) throws IllegalUrlException, XhrException, IOException {
+	public byte[] getForBytes(String url, Map<String, Object> params) throws Exception {
 		return getForBytes(url, params, null);
 	}
 
@@ -535,17 +419,11 @@ public class XHRPoolService {
 	 * @param params
 	 *            GET参数的MAP对象
 	 * @return byte[]
-	 * @throws IllegalUrlException
-	 * @throws IOException
-	 * @throws ClientProtocolException
+	 * @throws Exception
 	 */
-	public byte[] getForBytes(String url, Map<String, Object> params, Map<String, String> headers) throws IllegalUrlException, XhrException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public byte[] getForBytes(String url, Map<String, Object> params, Map<String, String> headers) throws Exception {
 		url = makeGetMethodUrl(url, params);
-		logger.debug(XHR_GET_LOGHEAD + url);
+		log.debug(XHR_GET_LOG_HEAD, LogUtils.forging(url));
 		HttpGet httpGet = new HttpGet(url);
 		if (headers != null) {
 			Iterator<String> iter = headers.keySet().iterator();
@@ -554,9 +432,9 @@ public class XHRPoolService {
 				httpGet.setHeader(name, headers.get(name));
 			}
 		}
-		CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpGet);
 		try {
-			return entity2Bytes(httpResponse, url);
+			return entity2Bytes(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpGet.releaseConnection();
@@ -565,8 +443,8 @@ public class XHRPoolService {
 
 	/**
      * 获取response header中Content-Disposition中的filename值
-     * @param response
-     * @return
+     * @param response CloseableHttpResponse
+     * @return String
      */
     public String getFileName(CloseableHttpResponse response) {
         Header contentHeader = response.getFirstHeader("Content-Disposition");
@@ -620,12 +498,10 @@ public class XHRPoolService {
 	 * @param url
 	 *            HTTP接口地址
 	 * @return String
-	 * @throws ClientProtocolException
-	 * @throws IllegalUrlException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public String post(String url) throws IllegalUrlException, XhrException, IOException {
-		return post(url, new HashMap<String, Object>());
+	public String post(String url) throws Exception {
+		return post(url, new HashMap<>());
 	}
 
 	/**
@@ -636,19 +512,13 @@ public class XHRPoolService {
 	 * @param params
 	 *            POST方法中提交的参数MAP对象
 	 * @return String
-	 * @throws IllegalUrlException
-	 * @throws ClientProtocolException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public String post(String url, Map<String, Object> params) throws XhrException, IllegalUrlException, IOException {
+	public String post(String url, Map<String, Object> params) throws Exception {
 		return post(url, params, new HashMap<>());
 	}
 
-	public String post(String url, Map<String, Object> params, Map<String, String> headers) throws XhrException, IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public String post(String url, Map<String, Object> params, Map<String, String> headers) throws Exception {
 		url = url.trim().replaceAll("\n", "");
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
@@ -662,7 +532,7 @@ public class XHRPoolService {
 			}
 		}
 
-		logger.debug(XHR_POST_LOGHEAD + url);
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
 		if (headers != null) {
@@ -673,19 +543,19 @@ public class XHRPoolService {
 			}
 		}
 
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
-			return entity2String(httpResponse, url);
+			return entity2String(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpPost.releaseConnection();
 		}
 	}
 
-	public String post(HttpPost httpPost) throws XhrException, IOException {
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+	public String post(HttpPost httpPost) throws Exception {
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
-			return entity2String(httpResponse, httpPost.getURI().getPath());
+			return entity2String(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpPost.releaseConnection();
@@ -700,15 +570,9 @@ public class XHRPoolService {
 	 *            GET参数的MAP对象
 	 * @param handler
 	 *            IResponseHandler
-	 * @throws ClientProtocolException
-	 * @throws IllegalUrlException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public void post(String url, Map<String, Object> params, Map<String, String> headers, IResponseHandler handler) throws IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public void post(String url, Map<String, Object> params, Map<String, String> headers, IResponseHandler handler) throws Exception {
 		url = url.trim().replaceAll("\n", "");
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
@@ -722,10 +586,18 @@ public class XHRPoolService {
 			}
 		}
 
-		logger.debug(XHR_POST_LOGHEAD + url);
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
+			while(iter.hasNext()) {
+				String name = iter.next();
+				httpPost.setHeader(name, headers.get(name));
+			}
+		}
+
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
 			handler.doHandle(httpResponse);
 		} finally {
@@ -734,7 +606,7 @@ public class XHRPoolService {
 		}
 	}
 
-	public CloseableHttpResponse postResponse(String url) throws IllegalUrlException, IOException {
+	public CloseableHttpResponse postResponse(String url) throws Exception {
 		return postResponse(url, new HashMap<String, Object>());
 	}
 
@@ -746,15 +618,9 @@ public class XHRPoolService {
 	 * @param params
 	 *            POST方法中提交的参数MAP对象
 	 * @return CloseableHttpResponse
-	 * @throws IllegalUrlException
-	 * @throws ClientProtocolException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public CloseableHttpResponse postResponse(String url, Map<String, Object> params) throws IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public CloseableHttpResponse postResponse(String url, Map<String, Object> params) throws Exception {
 		url = url.trim().replaceAll("\n", "");
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
@@ -768,13 +634,13 @@ public class XHRPoolService {
 			}
 		}
 
-		logger.debug(XHR_POST_LOGHEAD + url);
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
-		return httpClient.execute(httpPost);
+		return getHttpClient().execute(httpPost);
 	}
 
-	public byte[] postForBytes(String url, Map<String, Object> params) throws IllegalUrlException, XhrException, IOException {
+	public byte[] postForBytes(String url, Map<String, Object> params) throws Exception {
 		return postForBytes(url, params, null);
 	}
 
@@ -788,15 +654,9 @@ public class XHRPoolService {
 	 * @param headers
 	 *            POST方法中提交的请求头heads
 	 * @return byte[]
-	 * @throws IllegalUrlException
-	 * @throws ClientProtocolException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public byte[] postForBytes(String url, Map<String, Object> params, Map<String, String> headers) throws IllegalUrlException, XhrException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public byte[] postForBytes(String url, Map<String, Object> params, Map<String, String> headers) throws Exception {
 		url = url.trim().replaceAll("\n", "");
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
@@ -810,7 +670,7 @@ public class XHRPoolService {
 			}
 		}
 
-		logger.debug(XHR_POST_LOGHEAD + url);
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
 		if (headers != null) {
@@ -820,9 +680,9 @@ public class XHRPoolService {
 				httpPost.setHeader(name, headers.get(name));
 			}
 		}
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
-			return entity2Bytes(httpResponse, url);
+			return entity2Bytes(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpPost.releaseConnection();
@@ -837,15 +697,9 @@ public class XHRPoolService {
 	 * @param entity
 	 *            HttpEntity POST方法中提交的参数MAP对象
 	 * @return byte[]
-	 * @throws IllegalUrlException
-	 * @throws ClientProtocolException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public byte[] postForBytes(String url, HttpEntity entity,  Map<String, String> headers) throws IllegalUrlException, XhrException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public byte[] postForBytes(String url, HttpEntity entity,  Map<String, String> headers) throws Exception {
 		url = url.trim().replaceAll("\n", "");
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(entity);
@@ -856,9 +710,9 @@ public class XHRPoolService {
 				httpPost.setHeader(name, headers.get(name));
 			}
 		}
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
-			return entity2Bytes(httpResponse, url);
+			return entity2Bytes(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpPost.releaseConnection();
@@ -873,11 +727,9 @@ public class XHRPoolService {
 	 * @param entity
 	 *            HttpEntity POST方法中提交的参数MAP对象
 	 * @return byte[]
-	 * @throws IllegalUrlException
-	 * @throws ClientProtocolException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public byte[] postForBytes(String url, HttpEntity entity) throws IllegalUrlException, XhrException, IOException {
+	public byte[] postForBytes(String url, HttpEntity entity) throws Exception {
 		return postForBytes(url, entity, null);
 	}
 
@@ -889,15 +741,9 @@ public class XHRPoolService {
 	 * @param params
 	 *            POST方法中提交的参数MAP对象
 	 * @return FileBean
-	 * @throws IllegalUrlException
-	 * @throws ClientProtocolException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public FileBean postForFile(String url, Map<String, Object> params) throws IllegalUrlException, XhrException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public FileBean postForFile(String url, Map<String, Object> params) throws Exception {
 		url = url.trim().replaceAll("\n", "");
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
@@ -911,10 +757,10 @@ public class XHRPoolService {
 			}
 		}
 
-		logger.debug(XHR_POST_LOGHEAD + url);
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
 			Header[] cds = httpResponse.getHeaders("Content-disposition");
 			if (cds.length == 0)
@@ -924,7 +770,7 @@ public class XHRPoolService {
 				throw new IllegalUrlException(500, "没有获取到HeaderElement");
 
 			String filename = elements[0].getParameterByName("filename").getValue();
-			byte[] data = entity2Bytes(httpResponse, url);
+			byte[] data = entity2Bytes(httpResponse);
 			return new FileBean(filename, data);
 		} finally {
 			httpResponse.close();
@@ -940,29 +786,23 @@ public class XHRPoolService {
 	 * @param jsonBody
 	 *            POST到接口的JSON正文
 	 * @return String
-	 * @throws ClientProtocolException
-	 * @throws IllegalUrlException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public String post(String url, String jsonBody) throws XhrException, IllegalUrlException, IOException {
-		return post(url, jsonBody, CONTENTTYPE_JSON_UTF8);
+	public String post(String url, String jsonBody) throws Exception {
+		return post(url, jsonBody, CONTENT_TYPE_JSON_UTF8);
 	}
 
-	public String post(String url, String jsonBody, String contentType) throws XhrException, IllegalUrlException, IOException {
+	public String post(String url, String jsonBody, String contentType) throws Exception {
 		return post(url, jsonBody, contentType, new HashMap<>());
 	}
 
-	public String post(String url, String jsonBody, String contentType, Map<String, String> headers) throws XhrException, IllegalUrlException, IOException {
+	public String post(String url, String jsonBody, String contentType, Map<String, String> headers) throws Exception {
 		headers.put("Content-type", contentType);
 		return post(url, jsonBody, headers);
 	}
 
-	public String post(String url, String jsonBody, Map<String, String> headers) throws XhrException, IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
-		logger.debug(XHR_POST_LOGHEAD + url);
+	public String post(String url, String jsonBody, Map<String, String> headers) throws Exception {
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		StringEntity se = new StringEntity(jsonBody, UTF_8);
 		if (headers != null) {
@@ -974,17 +814,17 @@ public class XHRPoolService {
 		}
 		httpPost.setEntity(se);
 
-		//logger.debug("doPostPayload: " + jsonBody);
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		//log.debug("doPostPayload: " + jsonBody);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
 //			int statusCode = httpResponse.getStatusLine().getStatusCode();
 //			if (statusCode == HttpStatus.SC_MOVED_TEMPORARILY || statusCode == HttpStatus.SC_MOVED_PERMANENTLY) {
 //				Header header = httpResponse.getFirstHeader("location"); // 跳转的目标地址是在 HTTP-HEAD 中的
 //	            String newUri = header.getValue(); // 这就是跳转后的地址，再向这个地址发出新申请，以便得到跳转后的信息是啥。
-//	            logger.debug("HttpRequest 302 return: {}", newUri);
+//	            log.debug("HttpRequest 302 return: {}", newUri);
 //	            return post(newUri, jsonBody, heads);
 //			}
-			return entity2String(httpResponse, url);
+			return entity2String(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpPost.releaseConnection();
@@ -999,23 +839,17 @@ public class XHRPoolService {
 	 *            POST到接口的JSON正文
 	 * @param handler
 	 *            IResponseHandler
-	 * @throws ClientProtocolException
-	 * @throws IllegalUrlException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public void post(String url, String postBody, IResponseHandler handler) throws IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
-		logger.debug(XHR_POST_LOGHEAD + url);
+	public void post(String url, String postBody, IResponseHandler handler) throws Exception {
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		StringEntity se = new StringEntity(postBody, UTF_8);
-		httpPost.setHeader("Content-Type", CONTENTTYPE_JSON_UTF8);
+		httpPost.setHeader("Content-Type", CONTENT_TYPE_JSON_UTF8);
 		httpPost.setEntity(se);
 
-		//logger.debug("doPostPayload: " + postBody);
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		//log.debug("doPostPayload: " + postBody);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
 			handler.doHandle(httpResponse);
 		} finally {
@@ -1031,28 +865,22 @@ public class XHRPoolService {
 	 * @param postBody
 	 *            POST到接口的JSON正文
 	 * @return CloseableHttpResponse
-	 * @throws ClientProtocolException
-	 * @throws IllegalUrlException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public CloseableHttpResponse postResponse(String url, String postBody) throws IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
-		logger.debug(XHR_POST_LOGHEAD + url);
+	public CloseableHttpResponse postResponse(String url, String postBody) throws Exception {
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		StringEntity se = new StringEntity(postBody, UTF_8);
-		httpPost.setHeader("Content-Type", CONTENTTYPE_JSON_UTF8);
+		httpPost.setHeader("Content-Type", CONTENT_TYPE_JSON_UTF8);
 		httpPost.setEntity(se);
-		return httpClient.execute(httpPost);
+		return getHttpClient().execute(httpPost);
 	}
 
-	public String postEntity(String url, HttpEntity entity) throws IOException, XhrException {
+	public String postEntity(String url, HttpEntity entity) throws Exception {
 		return postEntity(url, entity, null);
 	}
 
-	public String postEntity(String url, HttpEntity entity, Map<String, String> headers) throws IOException, XhrException {
+	public String postEntity(String url, HttpEntity entity, Map<String, String> headers) throws Exception {
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(entity);
 		if (headers != null) {
@@ -1062,9 +890,9 @@ public class XHRPoolService {
 				httpPost.setHeader(name, headers.get(name));
 			}
 		}
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
-			return entity2String(httpResponse, url);
+			return entity2String(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpPost.releaseConnection();
@@ -1079,38 +907,32 @@ public class XHRPoolService {
 	 * @param xmlBody
 	 *            POST到接口的XML正文
 	 * @return String
-	 * @throws ClientProtocolException
-	 * @throws IllegalUrlException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public String postXML(String url, String xmlBody, Map<?, ?> heads) throws XhrException, IllegalUrlException, IOException {
-		return post(url, xmlBody, "application/xml; charset=UTF-8");
+	public String postXML(String url, String xmlBody, Map<String, String> headers) throws Exception {
+		return post(url, xmlBody, "application/xml; charset=UTF-8", headers);
 	}
 
-	public String postXSD(String url, String xmlBody, Map<?, ?> heads) throws XhrException, IOException, IllegalUrlException {
-		return post(url, xmlBody, "text/xml; charset=UTF-8");
+	public String postXSD(String url, String xmlBody, Map<String, String> headers) throws Exception {
+		return post(url, xmlBody, "text/xml; charset=UTF-8", headers);
 	}
 
-	public String postSOAP(String url, String xmlBody, Map<?, ?> heads) throws XhrException, IOException, IllegalUrlException {
-		return post(url, xmlBody, "application/soap+xml; charset=UTF-8");
+	public String postSOAP(String url, String xmlBody, Map<String, String> headers) throws Exception {
+		return post(url, xmlBody, "application/soap+xml; charset=UTF-8", headers);
 	}
 
-	public byte[] postForBytes(String url, String jsonBody) throws IllegalUrlException, XhrException, IOException {
+	public byte[] postForBytes(String url, String jsonBody) throws Exception {
 		return postForBytes(url, jsonBody, null);
 	}
 
-	public byte[] postForBytes(String url, String jsonBody, Map<String, String> heads) throws IllegalUrlException, XhrException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
-		logger.debug(XHR_POST_LOGHEAD + url);
+	public byte[] postForBytes(String url, String jsonBody, Map<String, String> heads) throws Exception {
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		StringEntity se = new StringEntity(jsonBody, UTF_8);
-		httpPost.setHeader("Content-Type", CONTENTTYPE_JSON_UTF8);
+		httpPost.setHeader("Content-Type", CONTENT_TYPE_JSON_UTF8);
 		httpPost.setEntity(se);
 
-		logger.debug("doPostPayload: " + jsonBody);
+		log.debug("doPostPayload: " + jsonBody);
 		if (heads != null) {
 			Iterator<String> iter = heads.keySet().iterator();
 			while(iter.hasNext()) {
@@ -1118,10 +940,10 @@ public class XHRPoolService {
 				httpPost.setHeader(name, heads.get(name));
 			}
 		}
-		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpPost);
 		try {
-			logger.debug("queryResponse: " + httpResponse.getStatusLine().getStatusCode());
-			return entity2Bytes(httpResponse, url);
+			log.debug("queryResponse: " + httpResponse.getStatusLine().getStatusCode());
+			return entity2Bytes(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpPost.releaseConnection();
@@ -1134,8 +956,8 @@ public class XHRPoolService {
 	 * @param url
 	 *            HTTP接口地址
 	 */
-	public String delete(String url) throws IllegalUrlException, XhrException, IOException {
-		return post(url, new HashMap<String, Object>());
+	public String delete(String url) throws Exception {
+		return delete(url, new HashMap<>());
 	}
 
 	/**
@@ -1146,11 +968,7 @@ public class XHRPoolService {
 	 * @param headers
 	 *            delete方法中提交的headers参数MAP对象
 	 */
-	public String delete(String url, Map<String, Object> headers) throws XhrException, IllegalUrlException, IOException {
-		if (null == url || !url.toLowerCase().startsWith("http")) {
-			throw new IllegalUrlException(404, url);
-		}
-
+	public String delete(String url, Map<String, Object> headers) throws Exception {
 		HttpDelete httpDelete = new HttpDelete(url);
 		url = url.trim().replaceAll("\n", "");
 		if (headers != null) {
@@ -1160,21 +978,17 @@ public class XHRPoolService {
 				httpDelete.setHeader(name, (String) headers.get(name));
 			}
 		}
-		logger.debug(XHR_POST_LOGHEAD + url);
-		CloseableHttpResponse httpResponse = httpClient.execute(httpDelete);
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
+		CloseableHttpResponse httpResponse = getHttpClient().execute(httpDelete);
 		try {
-			return entity2String(httpResponse, url);
+			return entity2String(httpResponse);
 		} finally {
 			httpResponse.close();
 			httpDelete.releaseConnection();
 		}
 	}
 
-	public String entity2String(HttpResponse httpResponse) throws XhrException, IOException {
-		return entity2String(httpResponse, null);
-	}
-
-	public String entity2String(HttpResponse httpResponse, String url) throws XhrException, IOException {
+	public String entity2String(HttpResponse httpResponse) throws Exception {
 		StatusLine statusLine = httpResponse.getStatusLine();
 		int statusCode = statusLine.getStatusCode();
 		if (statusCode != HttpStatus.SC_OK) {
@@ -1196,11 +1010,7 @@ public class XHRPoolService {
 		return EntityUtils.toString(responseEntity, UTF_8);
 	}
 
-	public byte[] entity2Bytes(HttpResponse httpResponse) throws XhrException, IOException {
-		return entity2Bytes(httpResponse, null);
-	}
-
-	public byte[] entity2Bytes(HttpResponse httpResponse, String url) throws XhrException, IOException {
+	public byte[] entity2Bytes(HttpResponse httpResponse) throws Exception {
 		StatusLine statusLine = httpResponse.getStatusLine();
 		int statusCode = statusLine.getStatusCode();
 		if (statusCode != HttpStatus.SC_OK) {
@@ -1241,16 +1051,12 @@ public class XHRPoolService {
 	 * @param request
 	 *            HttpUriRequest对象
 	 * @return String
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws ParseException
-	 * @throws IllegalUrlException
-	 * @throws XhrException
+	 * @throws Exception
 	 */
-	public String execute(HttpUriRequest request) throws IOException, XhrException {
-		CloseableHttpResponse httpResponse = httpClient.execute(request);
+	public String execute(HttpUriRequest request) throws Exception {
+		CloseableHttpResponse httpResponse = getHttpClient().execute(request);
 		try {
-			return entity2String(httpResponse, request.getURI().getPath());
+			return entity2String(httpResponse);
 		} finally {
 			httpResponse.close();
 		}
@@ -1266,11 +1072,9 @@ public class XHRPoolService {
 	 * @param method
 	 *            接口类型，GET或者POST
 	 * @return byte[]
-	 * @throws ClientProtocolException
-	 * @throws IllegalUrlException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public byte[] readBytes(String url, Map<String, Object> params, String method) throws IllegalUrlException, XhrException, IOException {
+	public byte[] readBytes(String url, Map<String, Object> params, String method) throws Exception {
 		if (method.equalsIgnoreCase(METHOD_GET)) {
 			return getForBytes(url, params);
 		} else {
@@ -1278,7 +1082,7 @@ public class XHRPoolService {
 		}
 	}
 
-	public Element soap(String url, String methodName, String namespace, Map<String, Object> parameterMap) throws IOException, IllegalUrlException, XhrException, DocumentException {
+	public Element soap(String url, String methodName, String namespace, Map<String, Object> parameterMap) throws Exception {
 		String xmlBody = buildWebServiceRequestData(methodName, namespace, parameterMap);
 		String strXML = postSOAP(url, xmlBody, null);
 		Element bodyElement = DomUtils.parser(strXML).getRootElement().element("Body");
@@ -1307,18 +1111,9 @@ public class XHRPoolService {
 		soapRequestData.append("</soap:Envelope>");
 		return soapRequestData.toString();
 	}
-
-	public PoolingHttpClientConnectionManager getConnectionManager() {
-		return this.connManager;
-	}
-
-	public CloseableHttpClient getHttpClient() {
-		return this.httpClient;
-	}
 }
 
 class IdleConnectionMonitorThread extends Thread {
-
 	private final HttpClientConnectionManager connMgr;
 	private volatile boolean shutdown;
 

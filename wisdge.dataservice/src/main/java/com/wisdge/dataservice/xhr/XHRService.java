@@ -105,7 +105,7 @@ public class XHRService {
 		try {
 			SSLConnectionSocketFactory sslsf = createSSLConnSocketFactory();
 			HttpClientBuilder clientBuilder = HttpClients.custom().setSSLSocketFactory(sslsf);
-			if (proxyConfig != null && proxyConfig.avaliable()) {
+			if (proxyConfig != null) {
 				HttpHost proxyHost = new HttpHost(proxyConfig.getHost(), proxyConfig.getPort());
 				DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
 				return clientBuilder.setRoutePlanner(routePlanner).build();
