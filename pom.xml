@@ -42,10 +42,16 @@
         </dependency>
     </dependencies>
 
+<!--    <distributionManagement>-->
+<!--        <repository>-->
+<!--            <id>wisdge-releases</id>-->
+<!--            <url>http://nexus.wisdge.com/repository/wisdge-releases/</url>-->
+<!--        </repository>-->
+<!--    </distributionManagement>-->
     <distributionManagement>
         <repository>
-            <id>wisdge-releases</id>
-            <url>http://nexus.wisdge.com/repository/wisdge-releases/</url>
+            <id>elite_releases</id>
+            <url>http://nexus.elitecrm.com/repository/elite/</url>
         </repository>
     </distributionManagement>
 

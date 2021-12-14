@@ -113,15 +113,7 @@
 			<artifactId>itext-licensekey</artifactId>
 			<version>3.1.5</version>
 		</dependency>
-
 	</dependencies>
-
-	<distributionManagement>
-		<repository>
-			<id>wisdge-releases</id>
-			<url>http://nexus.wisdge.com/repository/wisdge-releases/</url>
-		</repository>
-	</distributionManagement>
 
 	<build>
 		<plugins>

@@ -61,13 +61,6 @@
 		</dependency>
 	</dependencies>
 
-	<distributionManagement>
-		<repository>
-			<id>wisdge-releases</id>
-			<url>http://nexus.wisdge.com/repository/wisdge-releases/</url>
-		</repository>
-	</distributionManagement>
-
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
