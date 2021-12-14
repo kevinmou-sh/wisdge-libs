@@ -1,15 +1,11 @@
 package com.wisdge.commons.security;
 
-import com.wisdge.dataservice.exceptions.IllegalUrlException;
-import com.wisdge.dataservice.exceptions.XhrException;
 import com.wisdge.dataservice.xhr.XHRPoolService;
 import com.wisdge.utils.StringUtils;
 import com.wisdge.utils.security.MD5;
 import com.wisdge.utils.security.SHA;
 import com.wisdge.utils.security.sm.SM3Util;
 import org.apache.http.HttpException;
-
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -40,7 +36,7 @@ public class SignatureFactory {
 		this.encType = encType;
 	}
 
-	public String service(String url, Map<String, Object> params, Map<String, String> heads, XHRPoolService service, String httpType) throws HttpException, XhrException, IOException, IllegalUrlException {
+	public String service(String url, Map<String, Object> params, Map<String, String> heads, XHRPoolService service, String httpType) throws Exception {
 		Map<String, Object> map = new TreeMap<>();
 		for (Iterator<String> it = params.keySet().iterator(); it.hasNext();) {
 			String paramKey = it.next();
