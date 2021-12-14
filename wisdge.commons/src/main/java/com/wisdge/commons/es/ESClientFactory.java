@@ -50,7 +50,7 @@ public class ESClientFactory {
 	private String userName;
 	private String password;
 	private String initIndex;
-	private String space;
+	private String namespace;
 	private int version = 6; // 大版本号，默认6，如果是7的话，type变得不可多个，客户端会有不同逻辑处理
 
 	private static final RequestOptions COMMON_OPTIONS;
@@ -152,7 +152,7 @@ public class ESClientFactory {
 	}
 
 	public Response performRequest(String method, String endpoint, Object entity, Header header) throws Exception {
-		endpoint = "/" + (StringUtils.isEmpty(space) ? "" : space) + (endpoint.startsWith("/") ? endpoint.substring(1):endpoint);
+		endpoint = "/" + (StringUtils.isEmpty(namespace) ? "" : namespace) + (endpoint.startsWith("/") ? endpoint.substring(1):endpoint);
 		Request request = new Request(method, endpoint);
 		if (header != null) {
 			RequestOptions.Builder options = COMMON_OPTIONS.toBuilder();
