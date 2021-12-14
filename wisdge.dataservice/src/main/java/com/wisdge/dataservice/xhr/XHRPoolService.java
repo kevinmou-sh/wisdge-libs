@@ -24,6 +24,7 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import com.wisdge.dataservice.exceptions.MovedException;
 import com.wisdge.utils.LogUtils;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -346,6 +347,8 @@ public class XHRPoolService {
 		CloseableHttpResponse httpResponse = getHttpClient().execute(httpGet);
 		try {
 			return entity2String(httpResponse);
+//		} catch (MovedException e) {
+//			return get(e.getMessage(), params, heads);
 		} finally {
 			httpResponse.close();
 			httpGet.releaseConnection();
@@ -1002,18 +1005,16 @@ public class XHRPoolService {
 		StatusLine statusLine = httpResponse.getStatusLine();
 		int statusCode = statusLine.getStatusCode();
 		if (statusCode != HttpStatus.SC_OK) {
-			String payload = "";
-			try {
-				if (statusCode == HttpStatus.SC_MOVED_TEMPORARILY || statusCode == HttpStatus.SC_MOVED_PERMANENTLY) {
-					Header header = httpResponse.getFirstHeader("location"); // 跳转的目标地址是在 HTTP-HEAD 中的
-					payload = header.getValue(); // 这就是跳转后的地址，再向这个地址发出新申请，以便得到跳转后的信息是啥。
-				} else {
-					HttpEntity responseEntity = httpResponse.getEntity();
-					if (responseEntity != null)
-						payload = EntityUtils.toString(responseEntity, UTF_8);
-				}
-			} catch(Exception e) {}
-			throw new XhrException(statusCode, statusLine.getReasonPhrase(), payload);
+			if (statusCode == HttpStatus.SC_MOVED_TEMPORARILY || statusCode == HttpStatus.SC_MOVED_PERMANENTLY) {
+				Header header = httpResponse.getFirstHeader("location"); // 跳转的目标地址是在 HTTP-HEAD 中的
+				throw new MovedException(header.getValue()); // 这就是跳转后的地址，再向这个地址发出新申请，以便得到跳转后的信息是啥
+			} else {
+				String payload = "";
+				HttpEntity responseEntity = httpResponse.getEntity();
+				if (responseEntity != null)
+					payload = EntityUtils.toString(responseEntity, UTF_8);
+				throw new XhrException(statusCode, statusLine.getReasonPhrase(), payload);
+			}
 		}
 
 		HttpEntity responseEntity = httpResponse.getEntity();

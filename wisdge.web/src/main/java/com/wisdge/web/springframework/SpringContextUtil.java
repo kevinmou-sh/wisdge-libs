@@ -48,6 +48,10 @@ public class SpringContextUtil implements ApplicationContextAware {
 		return getApplicationContext().getBean(beanName, clazz);
 	}
 
+	public static <T> T getBean(Class<T> clazz, String beanName) {
+		return getApplicationContext().getBean(beanName, clazz);
+	}
+
 	public static boolean isSingleton(String beanName) throws NoSuchBeanDefinitionException {
         return applicationContext.isSingleton(beanName);
     }
