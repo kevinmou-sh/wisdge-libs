@@ -51,7 +51,6 @@ public class ESClientFactory {
 	private String password;
 	private String initIndex;
 	private String namespace;
-	private int version = 6; // 大版本号，默认6，如果是7的话，type变得不可多个，客户端会有不同逻辑处理
 
 	private static final RequestOptions COMMON_OPTIONS;
 	static {

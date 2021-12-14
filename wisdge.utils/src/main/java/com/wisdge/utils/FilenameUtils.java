@@ -1,5 +1,11 @@
 package com.wisdge.utils;
 
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.util.regex.Pattern;
+
 public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
 
     /**
@@ -53,12 +59,11 @@ public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
 
     /**
      * 将通配符表达式转化为正则表达式
-     *
-     * @param path
-     * @return
+     * @param regexString String
+     * @return Pattern
      */
-    private static String getRegPath(String path) {
-        char[] chars = path.toCharArray();
+    private static Pattern getRegex(String regexString) {
+        char[] chars = regexString.toCharArray();
         int len = chars.length;
         StringBuilder sb = new StringBuilder();
         boolean preX = false;
@@ -85,6 +90,18 @@ public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
                 }
             }
         }
-        return sb.toString();
+        return Pattern.compile(sb.toString());
+    }
+
+    /**
+     * 判断文件是否包含在路径描述中（适用通配符）
+     * @param pathRegex String 路径通配符描述
+     * @param file String 文件名（包含路径）
+     * @return boolean
+     */
+    public static boolean pathMatches(String pathRegex, String file) {
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pathRegex);
+        Path path = Paths.get(file);
+        return matcher.matches(path);
     }
 }
