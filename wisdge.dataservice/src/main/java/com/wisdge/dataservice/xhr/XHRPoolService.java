@@ -65,6 +65,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.pool.PoolStats;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Element;
 import com.wisdge.dataservice.exceptions.IllegalUrlException;
@@ -182,6 +183,15 @@ public class XHRPoolService {
 			log.error(e.getMessage(), e);
 			return null;
 		}
+	}
+
+	public PoolingHttpClientConnectionManager getConnectionManager() {
+		getHttpClient();
+		return connectionManager;
+	}
+
+	public PoolStats getPoolStats() {
+		return getConnectionManager().getTotalStats();
 	}
 
 	/**
