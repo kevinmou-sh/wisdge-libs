@@ -167,6 +167,12 @@
             <artifactId>spring-data-keyvalue</artifactId>
             <version>${springframework.data}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-rsa</artifactId>
+            <version>1.0.11.RELEASE</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.wisdge</groupId>
