@@ -989,4 +989,15 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 		}
 		return set;
 	}
+
+	public static String[] toArray(String source, String regex) {
+		List<String> set = new ArrayList<>();
+		if (StringUtils.isEmpty(source))
+			return set.toArray(new String[0]);
+
+		for(String sub : source.split(regex)) {
+			set.add(sub.trim());
+		}
+		return set.toArray(new String[0]);
+	}
 }

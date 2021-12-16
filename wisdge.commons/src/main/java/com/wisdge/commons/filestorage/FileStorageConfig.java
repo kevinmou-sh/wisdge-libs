@@ -45,5 +45,7 @@ public class FileStorageConfig {
     private String region;
     private int indexAtomic;
 
-    public String oosDomain;
+    private String oosDomain;
+
+    private String ignoreFileTypes;
 }

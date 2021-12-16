@@ -11,7 +11,10 @@ import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.wisdge.utils.StringUtils;
 import com.wisdge.web.springframework.WebUtils;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 
@@ -29,6 +32,7 @@ public class AliOSSStorageClient implements IFileStorageClient {
 	private String accessKeyId;
 	private String accessKeySecret;
 	private String endpoint;
+	@Setter(AccessLevel.NONE)
 	private OSS ossClient;
 	private String remoteRoot;
 	private boolean downloadFromURL;	// 是否通过OSS的URL直接下载

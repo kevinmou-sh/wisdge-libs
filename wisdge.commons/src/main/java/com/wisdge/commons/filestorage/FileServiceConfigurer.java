@@ -2,11 +2,13 @@ package com.wisdge.commons.filestorage;
 
 import com.wisdge.utils.StringUtils;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 @Data
+@Slf4j
 public class FileServiceConfigurer {
     private FileStorageConfig[] storages;
     private Set<String> whiteList;
@@ -16,6 +18,7 @@ public class FileServiceConfigurer {
     public FileStorage getFileStorage() {
         FileStorage fileStorage = new FileStorage(whiteList, StringUtils.toSet(forbidden, ","), StringUtils.toSet(accept, ","));
         for(FileStorageConfig config : storages) {
+            log.debug(config.toString());
             String name = config.getName();
             String type = config.getType();
             if (type.equalsIgnoreCase("AliOSS")) {
@@ -84,6 +87,29 @@ public class FileServiceConfigurer {
                 fileStorageClient.setOosDomain(config.getOosDomain());
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
+                fileStorage.addFileStorage(name, fileStorageClient);
+            } else if (type.equalsIgnoreCase("JDOss")) {
+                JDOSSStorageClient fileStorageClient = new JDOSSStorageClient();
+                fileStorageClient.setBucketName(config.getBucketName());
+                fileStorageClient.setAccessKey(config.getAccessKeyId());
+                fileStorageClient.setSecretSecret(config.getAccessKeySecret());
+                fileStorageClient.setRegion(config.getRegion());
+                fileStorageClient.setOosDomain(config.getOosDomain());
+                fileStorageClient.setRemoteRoot(config.getRemoteRoot());
+                fileStorageClient.init(config.isSecurity());
+                fileStorage.addFileStorage(name, fileStorageClient);
+            } else if (type.equalsIgnoreCase("QOss")) {
+                QCOSStorageClient fileStorageClient = new QCOSStorageClient();
+                fileStorageClient.setEndpoint(config.getEndpoint());
+                fileStorageClient.setBucketName(config.getBucketName());
+                fileStorageClient.setAccessKeyId(config.getAccessKeyId());
+                fileStorageClient.setAccessKeySecret(config.getAccessKeySecret());
+                fileStorageClient.setDownloadFromURL(config.isDownloadFromUrl());
+                fileStorageClient.setExpiredMinutes(config.getExpiredMinutes());
+                fileStorageClient.setRemoteRoot(config.getRemoteRoot());
+                fileStorageClient.setWanEndpoint(config.getWanEndpoint());
+                fileStorageClient.init(config.isSecurity());
+                fileStorageClient.setIgnoreFileTypes(StringUtils.toArray(config.getIgnoreFileTypes(), ","));
                 fileStorage.addFileStorage(name, fileStorageClient);
             } else if (type.equalsIgnoreCase("local")) {
                 LocalStorageClient fileStorageClient = new LocalStorageClient();
