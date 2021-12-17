@@ -9,8 +9,17 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class FileServiceConfigurer {
     private FileStorageConfig[] storages;
+    /**
+     * 禁止的文件类型，多个类型以逗号分隔
+     */
     private String forbidden;
+    /**
+     * 接受的文件类型，多个类型以逗号分隔
+     */
     private String accept;
+    /**
+     * 使用301进行转向的过期时间，仅定义参数，不具体实现
+     */
     private long expires;
 
     public FileStorage getFileStorage() {
