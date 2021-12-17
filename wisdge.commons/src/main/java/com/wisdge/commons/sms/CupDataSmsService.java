@@ -5,8 +5,6 @@ import com.wisdge.web.springframework.SpringContextUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jettison.json.JSONObject;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
