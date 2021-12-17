@@ -8,62 +8,27 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.wisdge.dataservice.utils.JSonUtils;
+import com.wisdge.utils.CollectionUtils;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Data
+@Slf4j
 public class AliSMSService extends AbstractSmsService {
-	private static final Logger logger = LoggerFactory.getLogger(AliSMSService.class);
 	private static final String LOCATION = "cn-hangzhou";
 	private String accessId;
 	private String accessSecret;
 	private String signName;
-	private Map<String, String> templateIds;
-	
-	public AliSMSService() {
-		templateIds = new HashMap<>();
-	}
-
-	public String getAccessId() {
-		return accessId;
-	}
-
-	public void setAccessId(String accessId) {
-		this.accessId = accessId;
-	}
-
-	public String getAccessSecret() {
-		return accessSecret;
-	}
-
-	public void setAccessSecret(String accessSecret) {
-		this.accessSecret = accessSecret;
-	}
-
-	public String getSignName() {
-		return signName;
-	}
-
-	public void setSignName(String signName) {
-		this.signName = signName;
-	}
-
-	public Map<String, String> getTemplateIds() {
-		return templateIds;
-	}
-
-	public void setTemplateIds(Map<String, String> templateIds) {
-		this.templateIds = templateIds;
-	}
+	private Map<String, String> templateIds = new HashMap<>();
 
 	public int send(String[] mobiles, Map<String, Object> paramsMap, String smsType, Date sendTime, String sign) {
 		String templateId = templateIds.get(smsType);
 		if (StringUtils.isEmpty(templateId)) {
-			logger.error("不能识别的短信模版：{}", smsType);
+			log.error("不能识别的短信模版：{}", smsType);
 			return 0;
 		}
 
@@ -83,7 +48,7 @@ public class AliSMSService extends AbstractSmsService {
 			// 使用post提交
 			request.setMethod(MethodType.POST);
 			// 必填:待发送手机号。支持以逗号分隔的形式进行批量调用，批量上限为1000个手机号码,批量调用相对于单条调用及时性稍有延迟,验证码类型的短信推荐使用单条调用的方式
-			request.setPhoneNumbers(com.wisdge.utils.CollectionUtils.join(mobiles, ","));
+			request.setPhoneNumbers(CollectionUtils.join(mobiles, ","));
 			// 必填:短信签名-可在短信控制台中找到
 			request.setSignName(sign != null ? sign : signName);
 			// 必填:短信模板-可在短信控制台中找到
@@ -96,17 +61,17 @@ public class AliSMSService extends AbstractSmsService {
 			// 可选:outId为提供给业务方扩展字段,最终在短信回执消息中将此值带回给调用者
 			request.setOutId(smsType);
 			// 请求失败这里会抛ClientException异常
-			logger.debug("Send message by Aliyun with template: {}", templateId);
+			log.debug("Send message by Aliyun with template: {}", templateId);
 			SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
 			String returnCode = sendSmsResponse.getCode();
 			if ("OK".equals(returnCode)) {
 				// 请求成功
 				return mobiles.length;
 			} else {
-				logger.debug("AliSMSService failed: {}", returnCode);
+				log.debug("AliSMSService failed: {}", returnCode);
 			}
 		} catch(Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		return 0;
 	}
