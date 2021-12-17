@@ -10,7 +10,6 @@ import java.security.PublicKey;
 import java.util.Base64;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Component
 public class CustomKeyPair {
@@ -20,6 +19,12 @@ public class CustomKeyPair {
 
     @Setter(AccessLevel.NONE)
     private KeyPair keyPair;
+
+    public CustomKeyPair(String file, String alias, String key) {
+        this.file = file;
+        this.alias = alias;
+        this.key = key;
+    }
 
     public KeyPair getKeyPair() {
         if (keyPair == null) {
