@@ -302,7 +302,7 @@ public class UrlUtils {
 	 * @param domains Set<String>
 	 * @return
 	 */
-	public static boolean isMatchDomain(String url, Set<String> domains) {
+	public static boolean isMatchDomains(String url, Set<String> domains) {
 		for(String domain : domains) {
 			Pattern urlPattern = Pattern.compile("^http(s?)://" + domain.trim().toLowerCase(Locale.ROOT).replace(".", "\\.") + "/", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 			Matcher matcher = urlPattern.matcher(url);
