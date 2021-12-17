@@ -10,24 +10,23 @@ import java.util.Map;
 @Data
 @Slf4j
 public class RLSMSService extends AbstractSmsService {
-	public static final String APP_URL = "app.cloopen.com";
-	public static final String APP_PORT = "8883";
-
+	private String appUrl = "app.cloopen.com";
+	private int appPort = 8883;
 	private String accId;
 	private String accToken;
 	private String appId;
 	private Map<String, String> templateIds = new HashMap<>();
 
-	public int send(String[] mobiles, Map<String, Object> paramsMap, String smsType) {
+	@Override
+	public SmsResponse send(String[] mobiles, Map<String, Object> paramsMap, String smsType) throws Exception {
 		String templateId = templateIds.get(smsType);
 		if (StringUtils.isEmpty(templateId)) {
-			log.error("不能识别的短信模版：{}", smsType);
-			return 0;
+			throw new NullPointerException("不能识别的短信模版：" +  smsType);
 		}
 
 		// 初始化SDK
 		CCPRestSmsSDK restAPI = new CCPRestSmsSDK();
-		restAPI.init(APP_URL, APP_PORT);
+		restAPI.init(appUrl, appPort + "");
 		restAPI.setAccount(accId, accToken);
 		restAPI.setAppId(appId);
 
@@ -45,6 +44,6 @@ public class RLSMSService extends AbstractSmsService {
 				log.error("[{}] {}", statusCode, result.get("statusMsg"));
 			}
 		}
-		return resultCount;
+		return SmsResponse.build(resultCount);
 	}
 }
