@@ -3,9 +3,7 @@ package com.wisdge.commons.filestorage;
 import com.wisdge.utils.StringUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
 
 @Data
 @Slf4j
@@ -13,6 +11,7 @@ public class FileServiceConfigurer {
     private FileStorageConfig[] storages;
     private String forbidden;
     private String accept;
+    private long expires;
 
     public FileStorage getFileStorage() {
         FileStorage fileStorage = new FileStorage(StringUtils.toSet(forbidden, ","), StringUtils.toSet(accept, ","));
