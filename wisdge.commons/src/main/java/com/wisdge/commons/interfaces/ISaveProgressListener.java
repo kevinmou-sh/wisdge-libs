@@ -1,4 +1,4 @@
-package com.wisdge.commons.filestorage;
+package com.wisdge.commons.interfaces;
 
 public interface ISaveProgressListener {
 }

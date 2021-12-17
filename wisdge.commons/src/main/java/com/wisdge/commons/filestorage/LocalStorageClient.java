@@ -1,5 +1,7 @@
 package com.wisdge.commons.filestorage;
 
+import com.wisdge.commons.interfaces.IFileExecutor;
+import com.wisdge.commons.interfaces.IFileStorageClient;
 import com.wisdge.utils.FileUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

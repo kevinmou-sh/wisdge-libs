@@ -14,6 +14,8 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
+import com.wisdge.commons.interfaces.IFileExecutor;
+import com.wisdge.commons.interfaces.IFileStorageClient;
 import com.wisdge.utils.StringUtils;
 import com.wisdge.web.springframework.WebUtils;
 import lombok.AccessLevel;

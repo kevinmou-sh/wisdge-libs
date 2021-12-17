@@ -1,4 +1,6 @@
-package com.wisdge.commons.filestorage;
+package com.wisdge.commons.interfaces;
+
+import com.wisdge.commons.filestorage.FileMetadata;
 
 import java.io.InputStream;
 

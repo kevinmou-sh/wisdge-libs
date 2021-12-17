@@ -1,5 +1,7 @@
 package com.wisdge.commons.filestorage;
 
+import com.wisdge.commons.interfaces.IFileExecutor;
+import com.wisdge.commons.interfaces.IFileStorageClient;
 import com.wisdge.dataservice.Result;
 import com.wisdge.dataservice.utils.JSonUtils;
 import com.wisdge.dataservice.xhr.XHRPoolService;

@@ -2,6 +2,8 @@ package com.wisdge.commons.filestorage;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpATTRS;
+import com.wisdge.commons.interfaces.IFileExecutor;
+import com.wisdge.commons.interfaces.IFileStorageClient;
 import com.wisdge.ftp.FTPConfig;
 import com.wisdge.ftp.FtpUtils;
 import lombok.Data;

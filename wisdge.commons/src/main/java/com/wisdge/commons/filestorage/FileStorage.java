@@ -1,11 +1,19 @@
 package com.wisdge.commons.filestorage;
 
+import com.wisdge.commons.interfaces.IFileDetector;
+import com.wisdge.commons.interfaces.IFileExecutor;
+import com.wisdge.commons.interfaces.IFileStorageClient;
 import com.wisdge.dataservice.Result;
 import com.wisdge.utils.FilenameUtils;
 import com.wisdge.utils.StringUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CloseShieldInputStream;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -19,14 +27,21 @@ public class FileStorage {
     private static final String FILE_STORAGE_NOT_EXIST = "文件服务{0}未配置";
     private static final String FILE_NOT_ACCEPT = "上传的文件类型{0}未被接受";
     private static final String FILE_FORBIDDEN = "上传的文件类型{0}被禁止";
+    private static final String FILE_NOT_SAFE = "监测到不合法的文件内容";
 
     private Map<String, IFileStorageClient> fileStorages = new HashedMap();
     private Set<String> forbidden;
     private Set<String> accept;
+    private IFileDetector fileDetector;
 
     public FileStorage(Set<String> forbidden, Set<String> accept) {
+        this(forbidden, accept, null);
+    }
+
+    public FileStorage(Set<String> forbidden, Set<String> accept, IFileDetector fileDetector) {
         this.forbidden = forbidden;
         this.accept = accept;
+        this.fileDetector = fileDetector;
     }
 
     public void addFileStorage(String key, IFileStorageClient fileStorageClient) {
@@ -156,11 +171,39 @@ public class FileStorage {
             if (isForbiddenFile(filename))
                 return new Result(Result.ERROR, MessageFormat.format(FILE_FORBIDDEN, FilenameUtils.getExtension(finalRemote)));
 
-            log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
-            String newPath = fileStorageClient.saveStream(finalRemote, inputStream, size, progressListener);
-            if (StringUtils.isNotEmpty(newPath))
-                requestRemote = fsKey.equals(DEFAULT_STORAGE) ? newPath : (fsKey + "@" + newPath);
-            return new Result(Result.SUCCESS, original, requestRemote);
+            if (fileDetector != null) {
+                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                    // Code simulating the copy
+                    // You could alternatively use NIO
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = inputStream.read(buffer)) > -1) {
+                        baos.write(buffer, 0, len);
+                    }
+                    baos.flush();
+                    // Open new InputStreams using recorded bytes
+                    // Can be repeated as many times as you wish
+                    try (
+                        InputStream is1 = new ByteArrayInputStream(baos.toByteArray());
+                        InputStream is2 = new ByteArrayInputStream(baos.toByteArray())
+                    ) {
+                        if (!fileDetector.isSafe(is1))
+                            return new Result(Result.ERROR, FILE_NOT_SAFE);
+
+                        log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
+                        String newPath = fileStorageClient.saveStream(finalRemote, is2, size, progressListener);
+                        if (StringUtils.isNotEmpty(newPath))
+                            requestRemote = fsKey.equals(DEFAULT_STORAGE) ? newPath : (fsKey + "@" + newPath);
+                        return new Result(Result.SUCCESS, original, requestRemote);
+                    }
+                }
+            } else {
+                log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
+                String newPath = fileStorageClient.saveStream(finalRemote, inputStream, size, progressListener);
+                if (StringUtils.isNotEmpty(newPath))
+                    requestRemote = fsKey.equals(DEFAULT_STORAGE) ? newPath : (fsKey + "@" + newPath);
+                return new Result(Result.SUCCESS, original, requestRemote);
+            }
         } catch(Exception e) {
             log.error(e.getMessage(), e);
             return new Result(Result.ERROR, e.getLocalizedMessage());
@@ -271,6 +314,8 @@ public class FileStorage {
                 return new Result(Result.ERROR, MessageFormat.format(FILE_NOT_ACCEPT, FilenameUtils.getExtension(finalRemote)));
             if (isForbiddenFile(filename))
                 return new Result(Result.ERROR, MessageFormat.format(FILE_FORBIDDEN, FilenameUtils.getExtension(finalRemote)));
+            if (fileDetector != null && !fileDetector.isSafe(data))
+                return new Result(Result.ERROR, FILE_NOT_SAFE);
 
             log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
             String newPath = fileStorageClient.save(finalRemote, data);
