@@ -11,12 +11,11 @@ import java.util.Set;
 @Slf4j
 public class FileServiceConfigurer {
     private FileStorageConfig[] storages;
-    private Set<String> whiteList;
     private String forbidden;
     private String accept;
 
     public FileStorage getFileStorage() {
-        FileStorage fileStorage = new FileStorage(whiteList, StringUtils.toSet(forbidden, ","), StringUtils.toSet(accept, ","));
+        FileStorage fileStorage = new FileStorage(StringUtils.toSet(forbidden, ","), StringUtils.toSet(accept, ","));
         for(FileStorageConfig config : storages) {
             log.debug(config.toString());
             String name = config.getName();

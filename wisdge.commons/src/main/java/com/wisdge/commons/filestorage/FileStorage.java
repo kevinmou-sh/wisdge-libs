@@ -1,11 +1,11 @@
 package com.wisdge.commons.filestorage;
 
 import com.wisdge.dataservice.Result;
+import com.wisdge.utils.FilenameUtils;
 import com.wisdge.utils.StringUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
-
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -16,15 +16,15 @@ import java.util.Set;
 @Data
 public class FileStorage {
     public static final String DEFAULT_STORAGE = "default";
-    private static final String FILESTORAGE_NOT_EXIST = "文件服务{0}未配置";
+    private static final String FILE_STORAGE_NOT_EXIST = "文件服务{0}未配置";
+    private static final String FILE_NOT_ACCEPT = "上传的文件类型{0}未被接受";
+    private static final String FILE_FORBIDDEN = "上传的文件类型{0}被禁止";
 
     private Map<String, IFileStorageClient> fileStorages = new HashedMap();
-    private Set<String> whiteList;
     private Set<String> forbidden;
     private Set<String> accept;
 
-    public FileStorage(Set<String> whiteList, Set<String> forbidden, Set<String> accept) {
-        this.whiteList = whiteList;
+    public FileStorage(Set<String> forbidden, Set<String> accept) {
         this.forbidden = forbidden;
         this.accept = accept;
     }
@@ -138,7 +138,7 @@ public class FileStorage {
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
-            return new Result(Result.ERROR, MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
+            return new Result(Result.ERROR, MessageFormat.format(FILE_STORAGE_NOT_EXIST, fsKey));
 
         // Replace specially char at filename and uploadPath
         filename = filterFilename(filename);
@@ -151,6 +151,11 @@ public class FileStorage {
         requestRemote = fsKey.equals(DEFAULT_STORAGE) ? requestRemote : (fsKey + "@" + requestRemote);
 
         try {
+            if (!isAcceptFile(finalRemote))
+                return new Result(Result.ERROR, MessageFormat.format(FILE_NOT_ACCEPT, FilenameUtils.getExtension(finalRemote)));
+            if (isForbiddenFile(filename))
+                return new Result(Result.ERROR, MessageFormat.format(FILE_FORBIDDEN, FilenameUtils.getExtension(finalRemote)));
+
             log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
             String newPath = fileStorageClient.saveStream(finalRemote, inputStream, size, progressListener);
             if (StringUtils.isNotEmpty(newPath))
@@ -162,13 +167,29 @@ public class FileStorage {
         }
     }
 
+    private boolean isAcceptFile(String filePath) {
+        String extension = FilenameUtils.getExtension(filePath);
+        if (accept == null || accept.isEmpty())
+            return true;
+
+        return accept.contains(extension);
+    }
+
+    private boolean isForbiddenFile(String filePath) {
+        String extension = FilenameUtils.getExtension(filePath);
+        if (forbidden == null || forbidden.isEmpty())
+            return false;
+
+        return forbidden.contains(extension);
+    }
+
     public void retrieveStream(String fsKey, String filepath, IFileExecutor executor) throws Exception {
         if (StringUtils.isEmpty(fsKey))
             fsKey = DEFAULT_STORAGE;
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
-            throw new NullPointerException(MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
+            throw new NullPointerException(MessageFormat.format(FILE_STORAGE_NOT_EXIST, fsKey));
 
         // Replace specially char at filename and uploadPath
         filepath = filterFilepath(filepath);
@@ -200,7 +221,7 @@ public class FileStorage {
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
-            throw new NullPointerException(MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
+            throw new NullPointerException(MessageFormat.format(FILE_STORAGE_NOT_EXIST, fsKey));
 
         // Replace specially char at filename and uploadPath
         filename = filterFilename(filename);
@@ -212,6 +233,11 @@ public class FileStorage {
         requestRemote = fsKey.equals(DEFAULT_STORAGE) ? requestRemote : (fsKey + "@" + requestRemote);
 
         try {
+            if (!isAcceptFile(finalRemote))
+                return new Result(Result.ERROR, MessageFormat.format(FILE_NOT_ACCEPT, FilenameUtils.getExtension(finalRemote)));
+            if (isForbiddenFile(filename))
+                return new Result(Result.ERROR, MessageFormat.format(FILE_FORBIDDEN, FilenameUtils.getExtension(finalRemote)));
+
             log.info("[{}] Save file to {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
             String newPath = fileStorageClient.save(finalRemote, data);
             if (! StringUtils.isEmpty(newPath)) {
@@ -230,7 +256,7 @@ public class FileStorage {
 
         IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
         if (fileStorageClient == null)
-            throw new NullPointerException(MessageFormat.format(FILESTORAGE_NOT_EXIST, fsKey));
+            throw new NullPointerException(MessageFormat.format(FILE_STORAGE_NOT_EXIST, fsKey));
 
         // Replace specially char at filename and uploadPath
         filepath = filterFilepath(filepath);
