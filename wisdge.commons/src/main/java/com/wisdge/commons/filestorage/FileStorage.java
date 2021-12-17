@@ -167,8 +167,21 @@ public class FileStorage {
         }
     }
 
-    private boolean isAcceptFile(String filePath) {
-        String extension = FilenameUtils.getExtension(filePath);
+    /**
+     * 判断文件路径包含的文件类型是否被允许
+     * @param filePath String 文件路径
+     * @return
+     */
+    public boolean isAcceptFile(String filePath) {
+        return isAcceptExtension(FilenameUtils.getExtension(filePath));
+    }
+
+    /**
+     * 判断文件后缀是否被允许
+     * @param extension String 文件后缀
+     * @return
+     */
+    public boolean isAcceptExtension(String extension) {
         if (accept == null || accept.isEmpty())
             return true;
 
@@ -179,8 +192,21 @@ public class FileStorage {
         return false;
     }
 
-    private boolean isForbiddenFile(String filePath) {
-        String extension = FilenameUtils.getExtension(filePath);
+    /**
+     * 判断文件路径包含的文件类型是否被禁止
+     * @param filePath String 文件路径
+     * @return
+     */
+    public boolean isForbiddenFile(String filePath) {
+        return isForbiddenExtension(FilenameUtils.getExtension(filePath));
+    }
+
+    /**
+     * 判断文件后缀是否被禁止
+     * @param extension String 文件后缀
+     * @return
+     */
+    public boolean isForbiddenExtension(String extension) {
         if (forbidden == null || forbidden.isEmpty())
             return false;
 
