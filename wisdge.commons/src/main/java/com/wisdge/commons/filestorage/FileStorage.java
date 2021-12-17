@@ -172,7 +172,11 @@ public class FileStorage {
         if (accept == null || accept.isEmpty())
             return true;
 
-        return accept.contains(extension);
+        for(String acceptExt : accept) {
+            if (acceptExt.equalsIgnoreCase(extension))
+                return true;
+        }
+        return false;
     }
 
     private boolean isForbiddenFile(String filePath) {
@@ -180,7 +184,11 @@ public class FileStorage {
         if (forbidden == null || forbidden.isEmpty())
             return false;
 
-        return forbidden.contains(extension);
+        for(String forbiddenExt : forbidden) {
+            if (forbiddenExt.equalsIgnoreCase(extension))
+                return true;
+        }
+        return false;
     }
 
     public void retrieveStream(String fsKey, String filepath, IFileExecutor executor) throws Exception {
