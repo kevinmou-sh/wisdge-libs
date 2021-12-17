@@ -9,9 +9,6 @@ import com.wisdge.utils.StringUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CloseShieldInputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -349,6 +346,23 @@ public class FileStorage {
             throw new FileNotFoundException(finalRemote);
         }
         return data;
+    }
+
+    public void deleteFile(String fsKey, String filepath) throws Exception {
+        if (StringUtils.isEmpty(fsKey))
+            fsKey = DEFAULT_STORAGE;
+
+        IFileStorageClient fileStorageClient = fileStorages.get(fsKey);
+        if (fileStorageClient == null)
+            throw new NullPointerException(MessageFormat.format(FILE_STORAGE_NOT_EXIST, fsKey));
+
+        // Replace specially char at filename and uploadPath
+        filepath = filterFilepath(filepath);
+        // Get final remote file path
+        String remoteRoot = getRemoteRoot(fileStorageClient.getRemoteRoot());
+        String finalRemote = concat(remoteRoot, filepath);
+        log.info("[{}] Delete file from {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
+        fileStorageClient.delete(finalRemote);
     }
 
     public String concat(String...path) {

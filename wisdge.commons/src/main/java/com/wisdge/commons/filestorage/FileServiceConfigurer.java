@@ -18,7 +18,7 @@ public class FileServiceConfigurer {
      */
     private String accept;
     /**
-     * 使用301进行转向的过期时间，仅定义参数，不具体实现
+     * 使用301进行转向的过期时间（秒），仅定义参数，不具体实现
      */
     private long expires;
 
