@@ -3,13 +3,15 @@ package com.wisdge.web;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.*;
 import org.junit.Test;
 import com.wisdge.utils.StringUtils;
 
 /**
  * Description: Web Content Management Copyright: (c) 2003
- * 
+ *
  * @author Kevin MOU
  * @version 1.0
  */
@@ -19,7 +21,7 @@ public class UrlUtils {
 
 	/**
 	 * 判断是否本地request请求
-	 * 
+	 *
 	 * @param request
 	 *            HttpServletRequest
 	 * @return boolean 判断结果
@@ -44,7 +46,7 @@ public class UrlUtils {
 
 	/**
 	 * 获得本地化语言对象
-	 * 
+	 *
 	 * @param request
 	 *            HttpServletRequest请求对象
 	 * @param response
@@ -64,7 +66,7 @@ public class UrlUtils {
 
 	/**
 	 * 获得本地语言设置
-	 * 
+	 *
 	 * @param request
 	 *            HttpServletRequest请求对象
 	 * @param response
@@ -88,7 +90,7 @@ public class UrlUtils {
 
 	/**
 	 * Obtains locale passed as lang parameter with a request during user session
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 *            response or null; if null, locale will not be persisted (in session cookie)
@@ -136,7 +138,7 @@ public class UrlUtils {
 		// initialize default locale
 		defaultLocale = Locale.getDefault().toString();
 	}
-	
+
 	public static String getBaseUrl(URL url) {
 		String baseUrl = url.getProtocol() + "://" + url.getHost();
 		int port = url.getPort();
@@ -147,7 +149,7 @@ public class UrlUtils {
 
 	/**
 	 * 取得URL的上一级路径
-	 * 
+	 *
 	 * @param url
 	 *            目标URL
 	 * @return String 父路径
@@ -171,7 +173,7 @@ public class UrlUtils {
 
 	/**
 	 * 对URL 进行UTF-8字符码解析 本方法为快速简易实现提供帮助
-	 * 
+	 *
 	 * @param url
 	 *            被解析的字符串
 	 * @param encoding
@@ -185,7 +187,7 @@ public class UrlUtils {
 
 	/**
 	 * 对字符串进行URL编码，并对URL中的路径符号 "/"不进行编码
-	 * 
+	 *
 	 * @param url
 	 *            被编码的字符串
 	 * @param encoding
@@ -260,14 +262,14 @@ public class UrlUtils {
 		}
 		return tmp.toString();
 	}
-	
+
 	public static String concat(String ...strings) {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true, e = false;
 		for(String str : strings) {
 			if (StringUtils.isEmpty(str))
 				continue;
-			
+
 			if (first)
 				builder.append(str);
 			else {
@@ -281,10 +283,17 @@ public class UrlUtils {
 		}
 		return builder.toString();
 	}
-	
-	@Test
-	public void test() {
-		System.out.println(concat("http://192.168.2.120:8080/elitejsservice/", "/jiejc?adsfef=sdf"));
+
+	/**
+	 * 判断url是否符合domain规则
+	 * @param url String
+	 * @param domain String
+	 * @return
+	 */
+	public static boolean isMatchDomain(String url, String domain) {
+		Pattern urlPattern = Pattern.compile("^http(s?)://" + domain.trim().toLowerCase(Locale.ROOT).replace(".", "\\.") + "/", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+		Matcher matcher = urlPattern.matcher(url);
+		return matcher.find();
 	}
 
 }
