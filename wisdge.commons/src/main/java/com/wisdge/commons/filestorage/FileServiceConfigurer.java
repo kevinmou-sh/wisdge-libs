@@ -42,10 +42,12 @@ public class FileServiceConfigurer {
                 fileStorage.addFileStorage(name, fileStorageClient);
             } else if (type.equalsIgnoreCase("ftp")) {
                 FtpStorageClient fileStorageClient = new FtpStorageClient();
-                fileStorageClient.setProtocal(config.getProtocol());
+                fileStorageClient.setProtocol(config.getProtocol());
                 fileStorageClient.setHostname(config.getHost());
                 fileStorageClient.setUsername(config.getUsername());
                 fileStorageClient.setPassword(config.getPassword());
+                fileStorageClient.setSsl(config.isSsl());
+                fileStorageClient.setSsh(config.isSsh());
                 fileStorageClient.setPassive(config.isPassive());
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.setForcePortP(config.isForcePort());

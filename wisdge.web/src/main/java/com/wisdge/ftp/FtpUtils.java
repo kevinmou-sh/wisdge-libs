@@ -12,6 +12,8 @@ import java.util.Properties;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocket;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.PrintCommandListener;
@@ -34,12 +36,10 @@ import com.wisdge.utils.StringUtils;
 
 /**
  * FTP操作类，快速读取下载文件
- *
- * @author MOU
- *
+ * @author Kevin MOU
  */
+@Slf4j
 public class FtpUtils {
-	private static final Logger logger = LoggerFactory.getLogger(FtpUtils.class);
 	/**
 	 * FTP协议里面，规定文件名编码为ISO-8859-1
 	 */
@@ -62,16 +62,16 @@ public class FtpUtils {
 
 		if (config.isSsl()) {
 			FTPSClient ftps;
-			if (!StringUtils.isEmpty(config.getProtocal())) {
-				ftps = new SSLSessionReuseFTPSClient(config.getProtocal(), config.isImplicit());
-				ftps.setAuthValue(config.getProtocal());
+			if (!StringUtils.isEmpty(config.getProtocol())) {
+				ftps = new SSLSessionReuseFTPSClient(config.getProtocol(), config.isImplicit());
+				ftps.setAuthValue(config.getProtocol());
 			} else
 				ftps = new FTPSClient(config.isImplicit());
-			if ("all".equals(config.getTrustmgr())) {
+			if ("all".equals(config.getTrustManager())) {
 				ftps.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
-			} else if ("valid".equals(config.getTrustmgr())) {
+			} else if ("valid".equals(config.getTrustManager())) {
 				ftps.setTrustManager(TrustManagerUtils.getValidateServerCertificateTrustManager());
-			} else if ("none".equals(config.getTrustmgr())) {
+			} else if ("none".equals(config.getTrustManager())) {
 				ftps.setTrustManager(null);
 			}
 			ftpClient = ftps;
@@ -146,7 +146,7 @@ public class FtpUtils {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
 			if (! ftpClient.retrieveFile(encodeRemote, baos)) {
-				throw new FTPException("Retrieve file faild: " + remote);
+				throw new FTPException("Retrieve file failed: " + remote);
 			}
 			return baos.toByteArray();
 		} finally {
@@ -397,7 +397,7 @@ public class FtpUtils {
 
 			root += "/" + dir;
 			if (! changeWorkingDirectory(ftpClient, root)) {
-				logger.error("无效的文件路径：" + root);
+				log.error("无效的文件路径：" + root);
 				return false;
 			}
 		}
@@ -410,17 +410,17 @@ public class FtpUtils {
 			if (! ftpClient.changeWorkingDirectory(directory)) {
 				try {
 					if (! ftpClient.makeDirectory(directory)) {
-						logger.error("无法创建文件路径：" + directory);
+						log.error("无法创建文件路径：" + directory);
 						return false;
 					}
 					return ftpClient.changeWorkingDirectory(directory);
 				} catch(Exception e) {
-					logger.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 					return false;
 				}
 			}
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return false;
 		}
 		return true;
@@ -469,11 +469,10 @@ public class FtpUtils {
     }
 }
 
+@Slf4j
 class SSLSessionReuseFTPSClient extends FTPSClient {
-	private final Logger logger = LoggerFactory.getLogger(SSLSessionReuseFTPSClient.class);
-
-	public SSLSessionReuseFTPSClient(String protocal, boolean isImpicit) {
-		super(protocal, isImpicit);
+	public SSLSessionReuseFTPSClient(String protocol, boolean impicit) {
+		super(protocol, impicit);
 	}
 
     @Override
@@ -490,7 +489,7 @@ class SSLSessionReuseFTPSClient extends FTPSClient {
                 final String key = String.format("%s:%s", socket.getInetAddress().getHostName(), String.valueOf(socket.getPort())).toLowerCase(Locale.ROOT);
                 method.invoke(cache, key, session);
             } catch(Exception e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
     }

@@ -22,6 +22,7 @@ public class FileStorageConfig {
     private String password;
     private int port = 21;
     private boolean ssh;
+    private boolean ssl;
     private boolean forcePort;
     private boolean implicit;
     private boolean passive;
