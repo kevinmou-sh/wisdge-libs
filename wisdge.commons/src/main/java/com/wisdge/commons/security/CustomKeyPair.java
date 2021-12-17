@@ -1,8 +1,6 @@
 package com.wisdge.commons.security;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.rsa.crypto.KeyStoreKeyFactory;
 import org.springframework.stereotype.Component;
@@ -12,6 +10,8 @@ import java.security.PublicKey;
 import java.util.Base64;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Component
 public class CustomKeyPair {
     private String file;
