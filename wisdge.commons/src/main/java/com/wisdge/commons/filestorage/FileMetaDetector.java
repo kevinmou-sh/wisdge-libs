@@ -8,7 +8,9 @@ import com.drew.metadata.MetadataException;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -16,14 +18,14 @@ public class FileMetaDetector {
 
     /**
      * 解析mp4文件时长
-     * @param is
-     * @return
+     * @param inputStream InputStream
+     * @return long duration of mp4
      * @throws ImageProcessingException
      * @throws IOException
      * @throws MetadataException
      */
-    public static long getMp4Duration(InputStream is) throws ImageProcessingException, IOException, MetadataException {
-        Metadata metadata = ImageMetadataReader.readMetadata(is);
+    public static long getMp4Duration(InputStream inputStream) throws ImageProcessingException, IOException, MetadataException {
+        Metadata metadata = ImageMetadataReader.readMetadata(inputStream);
         Iterable<Directory> it = metadata.getDirectories();
         for (Directory d : it) {
             if (d.getName().equalsIgnoreCase("MP4")) {
@@ -31,6 +33,22 @@ public class FileMetaDetector {
             }
         }
         return 0L;
+    }
+
+    /**
+     * 解析mp4文件时长
+     * @param mp4File File
+     * @return long duration of mp4
+     * @throws ImageProcessingException
+     * @throws IOException
+     * @throws MetadataException
+     */
+    public static long getMp4Duration(File mp4File) throws ImageProcessingException, IOException, MetadataException {
+        try (
+                InputStream inputStream = new FileInputStream(mp4File)
+        ) {
+            return getMp4Duration(inputStream);
+        }
     }
 
     /**
