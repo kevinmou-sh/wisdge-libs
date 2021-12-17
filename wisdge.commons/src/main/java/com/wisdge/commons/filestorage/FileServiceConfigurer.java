@@ -25,7 +25,6 @@ public class FileServiceConfigurer {
     public FileStorage getFileStorage() {
         FileStorage fileStorage = new FileStorage(StringUtils.toSet(forbidden, ","), StringUtils.toSet(accept, ","));
         for(FileStorageConfig config : storages) {
-            log.debug(config.toString());
             String name = config.getName();
             String type = config.getType();
             if (type.equalsIgnoreCase("AliOSS")) {
