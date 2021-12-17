@@ -296,4 +296,19 @@ public class UrlUtils {
 		return matcher.find();
 	}
 
+	/**
+	 * 判断url是否符合domain规则
+	 * @param url String
+	 * @param domains Set<String>
+	 * @return
+	 */
+	public static boolean isMatchDomain(String url, Set<String> domains) {
+		for(String domain : domains) {
+			Pattern urlPattern = Pattern.compile("^http(s?)://" + domain.trim().toLowerCase(Locale.ROOT).replace(".", "\\.") + "/", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+			Matcher matcher = urlPattern.matcher(url);
+			return matcher.find();
+		}
+		return false;
+	}
+
 }
