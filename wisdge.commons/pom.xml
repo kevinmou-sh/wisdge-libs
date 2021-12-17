@@ -204,12 +204,12 @@
             <version>${poi.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
-            <version>3.3.2</version>
-            <scope>compile</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.baomidou</groupId>-->
+<!--            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>-->
+<!--            <version>3.3.2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
 
 		<dependency>
             <groupId>io.minio</groupId>
