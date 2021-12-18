@@ -27,7 +27,7 @@ public class FileServiceConfigurer {
         FileStorage fileStorage = new FileStorage(StringUtils.toSet(forbidden, ","), StringUtils.toSet(accept, ","));
         storages.forEach((key, config) -> {
             String type = config.getType();
-            if (type.equalsIgnoreCase("AliOSS")) {
+            if ("AliOSS".equalsIgnoreCase(type)) {
                 AliOSSStorageClient fileStorageClient = new AliOSSStorageClient();
                 fileStorageClient.setEndpoint(config.getEndpoint());
                 fileStorageClient.setBucketName(config.getBucketName());
@@ -39,7 +39,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setWanEndpoint(config.getWanEndpoint());
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
-            } else if (type.equalsIgnoreCase("ftp")) {
+            } else if ("ftp".equalsIgnoreCase(type)) {
                 FtpStorageClient fileStorageClient = new FtpStorageClient();
                 fileStorageClient.setProtocol(config.getProtocol());
                 fileStorageClient.setHostname(config.getHost());
@@ -53,7 +53,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setImplicit(config.isImplicit());
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
-            } else if (type.equalsIgnoreCase("fastDFS")) {
+            } else if ("fastDFS".equalsIgnoreCase(type)) {
                 FastDFSStorageClient fileStorageClient = new FastDFSStorageClient();
                 fileStorageClient.setCharset(StandardCharsets.UTF_8.name());
                 fileStorageClient.setConnectTimeout(config.getConnectTimeout());
@@ -65,7 +65,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setPoolSize(config.getPoolSize());
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
-            } else if (type.equalsIgnoreCase("http")) {
+            } else if ("http".equalsIgnoreCase(type)) {
                 HttpStorageClient fileStorageClient = new HttpStorageClient();
                 fileStorageClient.setInputField(config.getInputField());
                 fileStorageClient.setPathField(config.getPathField());
@@ -74,7 +74,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
-            } else if (type.equalsIgnoreCase("minio")) {
+            } else if ("minio".equalsIgnoreCase(type)) {
                 MinioStorageClient fileStorageClient = new MinioStorageClient();
                 fileStorageClient.setEndpoint(config.getEndpoint());
                 fileStorageClient.setBucketName(config.getBucketName());
@@ -86,7 +86,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
-            } else if (type.equalsIgnoreCase("amazon")) {
+            } else if ("amazon".equalsIgnoreCase(type)) {
                 AmazonOSSStorage fileStorageClient = new AmazonOSSStorage();
                 fileStorageClient.setBucketName(config.getBucketName());
                 fileStorageClient.setAccessKey(config.getAccessKeyId());
@@ -96,7 +96,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
-            } else if (type.equalsIgnoreCase("JDOss")) {
+            } else if ("JDOss".equalsIgnoreCase(type)) {
                 JDOSSStorageClient fileStorageClient = new JDOSSStorageClient();
                 fileStorageClient.setBucketName(config.getBucketName());
                 fileStorageClient.setAccessKey(config.getAccessKeyId());
@@ -106,7 +106,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
-            } else if (type.equalsIgnoreCase("QOss")) {
+            } else if ("QOss".equalsIgnoreCase(type)) {
                 QCOSStorageClient fileStorageClient = new QCOSStorageClient();
                 fileStorageClient.setEndpoint(config.getEndpoint());
                 fileStorageClient.setBucketName(config.getBucketName());
@@ -119,11 +119,13 @@ public class FileServiceConfigurer {
                 fileStorageClient.init(config.isSecurity());
                 fileStorageClient.setIgnoreFileTypes(StringUtils.toArray(config.getIgnoreFileTypes(), ","));
                 fileStorage.addFileStorage(key, fileStorageClient);
-            } else if (type.equalsIgnoreCase("local")) {
+            } else if ("local".equalsIgnoreCase(type)) {
                 LocalStorageClient fileStorageClient = new LocalStorageClient();
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
+            } else {
+                log.error("No file storage type match {}", type);
             }
         });
         return fileStorage;
