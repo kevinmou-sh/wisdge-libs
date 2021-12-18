@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class FileStorageConfig {
-    private String name;
     private String type;
     private String endpoint;
     private String bucketName;

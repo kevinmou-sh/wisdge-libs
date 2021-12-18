@@ -4,11 +4,12 @@ import com.wisdge.utils.StringUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Data
 @Slf4j
 public class FileServiceConfigurer {
-    private FileStorageConfig[] storages;
+    private Map<String, FileStorageConfig> storages;
     /**
      * 禁止的文件类型，多个类型以逗号分隔
      */
@@ -24,8 +25,7 @@ public class FileServiceConfigurer {
 
     public FileStorage getFileStorage() {
         FileStorage fileStorage = new FileStorage(StringUtils.toSet(forbidden, ","), StringUtils.toSet(accept, ","));
-        for(FileStorageConfig config : storages) {
-            String name = config.getName();
+        storages.forEach((key, config) -> {
             String type = config.getType();
             if (type.equalsIgnoreCase("AliOSS")) {
                 AliOSSStorageClient fileStorageClient = new AliOSSStorageClient();
@@ -38,7 +38,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.setWanEndpoint(config.getWanEndpoint());
                 fileStorageClient.init(config.isSecurity());
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             } else if (type.equalsIgnoreCase("ftp")) {
                 FtpStorageClient fileStorageClient = new FtpStorageClient();
                 fileStorageClient.setProtocol(config.getProtocol());
@@ -52,7 +52,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setForcePortP(config.isForcePort());
                 fileStorageClient.setImplicit(config.isImplicit());
                 fileStorageClient.init(config.isSecurity());
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             } else if (type.equalsIgnoreCase("fastDFS")) {
                 FastDFSStorageClient fileStorageClient = new FastDFSStorageClient();
                 fileStorageClient.setCharset(StandardCharsets.UTF_8.name());
@@ -64,7 +64,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setHttpTrackerServers(config.getHttpTrackerServers());
                 fileStorageClient.setPoolSize(config.getPoolSize());
                 fileStorageClient.init(config.isSecurity());
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             } else if (type.equalsIgnoreCase("http")) {
                 HttpStorageClient fileStorageClient = new HttpStorageClient();
                 fileStorageClient.setInputField(config.getInputField());
@@ -73,7 +73,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setRetrieveUrl(config.getRetrieveUrl());
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             } else if (type.equalsIgnoreCase("minio")) {
                 MinioStorageClient fileStorageClient = new MinioStorageClient();
                 fileStorageClient.setEndpoint(config.getEndpoint());
@@ -85,7 +85,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setIndex(config.getIndexAtomic());
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             } else if (type.equalsIgnoreCase("amazon")) {
                 AmazonOSSStorage fileStorageClient = new AmazonOSSStorage();
                 fileStorageClient.setBucketName(config.getBucketName());
@@ -95,7 +95,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setOosDomain(config.getOosDomain());
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             } else if (type.equalsIgnoreCase("JDOss")) {
                 JDOSSStorageClient fileStorageClient = new JDOSSStorageClient();
                 fileStorageClient.setBucketName(config.getBucketName());
@@ -105,7 +105,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.setOosDomain(config.getOosDomain());
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             } else if (type.equalsIgnoreCase("QOss")) {
                 QCOSStorageClient fileStorageClient = new QCOSStorageClient();
                 fileStorageClient.setEndpoint(config.getEndpoint());
@@ -118,14 +118,14 @@ public class FileServiceConfigurer {
                 fileStorageClient.setWanEndpoint(config.getWanEndpoint());
                 fileStorageClient.init(config.isSecurity());
                 fileStorageClient.setIgnoreFileTypes(StringUtils.toArray(config.getIgnoreFileTypes(), ","));
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             } else if (type.equalsIgnoreCase("local")) {
                 LocalStorageClient fileStorageClient = new LocalStorageClient();
                 fileStorageClient.setRemoteRoot(config.getRemoteRoot());
                 fileStorageClient.init(config.isSecurity());
-                fileStorage.addFileStorage(name, fileStorageClient);
+                fileStorage.addFileStorage(key, fileStorageClient);
             }
-        }
+        });
         return fileStorage;
     }
 }
