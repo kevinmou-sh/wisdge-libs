@@ -94,7 +94,7 @@ public class XHRPoolService {
 	public static final String METHOD_WS_GET = "WS_GET";
 	public static final String METHOD_WS_POST = "WS_POST";
 
-	private String protocols = "TLSv1.2";
+	private String protocol = "TLSv1.2";
 
 	/**
 	 * 连接超时时间 （单位毫秒）
@@ -218,7 +218,7 @@ public class XHRPoolService {
 				return null;
 			}
 		};
-		SSLContext ctx = SSLContext.getInstance(protocols);
+		SSLContext ctx = SSLContext.getInstance(protocol);
 		ctx.init(null, new TrustManager[] { xtm }, null);
 
 		return new SSLConnectionSocketFactory(ctx, NoopHostnameVerifier.INSTANCE);
