@@ -3,6 +3,7 @@ package com.wisdge.commons.redis;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -21,12 +22,7 @@ public class RedisTemplate extends org.springframework.data.redis.core.RedisTemp
         this.setKeySerializer(stringRedisSerializer);
         this.setHashKeySerializer(stringRedisSerializer);
 
-        // 需要支持范型时使用 GenericJackson2JsonRedisSerializer，但是会有更多的系统开销
-        GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
-//        this.setValueSerializer(genericJackson2JsonRedisSerializer);
-//        this.setHashValueSerializer(genericJackson2JsonRedisSerializer);
-
-        Jackson2JsonRedisSerializer<?> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         this.setValueSerializer(jackson2JsonRedisSerializer);
         this.setHashValueSerializer(jackson2JsonRedisSerializer);
     }
