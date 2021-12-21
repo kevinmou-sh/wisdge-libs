@@ -431,18 +431,4 @@ public class NumberUtils {
 			return cn;
 		}
 	}
-
-	public static void main(String[] args) throws Exception {
-		// System.out.println(Number2Currency(12341234.12341234));
-		// System.out.println(Number2Currency((float) 1234334.2445));
-		// System.out.println(FormatCurrentcy(12341234.12341));
-		// System.out.println(tofNPrecision((float) 234123.62503, 1));
-		// System.out.println(todNPrecision(234123.12345123, 3));
-		// System.out.println(isZero(0.00000000012345123));
-		// System.out.println(equals(234.12345123, 234.234632456));
-		// System.out.println(new DecimalFormat("000").format(1));
-
-		System.out.println(makeCn2Arab("四"));
-	}
-
 }

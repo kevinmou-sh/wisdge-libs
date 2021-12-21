@@ -8,7 +8,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
 
 /**
  * 时间日期处理类
@@ -296,25 +295,5 @@ public class DateUtils {
 		Calendar target = new GregorianCalendar();
 		target.setTime(second);
 		return source.compareTo(target);
-	}
-	
-	@Test
-	public void test() throws ParseException {
-		System.out.println(DateUtils.format(new Date()));
-		System.out.println(DateUtils.format(new Date(), ISO8601LongestPattern));
-		System.out.println(DateUtils.format(new Date(), ISO8601SlatPattern));
-		System.out.println(DateUtils.format(new Date(), ISO8601ShortPattern));
-		System.out.println(DateUtils.format(new Date(), ISO8601TimePattern));
-		System.out.println(DateUtils.format(new Date(), ISO8601LongPatternWithDay));
-		System.out.println(DateUtils.format(new Date(), ISO8601SlatPatternWithDay));
-		System.out.println(DateUtils.format(new Date(), ISO8601ShortPatternWithDay));
-		System.out.println(DateUtils.format(new Date(), ISO8601ChineseLongPattern));
-		System.out.println(DateUtils.format(new Date(), ISO8601ChineseShortPattern));
-		
-		System.out.println(DateUtils.parse("2016-08-13 21:28:44.58"));
-		System.out.println(DateUtils.parse("2016-08-13 21:28:44.58", ISO8601LongestPattern));
-		System.out.println(DateUtils.parse("2016/08/13 21:28:44.58", ISO8601SlatPattern));
-		System.out.println(DateUtils.parse("21:28:44", ISO8601TimePattern));
-		System.out.println(DateUtils.parse("2016-08-13", ISO8601ShortPattern));
 	}
 }

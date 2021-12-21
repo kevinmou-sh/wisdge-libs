@@ -1,33 +1,23 @@
 package com.wisdge.ftp;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
 import org.apache.commons.net.PrintCommandListener;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPHTTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.FTPSClient;
+import org.apache.commons.net.ftp.*;
 import org.apache.commons.net.io.CopyStreamEvent;
 import org.apache.commons.net.io.CopyStreamListener;
 import org.apache.commons.net.util.TrustManagerUtils;
+import org.junit.Test;
+
+import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
 
 /**
  * This is an example program demonstrating how to use the FTPClient class. This program connects to an FTP server and retrieves the specified file. If the -s
  * flag is used, it stores the local file at the FTP server. Just so you can see what's happening, all reply strings are printed. If the -b flag is used, a
  * binary transfer is assumed (default is ASCII). See below for further options.
  */
-public final class FTPClientExample {
+public final class SimpleFTPClient {
 
 	public static final String USAGE = "Expected Parameters: [options] <hostname> <username> <password> [<remote file> [<local file>]]\n"
 			+ "\nDefault behavior is to download a file and use ASCII transfer mode.\n" + "\t-a - use local active mode (default is local passive)\n"
@@ -53,7 +43,7 @@ public final class FTPClientExample {
 			+ "\t-PrH server[:port] - HTTP Proxy host and optional port[80] \n" + "\t-PrU user - HTTP Proxy server username\n"
 			+ "\t-PrP password - HTTP Proxy server password\n" + "\t-# - add hash display during transfers\n";
 
-	public static void main(String[] args) throws UnknownHostException {
+	public void main(String[] args) throws UnknownHostException {
 		boolean storeFile = false, binaryTransfer = false, error = false, listFiles = false, listNames = false, hidden = false;
 		boolean localActive = false, useEpsvWithIPv4 = false, feat = false, printHash = false;
 		boolean mlst = false, mlsd = false, mdtm = false, saveUnparseable = false;

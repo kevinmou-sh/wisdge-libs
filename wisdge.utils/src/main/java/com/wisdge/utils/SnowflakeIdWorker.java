@@ -46,13 +46,13 @@ public class SnowflakeIdWorker {
     private final long sequenceMask = -1L ^ (-1L << sequenceBits);
 
     /** 工作机器ID(0~31) */
-    private long workerId;
+    private long workerId = 0L;
 
     /** 数据中心ID(0~31) */
-    private long datacenterId;
+    private long datacenterId = 0L;
 
     /** 备用的数据中心ID(0~31)，当时钟回拨时，为了不抛异常，启用备用ID */
-    private long standbyDatacenterId;
+    private long standbyDatacenterId = 16L;
 
     /**是否时钟回拨*/
     private boolean isTimestampBack = false;
@@ -63,25 +63,13 @@ public class SnowflakeIdWorker {
     /** 上次生成ID的时间截 */
     private long lastTimestamp = -1L;
 
-    //==============================Constructors=====================================
-    public SnowflakeIdWorker() {
-        this(0L, 0L);
-    }
-    /**
-     * 构造函数
-     * @param workerId 工作ID (0~31)
-     * @param datacenterId 数据中心ID (0~31)
-     */
-    public SnowflakeIdWorker(long workerId, long datacenterId) {
-        this(workerId, datacenterId, datacenterId + 16);
+    public SnowflakeIdWorker(long datacenterId, long workerId) {
+        this.datacenterId = datacenterId;
+        this.workerId = workerId;
+        this.standbyDatacenterId = datacenterId + 16;
     }
 
-    /**
-     * 构造函数
-     * @param workerId 工作ID (0~31)
-     * @param datacenterId 数据中心ID (0~31)
-     */
-    public SnowflakeIdWorker(long workerId, long datacenterId, long standbyDatacenterId) {
+    public void init() {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
@@ -97,9 +85,6 @@ public class SnowflakeIdWorker {
         if(datacenterId == standbyDatacenterId) {
             throw new IllegalArgumentException("datacenter Id can't equal to standby datacenter Id.");
         }
-        this.workerId = workerId;
-        this.datacenterId = datacenterId;
-        this.standbyDatacenterId = standbyDatacenterId;
     }
 
     // ==============================Methods==========================================
@@ -163,13 +148,5 @@ public class SnowflakeIdWorker {
      */
     protected long timeGen() {
         return System.currentTimeMillis();
-    }
-
-    public static void main(String[] args) {
-        SnowflakeIdWorker idWorker = new SnowflakeIdWorker(0, 1);
-        for (int i = 0; i < 1000; i++) {
-            long id = idWorker.nextId();
-            System.out.println(id);
-        }
     }
 }

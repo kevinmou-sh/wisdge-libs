@@ -88,8 +88,4 @@ public class JVMUtils {
 		}
 		return message;
 	}
-
-	public static void main(String[] args) {
-		System.out.println(JVMUtils.getJVMInfo());
-	}
 }

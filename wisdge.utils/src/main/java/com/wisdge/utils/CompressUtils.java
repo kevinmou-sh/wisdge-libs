@@ -2,6 +2,7 @@ package com.wisdge.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import org.apache.commons.codec.binary.Base64;
@@ -13,9 +14,9 @@ import org.apache.commons.codec.binary.Base64;
  * @version 1.0.0.20130105
  */
 public class CompressUtils {
-	private static int cachesize = 1024;
-	private static Inflater decompresser = new Inflater();
-	private static Deflater compresser = new Deflater();
+	private static final int cachesize = 1024;
+	private static final Inflater decompresser = new Inflater();
+	private static final Deflater compresser = new Deflater();
 
 	/**
 	 * Compress from byte[]
@@ -25,28 +26,17 @@ public class CompressUtils {
 	 * @return compressed bytes
 	 * @see #decompressBytes(byte[])
 	 */
-	public static byte[] compressBytes(byte input[]) {
+	public static byte[] compressBytes(byte input[]) throws IOException {
 		compresser.reset();
 		compresser.setInput(input);
 		compresser.finish();
-		byte output[] = new byte[0];
-		ByteArrayOutputStream o = new ByteArrayOutputStream(input.length);
-		try {
+		try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
 			byte[] buf = new byte[cachesize];
-			int got;
 			while (!compresser.finished()) {
-				got = compresser.deflate(buf);
-				o.write(buf, 0, got);
+				byteArrayOutputStream.write(buf, 0, compresser.deflate(buf));
 			}
-			output = o.toByteArray();
-		} finally {
-			try {
-				o.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			return byteArrayOutputStream.toByteArray();
 		}
-		return output;
 	}
 
 	/**
@@ -57,30 +47,16 @@ public class CompressUtils {
 	 * @return Uncompress bytes
 	 * @see #compressBytes(byte[])
 	 */
-	public static byte[] decompressBytes(byte input[]) {
-		byte output[] = new byte[0];
+	public static byte[] decompressBytes(byte input[]) throws IOException, DataFormatException {
 		decompresser.reset();
 		decompresser.setInput(input);
-		ByteArrayOutputStream o = new ByteArrayOutputStream(input.length);
-		try {
+		try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
 			byte[] buf = new byte[cachesize];
-
-			int got;
 			while (!decompresser.finished()) {
-				got = decompresser.inflate(buf);
-				o.write(buf, 0, got);
+				byteArrayOutputStream.write(buf, 0, decompresser.inflate(buf));
 			}
-			output = o.toByteArray();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				o.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			return byteArrayOutputStream.toByteArray();
 		}
-		return output;
 	}
 
 	/**
@@ -91,9 +67,8 @@ public class CompressUtils {
 	 * @return compressed string
 	 * @see #decompressString(String)
 	 */
-	public static String compressString(String input) {
-		byte[] result = compressBytes(input.getBytes());
-		return Base64.encodeBase64String(result);
+	public static String compressString(String input) throws IOException {
+		return Base64.encodeBase64String(compressBytes(input.getBytes()));
 	}
 
 	/**
@@ -104,16 +79,7 @@ public class CompressUtils {
 	 * @return Uncompress string
 	 * @see #compressString(String)
 	 */
-	public static String decompressString(String input) {
-		byte[] result = Base64.decodeBase64(input);
-		return new String(decompressBytes(result));
-	}
-
-	public static void main(String argv[]) throws Exception {
-		String str = "select top 100 customer_guid,customername,gender,customerid,tel_1,tel_2,mobile,address from customer where 1=1";
-
-		String result = compressString(str);
-		System.out.println(result);
-		System.out.println(decompressString(result));
+	public static String decompressString(String input) throws DataFormatException, IOException {
+		return new String(decompressBytes(Base64.decodeBase64(input)));
 	}
 }
