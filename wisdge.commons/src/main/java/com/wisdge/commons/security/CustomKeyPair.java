@@ -12,6 +12,7 @@ import java.util.Base64;
 @Data
 @NoArgsConstructor
 @Component
+@ToString
 public class CustomKeyPair {
     private String file;
     private String alias;
