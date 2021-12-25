@@ -1,5 +1,6 @@
 package com.wisdge.ezcell.analysis.v07;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -24,6 +25,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class XlsxSaxAnalyser extends BaseSaxAnalyser {
 
     private XSSFReader xssfReader;
@@ -38,7 +40,7 @@ public class XlsxSaxAnalyser extends BaseSaxAnalyser {
         this.analysisContext = analysisContext;
         init();
     }
-    
+
     private void init() throws IOException, OpenXML4JException, XmlException {
         analysisContext.setCurrentRowNo(0);
         xssfReader = new XSSFReader(OPCPackage.open(analysisContext.getInputStream()));
@@ -60,6 +62,7 @@ public class XlsxSaxAnalyser extends BaseSaxAnalyser {
         while (ite.hasNext()) {
             InputStream inputStream = ite.next();
             String sheetName = ite.getSheetName();
+            log.debug("Loading sheet {}", sheetName);
             SheetSource sheetSource = new SheetSource(sheetName, inputStream);
             sheetSourceList.add(sheetSource);
         }
@@ -69,27 +72,22 @@ public class XlsxSaxAnalyser extends BaseSaxAnalyser {
     protected void execute() {
         Sheet sheetParam = analysisContext.getCurrentSheet();
         if (sheetParam != null && sheetParam.getSheetNo() > 0 && sheetSourceList.size() >= sheetParam.getSheetNo()) {
-            InputStream sheetInputStream = sheetSourceList.get(sheetParam.getSheetNo() - 1).getInputStream();
+            SheetSource sheetSource = sheetSourceList.get(sheetParam.getSheetNo() - 1);
+            log.debug("Parsing sheet {}", sheetSource.sheetName);
+            InputStream sheetInputStream = sheetSource.getInputStream();
             parseXmlSource(sheetInputStream);
         } else {
             int i = 0;
             for (SheetSource sheetSource : sheetSourceList) {
                 i++;
                 analysisContext.setCurrentSheet(new Sheet(i));
+                log.debug("Parsing sheet {}", sheetSource.sheetName);
                 parseXmlSource(sheetSource.getInputStream());
             }
         }
     }
-    
+
     private void parseXmlSource(InputStream inputStream) {
-        try {
-	        byte[] data = new byte[inputStream.available()];
-	        inputStream.read(data);
-	        inputStream.reset();
-	        com.wisdge.utils.FileUtils.writeByteArrayToFile(new java.io.File("/Users/kevinmou/Documents/test.xml"), data);
-        } catch(Exception e) {
-        	e.printStackTrace();
-        }
         InputSource sheetSource = new InputSource(inputStream);
         try {
             SAXParserFactory saxFactory = SAXParserFactory.newInstance();
@@ -105,6 +103,7 @@ public class XlsxSaxAnalyser extends BaseSaxAnalyser {
         } catch (Exception e) {
         	if (! (e instanceof SAXTerminatorException))
         		throw new ExcelAnalysisException(e);
+        	else log.error(e.getMessage(), e);
         }
     }
 
