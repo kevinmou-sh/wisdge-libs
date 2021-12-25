@@ -38,13 +38,13 @@ public class XlsSaxAnalyser extends BaseSaxAnalyser implements HSSFListener {
     }
 
     @Override
-    public List<Sheet> getSheets() {
+    public List<Sheet> getSheets() throws Exception {
         execute();
         return sheets;
     }
 
     @Override
-    public void execute() {
+    public void execute() throws Exception {
         init();
         MissingRecordAwareHSSFListener listener = new MissingRecordAwareHSSFListener(this);
         formatListener = new FormatTrackingHSSFListener(listener);

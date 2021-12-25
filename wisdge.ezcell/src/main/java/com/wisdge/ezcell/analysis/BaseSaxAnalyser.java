@@ -13,13 +13,12 @@ public abstract class BaseSaxAnalyser implements AnalysisEventRegisterCenter, Ex
 
     protected AnalysisContext analysisContext;
 
-    @SuppressWarnings("rawtypes")
 	private LinkedHashMap<String, AnalysisEventListener> listeners = new LinkedHashMap<String, AnalysisEventListener>();
 
     /**
      * execute method
      */
-    protected abstract void execute();
+    protected abstract void execute() throws Exception;
 
 
     @Override
@@ -30,22 +29,20 @@ public abstract class BaseSaxAnalyser implements AnalysisEventRegisterCenter, Ex
     }
 
     @Override
-    public void analysis(Sheet sheetParam) {
+    public void analysis(Sheet sheetParam) throws Exception {
         execute();
     }
 
     @Override
-    public void analysis() {
+    public void analysis() throws Exception {
         execute();
     }
 
-    @SuppressWarnings("rawtypes")
 	@Override
     public void cleanAllListeners() {
-        listeners = new LinkedHashMap<String, AnalysisEventListener>();
+        listeners = new LinkedHashMap<>();
     }
 
-    @SuppressWarnings("unchecked")
 	@Override
     public void notifyListeners(List<Object> event) {
     	if (isEmptyList(event))

@@ -30,7 +30,7 @@ public class EzReaderTest {
 
 	@Test
 	public void testBigFile() throws Exception {
-		InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/QQ/保司账号导入--模板2.xlsx"));
+		InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/Documents/temp/test.xlsx"));
 		ZipSecureFile.setMinInflateRatio(-1.0d);
 		EzSize size = EzCellFactory.read(inputStream, data -> {
 			System.out.println(data.toString());

@@ -39,7 +39,7 @@ public class EzReader {
     /**
      * Parse all sheet content by default
      */
-    public void read() {
+    public void read() throws Exception {
         analyser.analysis();
     }
 
@@ -48,7 +48,7 @@ public class EzReader {
      *
      * @param sheet Read sheet
      */
-    public void read(Sheet sheet) {
+    public void read(Sheet sheet) throws Exception {
         analyser.analysis(sheet);
     }
 

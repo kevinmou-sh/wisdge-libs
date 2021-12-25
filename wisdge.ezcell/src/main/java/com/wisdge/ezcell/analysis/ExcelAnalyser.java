@@ -12,12 +12,12 @@ public interface ExcelAnalyser {
      *
      * @param sheetParam
      */
-    void analysis(Sheet sheetParam);
+    void analysis(Sheet sheetParam) throws Exception;
 
     /**
      * parse all sheets
      */
-    void analysis();
+    void analysis() throws Exception;
     
     /**
      * Get Context of Analyzer
@@ -30,6 +30,6 @@ public interface ExcelAnalyser {
      *
      * @return all sheets
      */
-    List<Sheet> getSheets();
+    List<Sheet> getSheets() throws Exception;
 
 }

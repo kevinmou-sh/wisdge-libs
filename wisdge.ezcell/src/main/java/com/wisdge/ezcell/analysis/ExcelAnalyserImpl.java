@@ -23,7 +23,7 @@ public class ExcelAnalyserImpl implements ExcelAnalyser {
 	}
 
 	@Override
-	public void analysis() {
+	public void analysis() throws Exception {
 		BaseSaxAnalyser saxAnalyser = getSaxAnalyser();
 		appendListeners(saxAnalyser);
 		saxAnalyser.execute();
@@ -61,13 +61,13 @@ public class ExcelAnalyserImpl implements ExcelAnalyser {
 	}
 
 	@Override
-	public void analysis(Sheet sheetParam) {
+	public void analysis(Sheet sheetParam) throws Exception {
 		analysisContext.setCurrentSheet(sheetParam);
 		analysis();
 	}
 
 	@Override
-	public List<Sheet> getSheets() {
+	public List<Sheet> getSheets() throws Exception {
 		BaseSaxAnalyser saxAnalyser = getSaxAnalyser();
 		saxAnalyser.cleanAllListeners();
 		return saxAnalyser.getSheets();
