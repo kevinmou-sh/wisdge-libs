@@ -619,40 +619,6 @@ public class XHRPoolService {
 		}
 	}
 
-	public CloseableHttpResponse postResponse(String url) throws Exception {
-		return postResponse(url, new HashMap<String, Object>());
-	}
-
-	/**
-	 * 从XHR接口以POST方式获得CloseableHttpResponse对象，需自行close
-	 *
-	 * @param url
-	 *            HTTP接口地址
-	 * @param params
-	 *            POST方法中提交的参数MAP对象
-	 * @return CloseableHttpResponse
-	 * @throws Exception
-	 */
-	public CloseableHttpResponse postResponse(String url, Map<String, Object> params) throws Exception {
-		url = url.trim().replaceAll("\n", "");
-		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-
-		// add parameters extend
-		if (params != null) {
-			Iterator<String> iter = params.keySet().iterator();
-			while (iter.hasNext()) {
-				String key = iter.next();
-				Object value = params.get(key);
-				nvps.add(new BasicNameValuePair(key, value == null ? "" : value.toString()));
-			}
-		}
-
-		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
-		HttpPost httpPost = new HttpPost(url);
-		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
-		return getHttpClient().execute(httpPost);
-	}
-
 	public byte[] postForBytes(String url, Map<String, Object> params) throws Exception {
 		return postForBytes(url, params, null);
 	}
@@ -871,6 +837,63 @@ public class XHRPoolService {
 		}
 	}
 
+	public CloseableHttpResponse postResponse(String url) throws Exception {
+		return postResponse(url, new HashMap<String, Object>());
+	}
+
+	/**
+	 * 从XHR接口以POST方式获得CloseableHttpResponse对象，需自行close
+	 *
+	 * @param url
+	 *            HTTP接口地址
+	 * @param params
+	 *            POST方法中提交的参数MAP对象
+	 * @return CloseableHttpResponse
+	 * @throws Exception
+	 */
+	public CloseableHttpResponse postResponse(String url, Map<String, Object> params) throws Exception {
+		return postResponse(url, params, null);
+	}
+
+	/**
+	 * 从XHR接口以POST方式获得CloseableHttpResponse对象，需自行close
+	 *
+	 * @param url
+	 *            HTTP接口地址
+	 * @param params
+	 *            POST方法中提交的参数MAP对象
+	 * @param headers
+	 * 			  Header头
+	 * @return CloseableHttpResponse
+	 * @throws Exception
+	 */
+	public CloseableHttpResponse postResponse(String url, Map<String, Object> params, Map<String, String> headers) throws Exception {
+		url = url.trim().replaceAll("\n", "");
+		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+
+		// add parameters extend
+		if (params != null) {
+			Iterator<String> iter = params.keySet().iterator();
+			while (iter.hasNext()) {
+				String key = iter.next();
+				Object value = params.get(key);
+				nvps.add(new BasicNameValuePair(key, value == null ? "" : value.toString()));
+			}
+		}
+
+		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
+		HttpPost httpPost = new HttpPost(url);
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
+			while(iter.hasNext()) {
+				String name = iter.next();
+				httpPost.setHeader(name, headers.get(name));
+			}
+		}
+		httpPost.setEntity(new UrlEncodedFormEntity(nvps, UTF_8));
+		return getHttpClient().execute(httpPost);
+	}
+
 	/**
 	 * 从XHR接口通过POST方法处理请求
 	 * @param url
@@ -881,10 +904,32 @@ public class XHRPoolService {
 	 * @throws Exception
 	 */
 	public CloseableHttpResponse postResponse(String url, String postBody) throws Exception {
+		return postResponse(url, postBody, null);
+	}
+
+	/**
+	 * 从XHR接口通过POST方法处理请求
+	 * @param url
+	 *            HTTP接口地址
+	 * @param postBody
+	 *            POST到接口的JSON正文
+	 * @param headers
+	 * 			  Header头
+	 * @return CloseableHttpResponse
+	 * @throws Exception
+	 */
+	public CloseableHttpResponse postResponse(String url, String postBody, Map<String, String> headers) throws Exception {
 		log.debug(XHR_POST_LOG_HEAD, LogUtils.forging(url));
 		HttpPost httpPost = new HttpPost(url);
 		StringEntity se = new StringEntity(postBody, UTF_8);
 		httpPost.setHeader("Content-Type", CONTENT_TYPE_JSON_UTF8);
+		if (headers != null) {
+			Iterator<String> iter = headers.keySet().iterator();
+			while(iter.hasNext()) {
+				String name = iter.next();
+				httpPost.setHeader(name, headers.get(name));
+			}
+		}
 		httpPost.setEntity(se);
 		return getHttpClient().execute(httpPost);
 	}
