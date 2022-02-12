@@ -1,5 +1,6 @@
 package com.wisdge.ezcell.analysis.v03;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.eventusermodel.*;
 import org.apache.poi.hssf.eventusermodel.dummyrecord.LastCellOfRowDummyRecord;
 import org.apache.poi.hssf.eventusermodel.dummyrecord.MissingCellDummyRecord;
@@ -24,6 +25,7 @@ import java.util.List;
  * </p>
  * @see <a href="http://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/hssf/eventusermodel/examples/XLS2CSVmra.java">XLS2CSVmra</a>
  */
+@Slf4j
 public class XlsSaxAnalyser extends BaseSaxAnalyser implements HSSFListener {
     private boolean analyAllSheet = false;
 
@@ -31,6 +33,7 @@ public class XlsSaxAnalyser extends BaseSaxAnalyser implements HSSFListener {
         this.analysisContext = context;
         this.records = new ArrayList<>();
         if (analysisContext.getCurrentSheet() == null) {
+            log.debug("Analysis all sheet");
             this.analyAllSheet = true;
         }
         context.setCurrentRowNo(0);

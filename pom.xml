@@ -13,7 +13,7 @@
 
     <groupId>com.wisdge</groupId>
     <artifactId>wisdge.libs</artifactId>
-    <version>1.9.3.1</version>
+    <version>1.9.3.2</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -21,7 +21,7 @@
         <java.version>1.8</java.version>
         <poi.version>5.1.0</poi.version>
         <http.version>4.5.13</http.version>
-        <wisdge.version>1.9.3.1</wisdge.version>
+        <wisdge.version>1.9.3.2</wisdge.version>
         <elasticsearch.version>7.15.2</elasticsearch.version>
         <fasterxml.version>2.13.0</fasterxml.version>
     </properties>

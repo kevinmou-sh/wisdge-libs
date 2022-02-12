@@ -13,7 +13,9 @@ import com.wisdge.ezcell.event.AnalysisEventListener;
 import com.wisdge.ezcell.event.ModelBuildEventListener;
 import com.wisdge.ezcell.exception.ExcelAnalysisException;
 import com.wisdge.ezcell.meta.Sheet;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ExcelAnalyserImpl implements ExcelAnalyser {
 	private AnalysisContext analysisContext;
 	private BaseSaxAnalyser saxAnalyser;
@@ -26,6 +28,7 @@ public class ExcelAnalyserImpl implements ExcelAnalyser {
 	public void analysis() throws Exception {
 		BaseSaxAnalyser saxAnalyser = getSaxAnalyser();
 		appendListeners(saxAnalyser);
+		log.debug("With {}", saxAnalyser.getClass().getName());
 		saxAnalyser.execute();
 		analysisContext.getEventListener().doAfterAllAnalysed(analysisContext);
 	}
