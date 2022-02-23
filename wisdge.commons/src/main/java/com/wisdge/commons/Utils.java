@@ -69,7 +69,7 @@ public class Utils {
 		return matcher.matches(path);
 	}
 
-	public static Image generateCaptcha(String style, int length, int fontSize) {
+	public static BufferedImage generateCaptcha(String style, int length, int fontSize) {
 		String captcha = generateRandomAlphabet(length, style);
 
 		Font font = new Font("STIX", Font.PLAIN, fontSize);
