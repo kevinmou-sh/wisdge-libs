@@ -69,9 +69,7 @@ public class Utils {
 		return matcher.matches(path);
 	}
 
-	public static BufferedImage generateCaptcha(String style, int length, int fontSize) {
-		String captcha = generateRandomAlphabet(length, style);
-
+	public static BufferedImage generateCaptcha(String captcha, int fontSize) {
 		Font font = new Font("STIX", Font.PLAIN, fontSize);
 		BufferedImage tmpImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 		Graphics tmpG = tmpImage.getGraphics();
@@ -97,7 +95,7 @@ public class Utils {
 		}
 
 		String pad = "";
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < captcha.length(); i++) {
 			g.setColor(new Color(20 + random.nextInt(110), 20 + random.nextInt(110), 20 + random.nextInt(110)));
 			String s = captcha.substring(i, i + 1);
 			double angle = generateRandRotate();
