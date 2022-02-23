@@ -9,6 +9,7 @@
         <version>1.9.3.2</version>
     </parent>
     <artifactId>wisdge.commons</artifactId>
+    <version>1.9.3.3</version>
 
     <properties>
         <amazon.s3.version>1.12.129</amazon.s3.version>
