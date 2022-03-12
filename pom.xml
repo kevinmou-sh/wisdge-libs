@@ -13,7 +13,7 @@
 
     <groupId>com.wisdge</groupId>
     <artifactId>wisdge.libs</artifactId>
-    <version>1.9.3.2</version>
+    <version>1.9.4</version>
     <packaging>pom</packaging>
 
     <properties>

@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.*;
-import org.junit.Test;
 import com.wisdge.utils.StringUtils;
 
 /**
@@ -184,6 +183,9 @@ public class UrlUtils {
 	public static String decode(String url, String encoding) throws UnsupportedEncodingException {
 		return URLDecoder.decode(url, encoding);
 	}
+	public static String decode(String url) throws UnsupportedEncodingException {
+		return decode(url, "UTF-8");
+	}
 
 	/**
 	 * 对字符串进行URL编码，并对URL中的路径符号 "/"不进行编码
@@ -205,6 +207,9 @@ public class UrlUtils {
 			buf.append(URLEncoder.encode(tokens[i], encoding));
 		}
 		return buf.toString();
+	}
+	public static String encode(String url) throws UnsupportedEncodingException {
+		return encode(url, "UTF-8");
 	}
 
 	public static String escape(String src) {
@@ -311,4 +316,46 @@ public class UrlUtils {
 		return false;
 	}
 
+	/**
+     *  Parses a query string into a parameter map, decoding values as needed.
+     *  Does not support multiple parameter values; later values will overwrite
+     *  earlier.
+     *
+	 *  @param  query       The query string: zero or more <code>name=value</code>
+	 *                      pairs separated by ampersands, with or without a
+     *                      leading question mark.
+     *  @param  ignoreEmpty If <code>true</code>, ignores any entries without a
+     *                      value (eg, "<code>name=</code>"; if <code>false</code>
+	 *                      these are added to the map with an empty string for
+	 *                      the value.
+	 *  @return A map of the name-value pairs. Caller is permitted to modify this
+	 *          map.
+	 *  @throws RuntimeException on any failure.
+	 */
+	public static Map<String, String> parseQueryString(String query, boolean ignoreEmpty) throws UnsupportedEncodingException {
+		Map<String, String> result = new HashMap<>();
+		if ((query == null) || (query.length() == 0))
+			return result;
+
+		if (query.charAt(0) == '?')
+			query = query.substring(1);
+		// need to repeat test for empty string
+		if (query.length() == 0)
+			return result;
+
+		for (String param : query.split("&")) {
+			// why not use split again? because it doesn't handle a missing '='
+			int delimIdx = param.indexOf('=');
+			if (delimIdx < 0)
+				throw new RuntimeException("Not parsable parameter: " + param);
+
+			String name = param.substring(0, delimIdx);
+			String value = param.substring(delimIdx + 1);
+
+			if ((value.length() > 0) || !ignoreEmpty)
+				result.put(name, decode(value));
+		}
+
+		return result;
+	}
 }
