@@ -37,22 +37,17 @@ public class SignatureFactory {
 	}
 
 	public String service(String url, Map<String, Object> params, Map<String, String> heads, XHRPoolService service, String httpType) throws Exception {
-		Map<String, Object> map = new TreeMap<>();
-		for (Iterator<String> it = params.keySet().iterator(); it.hasNext();) {
-			String paramKey = it.next();
-		    map.put(paramKey, map.get(paramKey));
-		}
+		Map<String, Object> map = new TreeMap<>(params);
 
 		StringBuilder builder = new StringBuilder();
-		for (Iterator<String> it = params.keySet().iterator(); it.hasNext();) {
-			String paramKey = it.next();
-			builder.append(paramKey).append(map.get(paramKey).toString());
+		for (String key : map.keySet()) {
+			builder.append(key).append(map.get(key).toString());
 		}
 
 		String sign = "";
-		if (encType.equalsIgnoreCase("SHA"))
+		if ("SHA".equalsIgnoreCase(encType))
 			sign = (StringUtils.isEmpty(key) ? SHA.encrypt(builder.toString()) : SHA.hmac(builder.toString(), key)).toUpperCase();
-		else if (encType.equalsIgnoreCase("SM3"))
+		else if ("SM3".equalsIgnoreCase(encType))
 			sign = (StringUtils.isEmpty(key) ? SM3Util.hash(builder.toString()) : SM3Util.hmac(builder.toString(), key)).toUpperCase();
 		else
 			sign = (StringUtils.isEmpty(key) ? MD5.encrypt(builder.toString()) : MD5.hmac(builder.toString(), key)).toUpperCase();
@@ -68,9 +63,9 @@ public class SignatureFactory {
 
 	public String post(String url, String payload, Map<String, String> headers, XHRPoolService service) throws Exception {
 		String sign = "";
-		if (encType.equalsIgnoreCase("SHA"))
+		if ("SHA".equalsIgnoreCase(encType))
 			sign = (StringUtils.isEmpty(key) ? SHA.encrypt(payload) : SHA.hmac(payload, key)).toUpperCase();
-		else if (encType.equalsIgnoreCase("SM3"))
+		else if ("SM3".equalsIgnoreCase(encType))
 			sign = (StringUtils.isEmpty(key) ? SM3Util.hash(payload) : SM3Util.hmac(payload, key)).toUpperCase();
 		else
 			sign = (StringUtils.isEmpty(key) ? MD5.encrypt(payload) : MD5.hmac(payload, key)).toUpperCase();

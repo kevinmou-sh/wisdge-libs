@@ -342,7 +342,7 @@ public class FileStorage {
         log.info("[{}] Retrieve file from {}: {}", fsKey, fileStorageClient.getClass().getSimpleName(), finalRemote);
         byte[] data = fileStorageClient.retrieve(finalRemote);
 
-        if (data == null || data.length == 0) {
+        if (data == null) { // 允许空内容文件，无需判断data.length == 0
             throw new FileNotFoundException(finalRemote);
         }
         return data;

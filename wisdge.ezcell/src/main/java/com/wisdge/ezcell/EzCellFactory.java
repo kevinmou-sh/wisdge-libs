@@ -20,7 +20,7 @@ public class EzCellFactory {
 	 * @param previewSize 预览行数
 	 * @return EzPreview对象
 	 */
-	public static EzPreview getPreview(InputStream inputStream, int previewSize) {
+	public static EzPreview getPreview(InputStream inputStream, int previewSize) throws Exception {
 		Map<String, Object> attr = new HashMap<>();
 		attr.put("previewSize", previewSize);
 
@@ -31,7 +31,7 @@ public class EzCellFactory {
         return new EzPreview(content.getTotalRows(), content.getTotalCols(), listener.getData());
 	}
 
-	public static EzSize read(InputStream inputStream, EzReaderProcessor processor) {
+	public static EzSize read(InputStream inputStream, EzReaderProcessor processor) throws Exception {
 		Map<String, Object> attr = new HashMap<>();
 		attr.put("previewSize", 0);
 		EzReader ezReader = new EzReader(inputStream, attr, new AnalysisEventListener<List<Object>>() {

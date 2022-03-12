@@ -8,8 +8,10 @@ import com.wisdge.ezcell.annotation.ExcelTypeEnum;
 import com.wisdge.ezcell.context.AnalysisContext;
 import com.wisdge.ezcell.event.AnalysisEventListener;
 import com.wisdge.ezcell.meta.Sheet;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 
+@Slf4j
 public class EzReader {
 	private ExcelAnalyser analyser;
 
@@ -32,6 +34,7 @@ public class EzReader {
      */
     public EzReader(InputStream inputStream, Map<String, Object> customAttributes, AnalysisEventListener<?> eventListener) {
         ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.valueOf(inputStream);
+        log.debug("Load excel file as {}", excelTypeEnum.name());
         analyser = new ExcelAnalyserImpl(inputStream, excelTypeEnum, customAttributes, eventListener);
         ZipSecureFile.setMinInflateRatio(-1.0d);
     }
@@ -39,7 +42,7 @@ public class EzReader {
     /**
      * Parse all sheet content by default
      */
-    public void read() {
+    public void read() throws Exception {
         analyser.analysis();
     }
 
@@ -48,7 +51,7 @@ public class EzReader {
      *
      * @param sheet Read sheet
      */
-    public void read(Sheet sheet) {
+    public void read(Sheet sheet) throws Exception {
         analyser.analysis(sheet);
     }
 

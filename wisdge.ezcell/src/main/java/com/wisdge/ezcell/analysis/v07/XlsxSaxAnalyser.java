@@ -1,5 +1,7 @@
 package com.wisdge.ezcell.analysis.v07;
 
+import com.wisdge.utils.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -14,8 +16,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import com.wisdge.ezcell.analysis.BaseSaxAnalyser;
 import com.wisdge.ezcell.context.AnalysisContext;
-import com.wisdge.ezcell.exception.ExcelAnalysisException;
-import com.wisdge.ezcell.exception.SAXTerminatorException;
 import com.wisdge.ezcell.meta.Sheet;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class XlsxSaxAnalyser extends BaseSaxAnalyser {
 
     private XSSFReader xssfReader;
@@ -55,57 +56,48 @@ public class XlsxSaxAnalyser extends BaseSaxAnalyser {
         analysisContext.setUse1904WindowDate(use1904WindowDate);
 
         XSSFReader.SheetIterator ite;
-        sheetSourceList = new ArrayList<SheetSource>();
+        sheetSourceList = new ArrayList<>();
         ite = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
         while (ite.hasNext()) {
             InputStream inputStream = ite.next();
             String sheetName = ite.getSheetName();
+            log.debug("Loading sheet source {}", LogUtils.forging(sheetName));
             SheetSource sheetSource = new SheetSource(sheetName, inputStream);
             sheetSourceList.add(sheetSource);
         }
     }
 
     @Override
-    protected void execute() {
+    protected void execute() throws Exception {
         Sheet sheetParam = analysisContext.getCurrentSheet();
         if (sheetParam != null && sheetParam.getSheetNo() > 0 && sheetSourceList.size() >= sheetParam.getSheetNo()) {
-            InputStream sheetInputStream = sheetSourceList.get(sheetParam.getSheetNo() - 1).getInputStream();
+            SheetSource sheetSource = sheetSourceList.get(sheetParam.getSheetNo() - 1);
+            log.debug("Parsing sheet {}", sheetSource.sheetName);
+            InputStream sheetInputStream = sheetSource.getInputStream();
             parseXmlSource(sheetInputStream);
         } else {
             int i = 0;
             for (SheetSource sheetSource : sheetSourceList) {
                 i++;
                 analysisContext.setCurrentSheet(new Sheet(i));
+                log.debug("Parsing sheet {}", sheetSource.sheetName);
                 parseXmlSource(sheetSource.getInputStream());
             }
         }
     }
     
-    private void parseXmlSource(InputStream inputStream) {
-        try {
-	        byte[] data = new byte[inputStream.available()];
-	        inputStream.read(data);
-	        inputStream.reset();
-	        com.wisdge.utils.FileUtils.writeByteArrayToFile(new java.io.File("/Users/kevinmou/Documents/test.xml"), data);
-        } catch(Exception e) {
-        	e.printStackTrace();
-        }
+    private void parseXmlSource(InputStream inputStream) throws Exception {
         InputSource sheetSource = new InputSource(inputStream);
-        try {
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            saxFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            saxFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            SAXParser saxParser = saxFactory.newSAXParser();
-            XMLReader xmlReader = saxParser.getXMLReader();
-            ContentHandler handler = new XlsxRowHandler(this, sharedStringsTable, stylesTable, analysisContext);
-            xmlReader.setContentHandler(handler);
-            xmlReader.parse(sheetSource);
-            inputStream.close();
-        } catch (Exception e) {
-        	if (! (e instanceof SAXTerminatorException))
-        		throw new ExcelAnalysisException(e);
-        }
+        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
+        saxFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        saxFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        saxFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        SAXParser saxParser = saxFactory.newSAXParser();
+        XMLReader xmlReader = saxParser.getXMLReader();
+        ContentHandler handler = new XlsxRowHandler(this, sharedStringsTable, stylesTable, analysisContext);
+        xmlReader.setContentHandler(handler);
+        xmlReader.parse(sheetSource);
+        inputStream.close();
     }
 
     @Override

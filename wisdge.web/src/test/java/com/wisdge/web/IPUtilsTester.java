@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MyTest {
+public class IPUtilsTester {
 
     @Test
     public void test() throws SocketException {

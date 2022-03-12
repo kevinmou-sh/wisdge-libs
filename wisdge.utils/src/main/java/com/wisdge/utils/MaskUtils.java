@@ -117,14 +117,4 @@ public class MaskUtils {
         String endStr = word.substring(word.length() - endLength);
         return startStr + StringUtils.leftPad("", word.length() - startLength - endLength, pad) + endStr;
     }
-
-    @Test
-    public void test() {
-        System.out.println(MaskUtils.maskMobile("18621991973"));
-        System.out.println(MaskUtils.maskEmail("kevinmou@wisdge.com"));
-        System.out.println(MaskUtils.maskIDCard("36213019870314102x"));
-        System.out.println(MaskUtils.maskTel("02164516261"));
-        System.out.println(MaskUtils.maskBankCard("542763987183563"));
-        System.out.println(MaskUtils.maskName("李宁"));
-    }
 }

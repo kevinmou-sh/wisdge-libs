@@ -1,13 +1,12 @@
 package com.wisdge.ezcell.analysis.v07;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -16,17 +15,15 @@ import com.wisdge.ezcell.context.AnalysisContext;
 import com.wisdge.ezcell.event.AnalysisEventRegisterCenter;
 import com.wisdge.ezcell.exception.SAXTerminatorException;
 import com.wisdge.ezcell.utils.PositionUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static com.wisdge.ezcell.analysis.v07.ExcelXmlConstants.*;
 
+@Slf4j
 public class XlsxRowHandler extends DefaultHandler {
-	private static final Logger logger = LoggerFactory.getLogger(XlsxRowHandler.class);
 	private final DataFormatter formatter = new DataFormatter();
 
 	private SharedStringsTable sharedStringsTable;
@@ -207,7 +204,7 @@ public class XlsxRowHandler extends DefaultHandler {
 				else
 					result = value;
 			} catch(NumberFormatException e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				result = value;
 			}
 			// result = value.replace(" ", "");

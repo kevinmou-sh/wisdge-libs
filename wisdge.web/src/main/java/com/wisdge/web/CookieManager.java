@@ -25,7 +25,6 @@ import java.text.*;
  * @author <a href="mailto:kevin.mou@hotmail.com">Kevin MOU</a>
  */
 
-@SuppressWarnings("rawtypes")
 public class CookieManager {
 	private Map store;
 	private static final String SET_COOKIE = "Set-Cookie";
@@ -173,19 +172,5 @@ public class CookieManager {
 	 */
 	public String toString() {
 		return store.toString();
-	}
-
-	public static void main(String[] args) {
-		CookieManager cm = new CookieManager();
-		try {
-			URL url = new URL("http://localhost:8080/Arima/upload.acasper");
-			URLConnection conn = url.openConnection();
-			conn.connect();
-			cm.storeCookies(conn);
-			System.out.println(cm);
-			cm.setCookies(url.openConnection());
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
 	}
 }
