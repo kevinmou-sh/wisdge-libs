@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Elasticsearch RestClient 工厂类
@@ -78,6 +80,21 @@ public class ESClientFactory {
 		setHttpClientConfig();
 
 		restClient = builder.build();
+
+		try {
+			initIndex();
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	private void initIndex() throws Exception {
+		if (StringUtils.isNotEmpty(this.initIndex)) {
+			String endpoint = "/" + this.initIndex;
+			Response res = this.performRequest("HEAD", endpoint);
+			int statusCode = res.getStatusLine().getStatusCode();
+			log.debug("Initialized index status {}", statusCode);
+		}
 	}
 
 	// 主要关于异步httpclient的连接延时配置
