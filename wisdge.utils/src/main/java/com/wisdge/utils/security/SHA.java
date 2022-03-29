@@ -51,7 +51,7 @@ public class SHA {
 	/**
 	 * 得到签名
 	 * 
-	 * @param original
+	 * @param data
 	 * @param encName
 	 * @return
 	 * @throws NoSuchAlgorithmException 

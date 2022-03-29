@@ -163,11 +163,19 @@ public class FileStorage {
         requestRemote = fsKey.equals(DEFAULT_STORAGE) ? requestRemote : (fsKey + "@" + requestRemote);
 
         try {
+            /**
+             * 过滤文件上传白名单
+             */
             if (!isAcceptFile(finalRemote))
                 return new Result(Result.ERROR, MessageFormat.format(FILE_NOT_ACCEPT, FilenameUtils.getExtension(finalRemote)));
+            /**
+             * 过滤文件上传黑名单，黑名单的优先等级要高于白名单
+             */
             if (isForbiddenFile(filename))
                 return new Result(Result.ERROR, MessageFormat.format(FILE_FORBIDDEN, FilenameUtils.getExtension(finalRemote)));
-
+            /**
+             * 如果注入了文件内容安全检测器的，则需要对文件内容进行安全性检测
+             */
             if (fileDetector != null) {
                 try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                     // Code simulating the copy

@@ -143,25 +143,27 @@ public class RSAUtils {
 	public static byte[] decryptByPrivateKey(byte[] encryptedData, String privateKey) throws Exception {
 		byte[] keyBytes = Base64.decodeBase64(privateKey);
 		PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+		// 声明解码实例
 		KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
 		Key privateK = keyFactory.generatePrivate(pkcs8KeySpec);
 		Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+		// 注入私钥
 		cipher.init(Cipher.DECRYPT_MODE, privateK);
 		int inputLen = encryptedData.length;
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		int offSet = 0;
 		byte[] cache;
+		int offSet = 0;
 		int i = 0;
 		// 对数据分段解密
 		while (inputLen - offSet > 0) {
+			// 密文最大数据块约定为128字节
 			if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
 				cache = cipher.doFinal(encryptedData, offSet, MAX_DECRYPT_BLOCK);
 			} else {
 				cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			i++;
-			offSet = i * MAX_DECRYPT_BLOCK;
+			offSet = i++ * MAX_DECRYPT_BLOCK;
 		}
 		byte[] decryptedData = out.toByteArray();
 		out.close();
