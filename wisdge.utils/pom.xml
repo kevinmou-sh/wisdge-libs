@@ -8,8 +8,5 @@
 		<version>1.9.4</version>
 	</parent>
 	<artifactId>wisdge.utils</artifactId>
-
-	<dependencies>
-	</dependencies>
-
+	<version>1.9.4.1</version>
 </project>

@@ -1000,4 +1000,21 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 		}
 		return set.toArray(new String[0]);
 	}
+
+	public static String toCamel(String source) {
+		String temp = source.toLowerCase();
+		int len = temp.length();
+		StringBuilder sb = new StringBuilder(len);
+		for (int i = 0; i < len; i++) {
+			char c = temp.charAt(i);
+			if (c == '_') {
+				if (++i < len) {
+					sb.append(Character.toUpperCase(temp.charAt(i)));
+				}
+			} else {
+				sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
 }
