@@ -1001,7 +1001,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 		return set.toArray(new String[0]);
 	}
 
-	public static String toCamel(String source) {
+	public static String underlineToCamel(String source) {
 		String temp = source.toLowerCase();
 		int len = temp.length();
 		StringBuilder sb = new StringBuilder(len);
@@ -1014,6 +1014,22 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 			} else {
 				sb.append(c);
 			}
+		}
+		return sb.toString();
+	}
+
+	public static String camelToUnderline(String param) {
+		if (isBlank(param)) {
+			return "";
+		}
+		int len = param.length();
+		StringBuilder sb = new StringBuilder(len);
+		for (int i = 0; i < len; i++) {
+			char c = param.charAt(i);
+			if (Character.isUpperCase(c) && i > 0) {
+				sb.append('_');
+			}
+			sb.append(Character.toLowerCase(c));
 		}
 		return sb.toString();
 	}
