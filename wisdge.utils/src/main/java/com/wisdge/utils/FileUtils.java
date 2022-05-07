@@ -54,7 +54,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		throw new FileNotFoundException();
 	}
 
-
 	public static Charset detect(File file) throws IOException {
 		CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
 		detector.add(new ParsingDetector(false));

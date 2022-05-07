@@ -104,4 +104,105 @@ public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
         Path path = Paths.get(file);
         return matcher.matches(path);
     }
+
+
+    /**
+     * 对文件名过滤特殊字符
+     *
+     * @param filename
+     * @return
+     */
+    public static String filterFilename(String filename) {
+        if (StringUtils.isEmpty(filename))
+            return "";
+
+        return filename.trim().replace(" ", "_")
+                .replace("-", "_")
+                .replace("\\", "")
+                .replace("/", "")
+                .replace("+", "")
+                .replace("#", "")
+                .replace("%", "")
+                .replace("&", "")
+                .replace("?", "")
+                .replace("*", "")
+                .replace("@", "")
+                .replace("=", "")
+                .replace("..", "")
+                .replace(":", "");
+    }
+
+    /**
+     * 对文件路径过滤特殊字符
+     *
+     * @param filepath
+     * @return
+     */
+    public static String filterFilepath(String filepath) {
+        if (StringUtils.isEmpty(filepath))
+            return "";
+
+        return filepath.trim().replace(" ", "_")
+                .replace("\\", "/")
+                .replace("+", "")
+                .replace("#", "")
+                .replace("%", "")
+                .replace("&", "")
+                .replace("?", "")
+                .replace("*", "")
+                .replace("=", "")
+                .replace("..", "")
+                .replace(":", "")
+                .replace("@", "");
+    }
+
+    public static boolean isWordFile(String ext) {
+        String[] wordTypes = new String[]{
+                "DOC", "DOCX", "RTF", "DOT", "DOTX", "DOTM", "ODT", "OTT", "HTML", "HTML", "MHTML", "TXT"
+        };
+        return CollectionUtils.contains(wordTypes, ext.toUpperCase());
+    }
+
+    public static boolean isCellFile(String ext) {
+        return (ext.equalsIgnoreCase("xls") || ext.equalsIgnoreCase("xlsx"));
+    }
+
+    public static boolean isSlideFile(String ext) {
+        return (ext.equalsIgnoreCase("ppt") || ext.equalsIgnoreCase("pptx"));
+    }
+
+    public static String concat(String... path) {
+        if (path == null || path.length == 0)
+            return "";
+
+        if (path.length == 1)
+            return path[0];
+
+        String fullpath = path[0].replace("\\", "/");
+        for (int i = 1; i < path.length; i++) {
+            fullpath = concat2(fullpath, path[i].replace("\\", "/"));
+        }
+        return fullpath;
+    }
+
+    private static String concat2(String path1, String path2) {
+        if (StringUtils.isEmpty(path1))
+            return path2;
+        if (StringUtils.isEmpty(path2))
+            return path1;
+
+        if (path1.endsWith("/")) {
+            if (path2.startsWith("/")) {
+                return path1 + path2.substring(1);
+            } else {
+                return path1 + path2;
+            }
+        } else {
+            if (path2.startsWith("/")) {
+                return path1 + path2;
+            } else {
+                return path1 + "/" + path2;
+            }
+        }
+    }
 }

@@ -1033,4 +1033,13 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 		}
 		return sb.toString();
 	}
+
+	public static String utilsNotEmpty(String...strings) {
+		for(String value: strings) {
+			if (org.apache.commons.lang3.StringUtils.isNotEmpty(value))
+				return value;
+		}
+		return "";
+	}
+
 }
