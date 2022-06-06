@@ -6,13 +6,27 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public interface IRedisTemplate {
-	public void set(String key, Object value);
-	public void set(String key, Object value, long ttl, TimeUnit timeUnit);
-	public void putHash(String key, String hashKey, Object hashVaule);
-	public Object get(String key);
-	public Map<Object, Object> entries(String key);
-	public Boolean expire(String key, long timeout, TimeUnit unit);
-	public Boolean delete(String key);
-	public void convertAndSend(String channel, Object obj);
-	public RedisConnectionFactory getConnectionFactory();
+	void set(String key, Object value);
+	void set(String key, Object value, long ttl, TimeUnit timeUnit);
+
+	void setGlobal(String key, Object value);
+	void setGlobal(String key, Object value, long ttl, TimeUnit timeUnit);
+
+	void putHash(String key, String hashKey, Object hashVaule);
+	void putHashGlobal(String key, String hashKey, Object hashVaule);
+
+	Object get(String key);
+	Object getGlobal(String key);
+
+	Map<Object, Object> entries(String key);
+	Map<Object, Object> entriesGlobal(String key);
+
+	Boolean expire(String key, long timeout, TimeUnit unit);
+	Boolean expireGlobal(String key, long timeout, TimeUnit unit);
+
+	Boolean delete(String key);
+	Boolean deleteGlobal(String key);
+
+	void convertAndSend(String channel, Object obj);
+	RedisConnectionFactory getConnectionFactory();
 }
