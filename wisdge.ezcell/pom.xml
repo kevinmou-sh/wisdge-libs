@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.wisdge</groupId>
         <artifactId>wisdge.libs</artifactId>
-        <version>1.9.4.3</version>
+        <version>1.9.4.4</version>
     </parent>
     <artifactId>wisdge.ezcell</artifactId>
 

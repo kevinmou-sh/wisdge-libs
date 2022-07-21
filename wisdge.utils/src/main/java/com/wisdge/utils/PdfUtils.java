@@ -32,9 +32,8 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 
 @Slf4j
 public class PdfUtils {
-    private static final String CONVERT_SPENTTIME = "Convertion took time: {}'s";
-    private static final String WATERMARKER_SPENTTIME = "Water marker took time: {}'s";
-    private static final String SIGNMARKER_SPENTTIME = "Sign marker took time: {}'s";
+    private static final String WATERMARKER_SPENT_TIME = "Water marker took time: {}'s";
+    private static final String SIGNMARKER_SPENT_TIME = "Sign marker took time: {}'s";
     public static final String ITEXT_CHFONT_NAME = "STSongStd-Light";
     public static final String ITEXT_CHFONT_CODE = "UniGB-UCS2-H";
     public static final short WATER_MARKER = 0x01;
@@ -46,6 +45,10 @@ public class PdfUtils {
      * @return BufferedImage 图片对象
      */
     public static BufferedImage pdfToImage(InputStream inputStream) {
+        return pdfToImage(inputStream, 100f);
+    }
+
+    public static BufferedImage pdfToImage(InputStream inputStream, float dpi) {
         int shiftWidth = 0; // 总宽度
         int shiftHeight = 0; // 总高度
         List<PdfUnit> unitArr = new ArrayList<>();
@@ -58,7 +61,7 @@ public class PdfUtils {
             // 循环每个页码
             for (int i = 0, len = pdDocument.getNumberOfPages(); i < len; i++) {
                 // DPI参数越大，越清晰
-                BufferedImage image = renderer.renderImageWithDPI(i, 300, ImageType.RGB);
+                BufferedImage image = renderer.renderImageWithDPI(i, dpi, ImageType.RGB);
                 int imageHeight = image.getHeight();
                 int imageWidth = image.getWidth();
                 if (i == 0) {
@@ -120,9 +123,9 @@ public class PdfUtils {
             pdfReader.close();
             long now = System.currentTimeMillis();
             if (markType == WATER_MARKER)
-                log.debug(WATERMARKER_SPENTTIME, ((now - old) / 1000.0));
+                log.debug(WATERMARKER_SPENT_TIME, ((now - old) / 1000.0));
             else
-                log.debug(SIGNMARKER_SPENTTIME, ((now - old) / 1000.0));
+                log.debug(SIGNMARKER_SPENT_TIME, ((now - old) / 1000.0));
             return baos.toByteArray();
         } catch(Exception e) {
             log.error(e.getMessage(), e);
