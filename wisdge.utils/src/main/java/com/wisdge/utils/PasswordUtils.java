@@ -369,6 +369,10 @@ public class PasswordUtils {
 			}
 		}
 	}
+
+	public static String getRandomPwd() {
+		return RandomPassword.getRandomPwd(12);
+	}
 }
 
 enum CharactorType {
