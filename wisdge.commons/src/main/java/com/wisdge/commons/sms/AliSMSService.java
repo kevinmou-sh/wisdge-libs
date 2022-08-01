@@ -77,10 +77,11 @@ public class AliSMSService extends AbstractSmsService {
 		String returnCode = sendSmsResponse.getCode();
 		if ("OK".equals(returnCode)) {
 			// 请求成功
-			return SmsResponse.build(mobiles.length);
+			return SmsResponse.build(mobiles.length, sendSmsResponse.getCode(), sendSmsResponse.getMessage());
 		} else {
-			log.debug("AliSMSService failed: {}", returnCode);
-			return SmsResponse.build();
+//			log.debug("AliSMSService failed: {}", returnCode);
+//			return SmsResponse.build(sendSmsResponse.getCode(), sendSmsResponse.getMessage());
+			throw new SMSSendFailedException("[" + sendSmsResponse.getCode() + "] " + sendSmsResponse.getMessage());
 		}
 	}
 }
