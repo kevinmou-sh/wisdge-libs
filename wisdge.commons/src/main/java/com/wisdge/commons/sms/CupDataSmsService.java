@@ -4,6 +4,7 @@ import com.wisdge.dataservice.xhr.XHRPoolService;
 import com.wisdge.web.springframework.SpringContextUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jettison.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,16 @@ import java.util.Map;
 @Slf4j
 public class CupDataSmsService extends AbstractSmsService {
     private String uri;
+
+    public static CupDataSmsService getInstance(Map<String, Object> injectMapper) {
+        CupDataSmsService instance = new CupDataSmsService();
+        try {
+            BeanUtils.populate(instance, injectMapper);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return instance;
+    }
 
     @Override
     public SmsResponse send(String[] mobiles, Map<String, Object> paramsMap, String smsType) throws Exception {

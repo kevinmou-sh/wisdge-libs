@@ -3,6 +3,7 @@ package com.wisdge.commons.sms;
 import com.cloopen.rest.sdk.CCPRestSmsSDK;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,16 @@ public class RLSMSService extends AbstractSmsService {
 	private String accToken;
 	private String appId;
 	private Map<String, String> templateIds = new HashMap<>();
+
+	public static RLSMSService getInstance(Map<String, Object> injectMapper) {
+		RLSMSService instance = new RLSMSService();
+		try {
+			BeanUtils.populate(instance, injectMapper);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+		return instance;
+	}
 
 	@Override
 	public SmsResponse send(String[] mobiles, Map<String, Object> paramsMap, String smsType) throws Exception {
