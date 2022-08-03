@@ -107,7 +107,7 @@ public class FileServiceConfigurer {
                 fileStorageClient.init(config.isSecurity());
                 fileStorage.addFileStorage(key, fileStorageClient);
             } else if ("QOss".equalsIgnoreCase(type)) {
-                QCOSStorageClient fileStorageClient = new QCOSStorageClient();
+                QCosStorageClient fileStorageClient = new QCosStorageClient();
                 fileStorageClient.setEndpoint(config.getEndpoint());
                 fileStorageClient.setBucketName(config.getBucketName());
                 fileStorageClient.setAccessKeyId(config.getAccessKeyId());

@@ -34,7 +34,7 @@ import java.util.Date;
 
 @Slf4j
 @Data
-public class QCOSStorageClient implements IFileStorageClient {
+public class QCosStorageClient implements IFileStorageClient {
 	private String bucketName;
 	private String accessKeyId;
 	private String accessKeySecret;
