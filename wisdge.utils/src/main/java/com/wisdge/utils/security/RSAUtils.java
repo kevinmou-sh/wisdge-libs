@@ -163,7 +163,7 @@ public class RSAUtils {
 				cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			offSet = i++ * MAX_DECRYPT_BLOCK;
+			offSet = ++i * MAX_DECRYPT_BLOCK;
 		}
 		byte[] decryptedData = out.toByteArray();
 		out.close();
@@ -207,8 +207,7 @@ public class RSAUtils {
 				cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			i++;
-			offSet = i * MAX_DECRYPT_BLOCK;
+			offSet = ++i * MAX_DECRYPT_BLOCK;
 		}
 		byte[] decryptedData = out.toByteArray();
 		out.close();
@@ -253,8 +252,7 @@ public class RSAUtils {
 				cache = cipher.doFinal(data, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			i++;
-			offSet = i * MAX_ENCRYPT_BLOCK;
+			offSet = ++i * MAX_ENCRYPT_BLOCK;
 		}
 		byte[] encryptedData = out.toByteArray();
 		out.close();
@@ -298,8 +296,7 @@ public class RSAUtils {
 				cache = cipher.doFinal(data, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			i++;
-			offSet = i * MAX_ENCRYPT_BLOCK;
+			offSet = ++i * MAX_ENCRYPT_BLOCK;
 		}
 		byte[] encryptedData = out.toByteArray();
 		out.close();
