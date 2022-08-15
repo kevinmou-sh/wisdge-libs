@@ -44,12 +44,12 @@ public class RSAUtils {
 	/**
 	 * RSA最大加密明文大小
 	 */
-	private static final int MAX_ENCRYPT_BLOCK = 117;
+	private static final int MAX_ENCRYPT_BLOCK = 245;
 
 	/**
 	 * RSA最大解密密文大小
 	 */
-	private static final int MAX_DECRYPT_BLOCK = 128;
+	private static final int MAX_DECRYPT_BLOCK = 256;
 
 	/**
 	 * <p>
@@ -156,14 +156,15 @@ public class RSAUtils {
 		int i = 0;
 		// 对数据分段解密
 		while (inputLen - offSet > 0) {
-			// 密文最大数据块约定为128字节
+			// 密文最大数据块约定为256字节
 			if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
 				cache = cipher.doFinal(encryptedData, offSet, MAX_DECRYPT_BLOCK);
 			} else {
 				cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			offSet = ++i * MAX_DECRYPT_BLOCK;
+			i ++;
+			offSet = i * MAX_DECRYPT_BLOCK;
 		}
 		byte[] decryptedData = out.toByteArray();
 		out.close();
@@ -207,7 +208,8 @@ public class RSAUtils {
 				cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			offSet = ++i * MAX_DECRYPT_BLOCK;
+			i ++;
+			offSet = i * MAX_DECRYPT_BLOCK;
 		}
 		byte[] decryptedData = out.toByteArray();
 		out.close();
@@ -252,7 +254,8 @@ public class RSAUtils {
 				cache = cipher.doFinal(data, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			offSet = ++i * MAX_ENCRYPT_BLOCK;
+			i ++;
+			offSet = i * MAX_ENCRYPT_BLOCK;
 		}
 		byte[] encryptedData = out.toByteArray();
 		out.close();
@@ -296,7 +299,8 @@ public class RSAUtils {
 				cache = cipher.doFinal(data, offSet, inputLen - offSet);
 			}
 			out.write(cache, 0, cache.length);
-			offSet = ++i * MAX_ENCRYPT_BLOCK;
+			i ++;
+			offSet = i * MAX_ENCRYPT_BLOCK;
 		}
 		byte[] encryptedData = out.toByteArray();
 		out.close();
