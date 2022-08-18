@@ -2,16 +2,15 @@ package com.wisdge.dataservice.utils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wisdge.dataservice.Result;
 import com.wisdge.dataservice.exceptions.IllegalFormatException;
 
 public class JSonUtils {
@@ -24,10 +23,11 @@ public class JSonUtils {
 	 * @throws IOException
 	 */
 	public static String parse(Object object) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModules(new JavaTimeModule());
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		mapper.setDateFormat(format);
-		return mapper.writeValueAsString(object);
+		objectMapper.setDateFormat(format);
+		return objectMapper.writeValueAsString(object);
 	}
 
 	/**
