@@ -33,11 +33,11 @@ public class EzReader {
      * @param eventListener
      */
     public EzReader(InputStream inputStream, Map<String, Object> customAttributes, AnalysisEventListener<?> eventListener) {
+        ZipSecureFile.setMinInflateRatio(-1.0d);
         ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.valueOf(inputStream);
         if (excelTypeEnum == null) log.warn("Load unsupported excel file");
         else log.debug("Load excel file as {}", excelTypeEnum.name());
         analyser = new ExcelAnalyserImpl(inputStream, excelTypeEnum, customAttributes, eventListener);
-        ZipSecureFile.setMinInflateRatio(-1.0d);
     }
 
     /**

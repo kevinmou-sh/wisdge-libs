@@ -1,8 +1,12 @@
 package com.wisdge.ezcell;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.wisdge.ezcell.context.AnalysisContext;
+import com.wisdge.ezcell.event.SimpleEventListener;
+import com.wisdge.ezcell.meta.Sheet;
 import com.wisdge.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
@@ -30,11 +34,16 @@ public class EzReaderTest {
 
 	@Test
 	public void testBigFile() throws Exception {
-		InputStream inputStream = new BufferedInputStream(FileUtils.openInputStream("/Users/kevinmou/Documents/temp/test.xlsx"));
-		ZipSecureFile.setMinInflateRatio(-1.0d);
-		EzSize size = EzCellFactory.read(inputStream, data -> {
-			System.out.println(data.toString());
-		});
-		System.out.println(size);
+		Map<String, Object> attr = new HashMap<>();
+		File file = new File("/Users/kevinmou/Documents/temp/test.xlsx");
+		FileInputStream fis = new FileInputStream(file);
+		BufferedInputStream bis = new BufferedInputStream(fis);
+		SimpleEventListener listener = new SimpleEventListener();
+		EzReader ezReader = new EzReader(bis, attr, listener);
+		ezReader.read(new Sheet(1, 0));
+		AnalysisContext content = ezReader.getAnalysisContext();
+		log.debug("Rows: {}", content.getTotalRows());
+		bis.close();
+		fis.close();
 	}
 }
