@@ -6,10 +6,9 @@
     <parent>
         <groupId>com.wisdge</groupId>
         <artifactId>wisdge.libs</artifactId>
-        <version>1.9.4.5</version>
+        <version>1.9.4.6</version>
     </parent>
     <artifactId>wisdge.commons</artifactId>
-    <version>1.9.4.5</version>
 
     <properties>
         <amazon.s3.version>1.12.129</amazon.s3.version>

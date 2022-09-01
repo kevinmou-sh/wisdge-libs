@@ -43,7 +43,7 @@ public class XlsxSaxAnalyser extends BaseSaxAnalyser {
     private void init() throws IOException, OpenXML4JException, XmlException {
         analysisContext.setCurrentRowNo(0);
         xssfReader = new XSSFReader(OPCPackage.open(analysisContext.getInputStream()));
-        sharedStringsTable = (SharedStringsTable) xssfReader.getSharedStringsTable();
+        sharedStringsTable = xssfReader.getSharedStringsTable();
         stylesTable = xssfReader.getStylesTable();
 
         InputStream workbookXml = xssfReader.getWorkbookData();
